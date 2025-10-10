@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://kit.fontawesome.com/9ed711c3e8.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="style.css" />
+  <title>Sign in & Sign up Form</title>
+</head>
+
+<body>
+  <div class="container" id="auth-container" aria-live="polite">
+    <div class="forms-container">
+      <div class="signin-signup">
+        <!-- SIGN IN -->
+        <form id="signup-form" class="sign-up-form" novalidate>
+          <h2 class="title">Sign up</h2>
+
+          <div class="input-field">
+            <i class="fas fa-user"></i>
+            <input id="signup-username" name="username" type="text" placeholder="Username" required />
+          </div>
+
+          <div class="input-field">
+            <i class="fas fa-envelope"></i>
+            <input id="signup-email" name="email" type="email" placeholder="Email" required />
+          </div>
+
+          <div class="input-field">
+            <i class="fas fa-phone"></i>
+            <input id="signup-phone" name="phone_number" type="tel" placeholder="+91XXXXXXXXXX" required />
+          </div>
+
+          <div class="form-row" style="max-width:380px; margin-top:-5px;">
+            <button type="button" id="send-otp-btn" class="btn" style="width:100%; height:40px; font-size:0.9rem;">Send
+              OTP</button>
+          </div>
+
+          <div class="input-field" id="otp-field" style="display:none;">
+            <i class="fas fa-key"></i>
+            <input id="signup-otp" name="otp" type="text" placeholder="Enter OTP" maxlength="6" />
+          </div>
+
+          <div class="form-row" id="verify-otp-row" style="display:none; max-width:380px; margin-top:-5px;">
+            <button type="button" id="verify-otp-btn" class="btn"
+              style="width:100%; height:40px; font-size:0.9rem;">Verify OTP</button>
+          </div>
+
+          <div class="input-field password-field">
+            <i class="fas fa-lock"></i>
+            <input id="signup-password" name="password" type="password" placeholder="Password" required />
+            <button type="button" class="pass-toggle" tabindex="-1">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+
+          <div class="input-field password-field">
+            <i class="fas fa-lock"></i>
+            <input id="signup-confirm" name="confirmPassword" type="password" placeholder="Confirm Password" required />
+            <button type="button" class="pass-toggle" tabindex="-1">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+
+          <div class="input-field select-container">
+            <i class="fas fa-briefcase"></i>
+            <select id="profession" name="profession" required>
+              <option value="" disabled selected>Profession</option>
+              <option value="student">Student</option>
+              <option value="lawyer">Lawyer</option>
+              <option value="lawfirm">Lawfirm</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div id="otherField" class="input-field" style="display:none;">
+            <i class="fas fa-edit"></i>
+            <input id="otherInput" name="otherProfession" type="text" placeholder="Specify your profession" />
+          </div>
+
+          <div class="form-errors" id="signup-errors"></div>
+          <input id="signup-submit" type="submit" class="btn" value="Sign up" disabled />
+        </form>
+
+      </div>
+    </div>
+
+    <div class="panels-container">
+      <div class="panel left-panel">
+        <div class="content">
+          <h3>New here ?</h3>
+          <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Debitis, ex ratione. Aliquid!</p>
+          <button class="btn transparent" id="sign-up-btn">Sign up</button>
+        </div>
+        <img src="img/logo1.png" class="image" alt="Login illustration"
+          style="width: 500px; padding-right: 90px; padding-bottom: 90px;" />
+      </div>
+
+      <div class="panel right-panel">
+        <div class="content">
+          <h3>One of us ?</h3>
+          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum laboriosam ad deleniti.</p>
+          <button class="btn transparent" id="sign-in-btn">Sign in</button>
+        </div>
+        <img src="img/logo1.png" class="image" alt="Register illustration" />
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js" type="module"></script>
+</body>
+
+</html>
