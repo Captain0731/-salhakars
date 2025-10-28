@@ -1,5 +1,5 @@
 // API Service for Legal Platform - Complete Integration
-const API_BASE_URL = 'https://9f71fec2936e.ngrok-free.app';
+const API_BASE_URL = 'https://98d19fc12093.ngrok-free.app';
 
 // Fallback URLs in case the primary one fails
 const FALLBACK_URLS = [

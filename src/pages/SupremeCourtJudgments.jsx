@@ -63,7 +63,7 @@ export default function SupremeCourtJudgments() {
   const [filters, setFilters] = useState({
     search: '',
     cnr: '',
-    highCourt: '',
+    // highCourt: '',
     decisionDateFrom: ''
   });
 
@@ -321,7 +321,7 @@ export default function SupremeCourtJudgments() {
       <Navbar />
       
       {/* Clean Header Section */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white border-b border-gray-200 pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <div className="text-center">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3 sm:mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>

@@ -1,11 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
-import { JudgmentSkeleton } from "../components/SkeletonLoaders";
+import useSmoothInfiniteScroll from "../hooks/useSmoothInfiniteScroll";
+import { 
+  EnhancedJudgmentSkeleton, 
+  EnhancedInfiniteScrollLoader, 
+  SkeletonGrid,
+  SmoothTransitionWrapper 
+} from "../components/EnhancedLoadingComponents";
 
-// Add custom CSS animations
+// Add custom CSS animations and smooth scrolling
 const customStyles = `
   @keyframes shimmer {
     0% { transform: translateX(-100%); }
@@ -22,6 +28,28 @@ const customStyles = `
     50% { opacity: 0.7; }
   }
   
+  @keyframes fadeInUp {
+    from { 
+      opacity: 0; 
+      transform: translateY(30px); 
+    }
+    to { 
+      opacity: 1; 
+      transform: translateY(0); 
+    }
+  }
+  
+  @keyframes slideInFromBottom {
+    from { 
+      opacity: 0; 
+      transform: translateY(50px); 
+    }
+    to { 
+      opacity: 1; 
+      transform: translateY(0); 
+    }
+  }
+  
   .animate-shimmer {
     animation: shimmer 3s ease-in-out infinite;
   }
@@ -32,6 +60,43 @@ const customStyles = `
   
   .animate-pulse-slow {
     animation: pulse-slow 3s ease-in-out infinite;
+  }
+  
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+  
+  .animate-slide-in-bottom {
+    animation: slideInFromBottom 0.8s ease-out forwards;
+  }
+  
+  /* Smooth scrolling for the entire page */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Custom scrollbar for webkit browsers */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+  
+  /* Smooth transitions for all interactive elements */
+  * {
+    transition: all 0.2s ease-in-out;
   }
 `;
 
@@ -49,14 +114,15 @@ export default function HighCourtJudgments() {
   const { isAuthenticated, bookmarkJudgement, removeJudgementBookmark } = useAuth();
   const [bookmarkedJudgments, setBookmarkedJudgments] = useState(new Set());
   const [bookmarkError, setBookmarkError] = useState('');
+  const isMountedRef = useRef(true);
 
   // Data states
   const [judgments, setJudgments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
 
   // Filter states
   const [filters, setFilters] = useState({
@@ -66,19 +132,25 @@ export default function HighCourtJudgments() {
     decisionDateFrom: ''
   });
 
-  const pageSize = 10;
+  const pageSize = 10; // API maximum limit
 
-  // Fetch judgments function
-  const fetchJudgments = async (page = 1) => {
+  // Fetch judgments function with infinite scroll support
+  const fetchJudgments = useCallback(async (isLoadMore = false) => {
+    if (!isMountedRef.current) return;
+    
     try {
-      setLoading(true);
-      setError(null);
+      if (isLoadMore) {
+        setIsSearching(true);
+      } else {
+        setLoading(true);
+        setError(null);
+      }
       
-      console.log('High Court: Fetching judgments with params:', { page, filters });
+      console.log('High Court: Fetching judgments with params:', { isLoadMore, filters });
       
       const params = {
         limit: pageSize,
-        offset: (page - 1) * pageSize,
+        offset: 0, // Always start from 0 for fresh data
         ...filters
       };
 
@@ -93,17 +165,33 @@ export default function HighCourtJudgments() {
       const data = await apiService.getJudgements(params);
       console.log('High Court: API response:', data);
       
-      setJudgments(data.data || []);
+      if (!isMountedRef.current) return;
+      
+      const newJudgments = data.data || [];
+      
+      if (isLoadMore) {
+        setJudgments(prev => {
+          const currentLength = prev.length;
+          setHasMore(newJudgments.length === pageSize && currentLength + newJudgments.length < (data.total || 0));
+          return [...prev, ...newJudgments];
+        });
+      } else {
+        setJudgments(newJudgments);
+        setHasMore(newJudgments.length === pageSize && newJudgments.length < (data.total || 0));
+      }
+      
       setTotalCount(data.total || 0);
-      setTotalPages(Math.ceil((data.total || 0) / pageSize));
-      setCurrentPage(page);
     } catch (error) {
+      if (!isMountedRef.current) return;
       console.error('High Court: Error fetching judgments:', error);
       setError(error.message || 'Failed to fetch judgments');
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+        setIsSearching(false);
+      }
     }
-  };
+  }, [filters, pageSize]);
 
   // Filter handling functions
   const handleFilterChange = (filterName, value) => {
@@ -120,19 +208,23 @@ export default function HighCourtJudgments() {
       highCourt: '',
       decisionDateFrom: ''
     });
-    setCurrentPage(1);
+    setJudgments([]);
+    setHasMore(true);
   };
 
   const applyFilters = () => {
-    setCurrentPage(1);
-    fetchJudgments(1);
+    setJudgments([]);
+    setHasMore(true);
+    fetchJudgments(false);
   };
 
   // Auto-apply filters when they change (with debounce)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (filters.search || filters.cnr || filters.highCourt || filters.decisionDateFrom) {
-        applyFilters();
+        setJudgments([]);
+        setHasMore(true);
+        fetchJudgments(false);
       }
     }, 500); // 500ms debounce
 
@@ -141,27 +233,73 @@ export default function HighCourtJudgments() {
 
   // Load initial data
   useEffect(() => {
-    fetchJudgments(1);
-  }, []);
+    fetchJudgments(false);
+  }, []); // Empty dependency array to run only once on mount
 
-  // Pagination functions
-  const goToPage = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      fetchJudgments(page);
-    }
-  };
+  // Enhanced infinite scroll logic with smooth loading
+  const loadMoreData = useCallback(async () => {
+    if (!hasMore || loading || isSearching || !isMountedRef.current) return;
+    
+    try {
+      setIsSearching(true);
+      
+      const params = {
+        limit: pageSize,
+        offset: judgments.length, // Use current judgments length as offset
+        ...filters
+      };
 
-  const goToNextPage = () => {
-    if (currentPage < totalPages) {
-      goToPage(currentPage + 1);
-    }
-  };
+      // Remove empty filters
+      Object.keys(params).forEach(key => {
+        if (params[key] === "" || params[key] === null || params[key] === undefined) {
+          delete params[key];
+        }
+      });
 
-  const goToPreviousPage = () => {
-    if (currentPage > 1) {
-      goToPage(currentPage - 1);
+      console.log('High Court: Loading more with params:', params);
+      const data = await apiService.getJudgements(params);
+      console.log('High Court: Load more response:', data);
+      
+      if (!isMountedRef.current) return;
+      
+      const newJudgments = data.data || [];
+      
+      // Add smooth transition delay for each new item
+      setJudgments(prev => {
+        const updatedJudgments = [...prev, ...newJudgments];
+        setHasMore(newJudgments.length === pageSize && updatedJudgments.length < (data.total || 0));
+        return updatedJudgments;
+      });
+      
+    } catch (error) {
+      if (!isMountedRef.current) return;
+      console.error('High Court: Error loading more judgments:', error);
+      throw error; // Re-throw for the enhanced hook to handle
+    } finally {
+      if (isMountedRef.current) {
+        setIsSearching(false);
+      }
     }
-  };
+  }, [hasMore, loading, isSearching, judgments.length, filters, pageSize]);
+
+  // Enhanced infinite scroll hook with smooth animations
+  // Optimized for 10-item batches with smooth loading
+  const { 
+    loadingRef, 
+    isLoadingMore, 
+    error: scrollError, 
+    retry, 
+    retryCount,
+    isFetching 
+  } = useSmoothInfiniteScroll({
+    fetchMore: loadMoreData,
+    hasMore,
+    isLoading: loading || isSearching,
+    threshold: 0.1,
+    rootMargin: '100px', // Optimal margin for 10-item batches
+    preloadThreshold: 0.3, // Load when 30% visible for smooth experience
+    throttleDelay: 150 // Faster response for better UX
+  });
 
   const viewJudgment = (judgment) => {
     navigate('/view-pdf', { state: { judgment } });
@@ -194,24 +332,31 @@ export default function HighCourtJudgments() {
     }
   };
 
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   useEffect(() => {
     console.log('useEffect triggered.');
     console.log('Loading High Court data...');
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
+    <div className="min-h-screen animate-fade-in-up" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
       
-      {/* Clean Header Section */}
-      <div className="bg-white border-b border-gray-200">
+      {/* Enhanced Header Section with smooth animations */}
+      <div className="bg-white border-b border-gray-200 pt-20 animate-slide-in-bottom">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+            <h1 className="text-4xl lg:text-5xl font-bold mb-4 animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
               High Court Judgments
             </h1>
-            <div className="w-20 h-1 mx-auto mb-6" style={{ backgroundColor: '#CF9B63' }}></div>
-            <p className="text-lg max-w-3xl mx-auto" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}>
+            <div className="w-20 h-1 mx-auto mb-6 animate-fade-in-up" style={{ backgroundColor: '#CF9B63', animationDelay: '0.2s' }}></div>
+            <p className="text-lg max-w-3xl mx-auto animate-fade-in-up" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif', animationDelay: '0.4s' }}>
               Search and access legal judgments from High Courts across India
             </p>
           </div>
@@ -221,9 +366,9 @@ export default function HighCourtJudgments() {
       <div className="p-6">
         <div className="max-w-7xl mx-auto">
 
-          {/* Search and Filter Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
-            <h2 className="text-2xl font-bold mb-6" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+          {/* Enhanced Search and Filter Section with smooth animations */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+            <h2 className="text-2xl font-bold mb-6 animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif', animationDelay: '0.8s' }}>
               Search & Filter High Court Judgments
             </h2>
             
@@ -376,11 +521,11 @@ export default function HighCourtJudgments() {
             )}
           </div>
 
-          {/* Clean Results Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+          {/* Enhanced Results Section with smooth animations */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 animate-fade-in-up" style={{ animationDelay: '1s' }}>
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                <h2 className="text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif', animationDelay: '1.2s' }}>
                   {filters.search || filters.cnr || filters.highCourt || filters.decisionDateFrom 
                     ? 'Search Results - High Court Judgments' 
                     : 'Latest High Court Judgments'}
@@ -392,9 +537,33 @@ export default function HighCourtJudgments() {
                 </p>
               </div>
               <div className="text-right">
-                <span className="text-sm text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                  Showing {judgments.length} of {totalCount} judgments
-                </span>
+                <div className="flex items-center gap-4">
+                  <span className="text-sm text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    Showing {judgments.length} of {totalCount} judgments
+                  </span>
+                  {hasMore && !loading && !isSearching && (
+                    <button
+                      onClick={() => loadMoreData()}
+                      disabled={isLoadingMore}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50 flex items-center gap-2"
+                      style={{ fontFamily: 'Roboto, sans-serif' }}
+                    >
+                      {isLoadingMore ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          </svg>
+                          Load More
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
                 {(filters.search || filters.cnr || filters.highCourt || filters.decisionDateFrom) && (
                   <div className="mt-1">
                     <button
@@ -420,7 +589,7 @@ export default function HighCourtJudgments() {
                     </p>
                   </div>
                   <button
-                    onClick={() => fetchJudgments(currentPage)}
+                    onClick={() => fetchJudgments(false)}
                     disabled={loading}
                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium disabled:opacity-50"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
@@ -457,11 +626,7 @@ export default function HighCourtJudgments() {
             )}
 
             {loading ? (
-              <div className="space-y-4">
-                {[...Array(3)].map((_, index) => (
-                  <JudgmentSkeleton key={index} />
-                ))}
-              </div>
+              <SkeletonGrid count={3} />
             ) : judgments.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
@@ -480,10 +645,10 @@ export default function HighCourtJudgments() {
               <div className="space-y-4">
                 {console.log('Rendering High Court judgments:', judgments.length, judgments)}
                 {judgments.map((judgment, index) => (
-                  <div
-                    key={judgment.cnr || index}
-                    className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200"
-                  >
+                  <SmoothTransitionWrapper key={judgment.cnr || index} delay={index * 50}>
+                    <div
+                      className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-all duration-300 hover:scale-[1.02] bg-white"
+                    >
                     <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
@@ -576,142 +741,25 @@ export default function HighCourtJudgments() {
                         </button>
                       </div>
                     </div>
-                  </div>
+                    </div>
+                  </SmoothTransitionWrapper>
                 ))}
                 
-                {/* Pagination Controls */}
-                {totalPages > 1 && (
-                  <div className="mt-8 flex items-center justify-between">
-                    <div className="text-sm text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} judgments
-                    </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={goToPreviousPage}
-                        disabled={currentPage === 1 || loading}
-                        className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        style={{ fontFamily: 'Roboto, sans-serif' }}
-                      >
-                        Previous
-                      </button>
-                      
-                      <div className="flex items-center space-x-1">
-                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                          let pageNum;
-                          if (totalPages <= 5) {
-                            pageNum = i + 1;
-                          } else if (currentPage <= 3) {
-                            pageNum = i + 1;
-                          } else if (currentPage >= totalPages - 2) {
-                            pageNum = totalPages - 4 + i;
-                          } else {
-                            pageNum = currentPage - 2 + i;
-                          }
-                          
-                          return (
-                            <button
-                              key={pageNum}
-                              onClick={() => goToPage(pageNum)}
-                              disabled={loading}
-                              className={`px-3 py-2 text-sm font-medium rounded-lg ${
-                                currentPage === pageNum
-                                  ? 'bg-blue-600 text-white'
-                                  : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
-                              } disabled:opacity-50 disabled:cursor-not-allowed`}
-                              style={{ fontFamily: 'Roboto, sans-serif' }}
-                            >
-                              {pageNum}
-                            </button>
-                          );
-                        })}
-                      </div>
-                      
-                      <button
-                        onClick={goToNextPage}
-                        disabled={currentPage === totalPages || loading}
-                        className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        style={{ fontFamily: 'Roboto, sans-serif' }}
-                      >
-                        Next
-                      </button>
-                    </div>
-                  </div>
-                )}
+                {/* Enhanced Infinite Scroll Loader */}
+                <div ref={loadingRef}>
+                  <EnhancedInfiniteScrollLoader 
+                    isLoading={isLoadingMore} 
+                    hasMore={hasMore} 
+                    error={scrollError} 
+                    onRetry={retry}
+                    retryCount={retryCount}
+                    isFetching={isFetching}
+                  />
+                </div>
               </div>
             )}
           </div>
 
-          {/* Related Links Section */}
-          <div className="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-xl font-bold mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-              Explore More Legal Resources
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <button
-                onClick={() => navigate('/supreme-court-judgments')}
-                className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 hover:shadow-md transition-all duration-300 group"
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      Supreme Court Judgments
-                    </h4>
-                    <p className="text-sm text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      Access judgments from the Supreme Court of India
-                    </p>
-                  </div>
-                </div>
-              </button>
-
-              <button
-                onClick={() => navigate('/browse-acts')}
-                className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200 hover:shadow-md transition-all duration-300 group"
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-semibold text-gray-800 group-hover:text-green-600 transition-colors" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      Law Library
-                    </h4>
-                    <p className="text-sm text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      Browse Central and State Acts
-                    </p>
-                  </div>
-                </div>
-              </button>
-
-              <button
-                onClick={() => navigate('/legal-chatbot')}
-                className="p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg border border-purple-200 hover:shadow-md transition-all duration-300 group"
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-semibold text-gray-800 group-hover:text-purple-600 transition-colors" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      Legal Chatbot
-                    </h4>
-                    <p className="text-sm text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      Get instant legal assistance and support
-                    </p>
-                  </div>
-                </div>
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
