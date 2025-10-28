@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
 
 export default function Login() {
@@ -361,8 +360,7 @@ export default function Login() {
           <div className="absolute bottom-1/4 left-1/4 w-20 h-20 rounded-full opacity-4 animate-float animation-delay-2000" style={{ backgroundColor: '#8C969F' }}></div>
         </div>
 
-        <Navbar />
-        <div className="flex items-center justify-center p-4 sm:p-6 lg:p-8 pt-24 relative z-10 min-h-[calc(100vh-80px)]">
+        <div className="flex items-center justify-center p-4 sm:p-6 lg:p-8 relative z-10 min-h-screen">
 
       <div className="max-w-4xl w-full relative z-10">
         <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-gray-100 hover-lift">
