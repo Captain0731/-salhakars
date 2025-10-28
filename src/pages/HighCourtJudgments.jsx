@@ -108,6 +108,24 @@ if (typeof document !== 'undefined') {
   document.head.appendChild(styleSheet);
 }
 
+// Utility function to convert MM-DD-YYYY to YYYY-MM-DD and format for display
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  
+  if (dateStr.includes('-')) {
+    const parts = dateStr.split('-');
+    if (parts.length === 3 && parts[0].length <= 2) {
+      // MM-DD-YYYY format detected, convert to YYYY-MM-DD
+      const [month, day, year] = parts;
+      const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      return new Date(formattedDate).toLocaleDateString();
+    }
+  }
+  
+  // If already in YYYY-MM-DD format or other format, use as is
+  return new Date(dateStr).toLocaleDateString();
+};
+
 export default function HighCourtJudgments() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -626,7 +644,7 @@ export default function HighCourtJudgments() {
                             <div>
                               <span className="font-medium text-gray-800">Decision Date:</span>
                               <span className="ml-2" style={{ color: '#8C969F' }}>
-                                {new Date(judgment.decision_date).toLocaleDateString()}
+                                {formatDate(judgment.decision_date)}
                               </span>
                             </div>
                           )}
@@ -663,7 +681,7 @@ export default function HighCourtJudgments() {
                             <div>
                               <span className="font-medium text-gray-800">Registration Date:</span>
                               <span className="ml-2" style={{ color: '#8C969F' }}>
-                                {new Date(judgment.date_of_registration).toLocaleDateString()}
+                                {formatDate(judgment.date_of_registration)}
                               </span>
                             </div>
                           )}
