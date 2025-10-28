@@ -123,6 +123,7 @@ export default function HighCourtJudgments() {
   const [totalCount, setTotalCount] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
+  const [nextCursor, setNextCursor] = useState(null);
 
   // Filter states
   const [filters, setFilters] = useState({
@@ -134,7 +135,7 @@ export default function HighCourtJudgments() {
 
   const pageSize = 10; // API maximum limit
 
-  // Fetch judgments function with infinite scroll support
+  // Fetch judgments function with cursor-based pagination
   const fetchJudgments = useCallback(async (isLoadMore = false) => {
     if (!isMountedRef.current) return;
     
@@ -146,13 +147,18 @@ export default function HighCourtJudgments() {
         setError(null);
       }
       
-      console.log('High Court: Fetching judgments with params:', { isLoadMore, filters });
+      console.log('High Court: Fetching judgments with params:', { isLoadMore, filters, nextCursor });
       
       const params = {
         limit: pageSize,
-        offset: 0, // Always start from 0 for fresh data
         ...filters
       };
+
+      // Add cursor for pagination if loading more
+      if (isLoadMore && nextCursor) {
+        params.cursor_decision_date = nextCursor.decision_date;
+        params.cursor_id = nextCursor.id;
+      }
 
       // Remove empty filters
       Object.keys(params).forEach(key => {
@@ -168,19 +174,23 @@ export default function HighCourtJudgments() {
       if (!isMountedRef.current) return;
       
       const newJudgments = data.data || [];
+      const paginationInfo = data.pagination_info || {};
       
       if (isLoadMore) {
-        setJudgments(prev => {
-          const currentLength = prev.length;
-          setHasMore(newJudgments.length === pageSize && currentLength + newJudgments.length < (data.total || 0));
-          return [...prev, ...newJudgments];
-        });
+        setJudgments(prev => [...prev, ...newJudgments]);
       } else {
         setJudgments(newJudgments);
-        setHasMore(newJudgments.length === pageSize && newJudgments.length < (data.total || 0));
       }
       
-      setTotalCount(data.total || 0);
+      // Update cursor and hasMore based on API response
+      setNextCursor(data.next_cursor || null);
+      setHasMore(paginationInfo.has_more || false);
+      
+      // Estimate total count (this might not be available in cursor-based pagination)
+      if (!isLoadMore) {
+        setTotalCount(newJudgments.length + (paginationInfo.has_more ? 1 : 0));
+      }
+      
     } catch (error) {
       if (!isMountedRef.current) return;
       console.error('High Court: Error fetching judgments:', error);
@@ -191,7 +201,7 @@ export default function HighCourtJudgments() {
         setIsSearching(false);
       }
     }
-  }, [filters, pageSize]);
+  }, [filters, pageSize, nextCursor]);
 
   // Filter handling functions
   const handleFilterChange = (filterName, value) => {
@@ -210,11 +220,13 @@ export default function HighCourtJudgments() {
     });
     setJudgments([]);
     setHasMore(true);
+    setNextCursor(null);
   };
 
   const applyFilters = () => {
     setJudgments([]);
     setHasMore(true);
+    setNextCursor(null);
     fetchJudgments(false);
   };
 
@@ -224,6 +236,7 @@ export default function HighCourtJudgments() {
       if (filters.search || filters.cnr || filters.highCourt || filters.decisionDateFrom) {
         setJudgments([]);
         setHasMore(true);
+        setNextCursor(null);
         fetchJudgments(false);
       }
     }, 500); // 500ms debounce
@@ -236,51 +249,11 @@ export default function HighCourtJudgments() {
     fetchJudgments(false);
   }, []); // Empty dependency array to run only once on mount
 
-  // Enhanced infinite scroll logic with smooth loading
+  // Enhanced infinite scroll logic with cursor-based pagination
   const loadMoreData = useCallback(async () => {
     if (!hasMore || loading || isSearching || !isMountedRef.current) return;
-    
-    try {
-      setIsSearching(true);
-      
-      const params = {
-        limit: pageSize,
-        offset: judgments.length, // Use current judgments length as offset
-        ...filters
-      };
-
-      // Remove empty filters
-      Object.keys(params).forEach(key => {
-        if (params[key] === "" || params[key] === null || params[key] === undefined) {
-          delete params[key];
-        }
-      });
-
-      console.log('High Court: Loading more with params:', params);
-      const data = await apiService.getJudgements(params);
-      console.log('High Court: Load more response:', data);
-      
-      if (!isMountedRef.current) return;
-      
-      const newJudgments = data.data || [];
-      
-      // Add smooth transition delay for each new item
-      setJudgments(prev => {
-        const updatedJudgments = [...prev, ...newJudgments];
-        setHasMore(newJudgments.length === pageSize && updatedJudgments.length < (data.total || 0));
-        return updatedJudgments;
-      });
-      
-    } catch (error) {
-      if (!isMountedRef.current) return;
-      console.error('High Court: Error loading more judgments:', error);
-      throw error; // Re-throw for the enhanced hook to handle
-    } finally {
-      if (isMountedRef.current) {
-        setIsSearching(false);
-      }
-    }
-  }, [hasMore, loading, isSearching, judgments.length, filters, pageSize]);
+    await fetchJudgments(true);
+  }, [hasMore, loading, isSearching, fetchJudgments]);
 
   // Enhanced infinite scroll hook with smooth animations
   // Optimized for 10-item batches with smooth loading
@@ -537,33 +510,12 @@ export default function HighCourtJudgments() {
                 </p>
               </div>
               <div className="text-right">
-                <div className="flex items-center gap-4">
-                  <span className="text-sm text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                    Showing {judgments.length} of {totalCount} judgments
-                  </span>
-                  {hasMore && !loading && !isSearching && (
-                    <button
-                      onClick={() => loadMoreData()}
-                      disabled={isLoadingMore}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50 flex items-center gap-2"
-                      style={{ fontFamily: 'Roboto, sans-serif' }}
-                    >
-                      {isLoadingMore ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          Loading...
-                        </>
-                      ) : (
-                        <>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                          </svg>
-                          Load More
-                        </>
-                      )}
-                    </button>
-                  )}
-                </div>
+                <span className="text-sm text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  {hasMore 
+                    ? `Showing ${judgments.length} judgments (and more available)`
+                    : `Showing ${judgments.length} judgments`
+                  }
+                </span>
                 {(filters.search || filters.cnr || filters.highCourt || filters.decisionDateFrom) && (
                   <div className="mt-1">
                     <button
@@ -635,7 +587,7 @@ export default function HighCourtJudgments() {
                   </svg>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-700 mb-2" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                  Showing 0 of {totalCount} judgments
+                  No judgments found
                 </h3>
                 <p className="text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   No High Court judgments found matching your search criteria. Please try different filters or check your connection.
