@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
+import BookmarkButton from "../components/BookmarkButton";
 import useSmoothInfiniteScroll from "../hooks/useSmoothInfiniteScroll";
 import { 
   EnhancedJudgmentSkeleton, 
@@ -111,9 +112,7 @@ if (typeof document !== 'undefined') {
 export default function HighCourtJudgments() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, bookmarkJudgement, removeJudgementBookmark } = useAuth();
-  const [bookmarkedJudgments, setBookmarkedJudgments] = useState(new Set());
-  const [bookmarkError, setBookmarkError] = useState('');
+  const { isAuthenticated } = useAuth();
   const isMountedRef = useRef(true);
 
   // Data states
@@ -278,32 +277,6 @@ export default function HighCourtJudgments() {
     navigate('/view-pdf', { state: { judgment } });
   };
 
-  const handleBookmarkToggle = async (judgment) => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
-
-    try {
-      const isBookmarked = bookmarkedJudgments.has(judgment.id);
-
-      if (isBookmarked) {
-        await removeJudgementBookmark(judgment.id);
-        setBookmarkedJudgments(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(judgment.id);
-          return newSet;
-        });
-      } else {
-        await bookmarkJudgement(judgment.id);
-        setBookmarkedJudgments(prev => new Set(prev).add(judgment.id));
-      }
-      setBookmarkError(''); // Clear any previous error
-    } catch (error) {
-      console.error('Bookmark toggle error:', error);
-      setBookmarkError('Failed to update bookmark. Please try again.');
-    }
-  };
 
   // Cleanup effect
   useEffect(() => {
@@ -559,30 +532,6 @@ export default function HighCourtJudgments() {
               </div>
             )}
 
-            {/* Bookmark Error */}
-            {bookmarkError && (
-              <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="text-yellow-600">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-yellow-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      {bookmarkError}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setBookmarkError('')}
-                    className="px-3 py-1 bg-yellow-600 text-white rounded text-sm font-medium hover:bg-yellow-700 transition-colors"
-                    style={{ fontFamily: 'Roboto, sans-serif' }}
-                  >
-                    Dismiss
-                  </button>
-                </div>
-              </div>
-            )}
 
             {loading ? (
               <SkeletonGrid count={3} />
@@ -678,25 +627,19 @@ export default function HighCourtJudgments() {
 
                       </div>
 
-                      <div className="flex-shrink-0 flex flex-col gap-2">
+                      <div className="flex-shrink-0 flex flex-col sm:flex-row gap-2">
+                        <BookmarkButton
+                          item={judgment}
+                          type="judgement"
+                          size="default"
+                          showText={true}
+                        />
                         <button
                           onClick={() => viewJudgment(judgment)}
                           className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow-md"
                           style={{ fontFamily: 'Roboto, sans-serif' }}
                         >
                           View Details
-                        </button>
-                        <button
-                          onClick={() => handleBookmarkToggle(judgment)}
-                          className={`px-4 py-2 rounded-lg transition-colors font-medium shadow-sm hover:shadow-md ${
-                            bookmarkedJudgments.has(judgment.id)
-                              ? 'bg-yellow-500 text-white hover:bg-yellow-600'
-                              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                          }`}
-                          style={{ fontFamily: 'Roboto, sans-serif' }}
-                          title={bookmarkedJudgments.has(judgment.id) ? 'Remove bookmark' : 'Add bookmark'}
-                        >
-                          {bookmarkedJudgments.has(judgment.id) ? '★ Bookmarked' : '☆ Bookmark'}
                         </button>
                       </div>
                     </div>
