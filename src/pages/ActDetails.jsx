@@ -80,6 +80,7 @@ export default function ActDetails() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
+      <div className="pt-20">
       
       {/* Responsive Layout: Stacked on mobile, side-by-side on desktop */}
       <div className="flex-1 p-3 sm:p-4 lg:p-6" style={{ minHeight: 'calc(100vh - 80px)' }}>
@@ -304,6 +305,7 @@ export default function ActDetails() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

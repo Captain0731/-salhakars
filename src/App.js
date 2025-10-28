@@ -68,6 +68,13 @@ function AppLayout() {
         <Route path="/legal-chatbot" element={<LegalChatbot />} />
         <Route path="/profile" element={<Profile />} />
         
+        {/* Additional Routes for Navigation */}
+        <Route path="/judgment-access" element={<SupremeCourtJudgments />} />
+        <Route path="/bookmarks" element={<Profile />} />
+        <Route path="/invite-friends" element={<InviteFriends />} />
+        <Route path="/earn-rewards" element={<EarnRewards />} />
+        <Route path="/track-referrals" element={<TrackReferrals />} />
+        
         {/* Protected Routes - Authentication Required */}
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         

@@ -81,7 +81,7 @@ export default function LegalTemplate() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
-      <div className="p-6">
+      <div className="p-6 pt-24">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">

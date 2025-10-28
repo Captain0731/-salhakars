@@ -93,6 +93,7 @@ const Navbar = () => {
   const subHoverTimeoutRef = useRef(null);
 
   const handleNavClick = (path, filter = null) => {
+    console.log('Navigating to:', path);
     if (path && path !== "#") {
       if (path.startsWith("/#")) {
         const anchorId = path.substring(2);
@@ -232,6 +233,7 @@ const Navbar = () => {
                   if (hoverTimeoutRef.current) {
                     clearTimeout(hoverTimeoutRef.current);
                   }
+                  console.log('Opening dropdown for:', item.label, 'index:', idx);
                   setDropdownOpen(idx);
                 }
               }}
@@ -304,13 +306,17 @@ const Navbar = () => {
                     className={`w-full md:absolute md:left-0 md:top-full backdrop-blur-md shadow-2xl rounded-2xl py-3 mt-3 md:min-w-[300px] border ${
                       isScrolled ? 'bg-white/80' : 'bg-white/95'
                     } ${
-                      dropdownOpen === idx ? "block" : "hidden"
+                      dropdownOpen === idx ? "block opacity-100" : "hidden opacity-0"
                     } ${animatedDropdownClass(dropdownOpen === idx)}`}
                   style={{ 
                     borderColor: '#E5E7EB',
-                    zIndex: 1000,
+                    zIndex: 9999,
                     backgroundColor: 'white',
-                    color: '#1f2937'
+                    color: '#1f2937',
+                    position: 'absolute',
+                    top: '100%',
+                    left: '0',
+                    minWidth: '300px'
                   }}
                   onMouseEnter={() => {
                     if (window.innerWidth >= 768) {
@@ -424,13 +430,17 @@ const Navbar = () => {
                               isScrolled ? 'bg-white/80' : 'bg-white/95'
                             } 
                               ${window.innerWidth >= 768 ? "md:absolute md:left-full md:top-0" : "static"} 
-                              ${(subDropdownOpen.main === idx && subDropdownOpen.sub === i) ? "block" : "hidden"}
+                              ${(subDropdownOpen.main === idx && subDropdownOpen.sub === i) ? "block opacity-100" : "hidden opacity-0"}
                               ${animatedSubDropdownClass(subDropdownOpen.main === idx && subDropdownOpen.sub === i)}`}
                           style={{ 
                             borderColor: '#E5E7EB',
-                            zIndex: 1001,
+                            zIndex: 10000,
                             backgroundColor: 'white',
-                            color: '#1f2937'
+                            color: '#1f2937',
+                            position: 'absolute',
+                            top: '0',
+                            left: '100%',
+                            minWidth: '220px'
                           }}
                           onMouseEnter={() => {
                             if (window.innerWidth >= 768) {

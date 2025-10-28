@@ -131,6 +131,7 @@ export default function ViewPDF() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
+      <div className="pt-20">
       
       {/* PDF Translator Component - Handles PDF translation */}
       <PDFTranslator 
@@ -442,6 +443,7 @@ export default function ViewPDF() {
             </div>
           </div>
         </div>
+      </div>
       </div>
 
     </div>

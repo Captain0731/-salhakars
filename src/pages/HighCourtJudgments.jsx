@@ -108,24 +108,6 @@ if (typeof document !== 'undefined') {
   document.head.appendChild(styleSheet);
 }
 
-// Utility function to convert MM-DD-YYYY to YYYY-MM-DD and format for display
-const formatDate = (dateStr) => {
-  if (!dateStr) return '';
-  
-  if (dateStr.includes('-')) {
-    const parts = dateStr.split('-');
-    if (parts.length === 3 && parts[0].length <= 2) {
-      // MM-DD-YYYY format detected, convert to YYYY-MM-DD
-      const [month, day, year] = parts;
-      const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-      return new Date(formattedDate).toLocaleDateString();
-    }
-  }
-  
-  // If already in YYYY-MM-DD format or other format, use as is
-  return new Date(dateStr).toLocaleDateString();
-};
-
 export default function HighCourtJudgments() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -452,10 +434,17 @@ export default function HighCourtJudgments() {
                 <input
                   type="date"
                   value={filters.decisionDateFrom}
-                  onChange={(e) => handleFilterChange('decisionDateFrom', e.target.value)}
+                  onChange={(e) => {
+                    // Convert from yyyy-mm-dd to yyyy-mm-dd format (already correct for API)
+                    handleFilterChange('decisionDateFrom', e.target.value);
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   style={{ fontFamily: 'Roboto, sans-serif' }}
+                  placeholder="YYYY-MM-DD"
                 />
+                <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  Format: YYYY-MM-DD (e.g., 2025-10-17)
+                </p>
               </div>
             </div>
 
@@ -504,7 +493,7 @@ export default function HighCourtJudgments() {
                   )}
                   {filters.decisionDateFrom && (
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
-                      From: {new Date(filters.decisionDateFrom).toLocaleDateString()}
+                      From: {filters.decisionDateFrom}
                     </span>
                   )}
                 </div>
@@ -644,7 +633,7 @@ export default function HighCourtJudgments() {
                             <div>
                               <span className="font-medium text-gray-800">Decision Date:</span>
                               <span className="ml-2" style={{ color: '#8C969F' }}>
-                                {formatDate(judgment.decision_date)}
+                                {judgment.decision_date}
                               </span>
                             </div>
                           )}
@@ -681,7 +670,7 @@ export default function HighCourtJudgments() {
                             <div>
                               <span className="font-medium text-gray-800">Registration Date:</span>
                               <span className="ml-2" style={{ color: '#8C969F' }}>
-                                {formatDate(judgment.date_of_registration)}
+                                {judgment.date_of_registration}
                               </span>
                             </div>
                           )}

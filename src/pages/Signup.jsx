@@ -410,7 +410,7 @@ export default function Signup() {
         </div>
 
         <Navbar />
-        <div className="flex items-center justify-center p-4 sm:p-6 lg:p-8 relative z-10 min-h-[calc(100vh-80px)]">
+        <div className="flex items-center justify-center p-4 sm:p-6 lg:p-8 pt-24 relative z-10 min-h-[calc(100vh-80px)]">
 
       <div className="max-w-6xl w-full relative z-10">
         <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-gray-100 hover-lift">
