@@ -13,7 +13,7 @@ const navItems = [
     links: [
       { 
         label: "Legal Judgment", 
-        path: "/high-court-judgments",
+        path: "/judgment-access",
         subLinks: [
           { label: "Supreme Court", path: "/supreme-court-judgments" },
           { label: "High Court", path: "/high-court-judgments" },
@@ -43,6 +43,10 @@ const navItems = [
       { 
         label: "YouTube Summarizer", 
         path: "/youtube-summary",
+      },
+      { 
+        label: "My Bookmarks", 
+        path: "/bookmarks",
       },
     ],
   },
@@ -83,6 +87,7 @@ const Navbar = () => {
   // Changed: track both main index and sub index to avoid collisions
   const [subDropdownOpen, setSubDropdownOpen] = useState({ main: null, sub: null });
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const navRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
   const subHoverTimeoutRef = useRef(null);
@@ -109,6 +114,19 @@ const Navbar = () => {
       setSubDropdownOpen({ main: null, sub: null });
     }
   };
+
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      setIsScrolled(scrollTop > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -147,8 +165,12 @@ const Navbar = () => {
     }`;
 
   return (
-    <nav ref={navRef} className="bg-white sticky top-0 z-50 border-b shadow-lg" style={{ borderColor: '#E5E7EB', zIndex: 9998 }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 md:py-4 flex justify-between items-center">
+    <nav ref={navRef} className={`fixed top-0 left-0 right-0 z-[9999] border-b transition-all duration-500 ease-in-out ${
+      isScrolled 
+        ? 'bg-white/20 backdrop-blur-lg shadow-xl py-2' 
+        : 'bg-white/90 backdrop-blur-md shadow-lg py-3 sm:py-4 md:py-4'
+    }`} style={{ borderColor: '#E5E7EB' }}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         
         {/* Brand Logo */}
         <div
@@ -158,7 +180,9 @@ const Navbar = () => {
           <img
             src="/logo4.png"
             alt="सलहाकार Logo"
-            className="h-12 sm:h-14 md:h-16 w-auto group-hover:scale-110 transition-all duration-500 ease-out"
+            className={`w-auto group-hover:scale-110 transition-all duration-500 ease-out ${
+              isScrolled ? 'h-10 sm:h-12 md:h-14' : 'h-12 sm:h-14 md:h-16'
+            }`}
             onError={(e) => {
               if (e.target.src.includes('logo4.png')) {
                 e.target.src = '/logo.png';
@@ -192,7 +216,9 @@ const Navbar = () => {
 
         {/* Nav Links */}
         <ul
-          className={`flex-col md:flex-row md:flex gap-1 sm:gap-2 items-center absolute md:static top-20 sm:top-24 left-0 w-full md:w-auto bg-white md:bg-transparent p-6 sm:p-8 md:p-0 transition-all duration-300 ease-out shadow-2xl md:shadow-none rounded-2xl md:rounded-none border-t md:border-t-0 z-40 ${menuOpen ? "flex opacity-100 translate-y-0" : "hidden md:flex opacity-0 md:opacity-100 -translate-y-2 md:translate-y-0"}`}
+          className={`flex-col md:flex-row md:flex gap-1 sm:gap-2 items-center absolute md:static left-0 w-full md:w-auto backdrop-blur-lg md:bg-transparent p-6 sm:p-8 md:p-0 transition-all duration-500 ease-out shadow-2xl md:shadow-none rounded-2xl md:rounded-none border-t md:border-t-0 z-40 ${
+            isScrolled ? 'bg-white/70 backdrop-blur-lg top-16 sm:top-18' : 'bg-white/90 backdrop-blur-md top-20 sm:top-24'
+          } ${menuOpen ? "flex opacity-100 translate-y-0" : "hidden md:flex opacity-0 md:opacity-100 -translate-y-2 md:translate-y-0"}`}
           style={{ borderTopColor: '#E5E7EB', zIndex: 9999 }}
         >
           {navItems.map((item, idx) => (
@@ -275,7 +301,9 @@ const Navbar = () => {
                 {/* Main Dropdown - uses smooth animation class */}
                 {item.links && item.links.length > 0 && (
                   <ul
-                    className={`w-full md:absolute md:left-0 md:top-full bg-white shadow-2xl rounded-2xl py-3 mt-3 md:min-w-[300px] border ${
+                    className={`w-full md:absolute md:left-0 md:top-full backdrop-blur-md shadow-2xl rounded-2xl py-3 mt-3 md:min-w-[300px] border ${
+                      isScrolled ? 'bg-white/80' : 'bg-white/95'
+                    } ${
                       dropdownOpen === idx ? "block" : "hidden"
                     } ${animatedDropdownClass(dropdownOpen === idx)}`}
                   style={{ 
@@ -392,7 +420,9 @@ const Navbar = () => {
                         {link.subLinks && link.subLinks.length > 0 && (
                           <ul
                             // On md+: absolute flyout; on mobile: static block below parent
-                            className={`w-full bg-white shadow-2xl rounded-2xl py-3 ml-0 md:ml-2 md:min-w-[220px] border 
+                            className={`w-full backdrop-blur-md shadow-2xl rounded-2xl py-3 ml-0 md:ml-2 md:min-w-[220px] border ${
+                              isScrolled ? 'bg-white/80' : 'bg-white/95'
+                            } 
                               ${window.innerWidth >= 768 ? "md:absolute md:left-full md:top-0" : "static"} 
                               ${(subDropdownOpen.main === idx && subDropdownOpen.sub === i) ? "block" : "hidden"}
                               ${animatedSubDropdownClass(subDropdownOpen.main === idx && subDropdownOpen.sub === i)}`}
@@ -510,38 +540,6 @@ const Navbar = () => {
                 </div>
                 
                 <button
-                  onClick={() => {
-                    navigate("/dashboard");
-                    setMenuOpen(false);
-                  }}
-                  className="text-white px-6 sm:px-8 py-3 sm:py-3 rounded-full font-semibold hover:shadow-xl hover:scale-110 transition-all duration-500 ease-out transform w-full text-sm sm:text-base touch-manipulation relative overflow-hidden group mb-2"
-                  style={{ 
-                    backgroundColor: '#1E65AD', 
-                    fontFamily: 'Roboto, sans-serif',
-                    boxShadow: '0 4px 15px rgba(30, 101, 173, 0.3)',
-                    minHeight: '44px'
-                  }}
-                >
-                  Dashboard
-                </button>
-                
-                <button
-                  onClick={() => {
-                    navigate("/profile");
-                    setMenuOpen(false);
-                  }}
-                  className="text-white px-6 sm:px-8 py-3 sm:py-3 rounded-full font-semibold hover:shadow-xl hover:scale-110 transition-all duration-500 ease-out transform w-full text-sm sm:text-base touch-manipulation relative overflow-hidden group mb-2"
-                  style={{ 
-                    backgroundColor: '#8C969F', 
-                    fontFamily: 'Roboto, sans-serif',
-                    boxShadow: '0 4px 15px rgba(140, 150, 159, 0.3)',
-                    minHeight: '44px'
-                  }}
-                >
-                  Profile
-                </button>
-                
-                <button
                   onClick={handleLogout}
                   className="text-white px-6 sm:px-8 py-3 sm:py-3 rounded-full font-semibold hover:shadow-xl hover:scale-110 transition-all duration-500 ease-out transform w-full text-sm sm:text-base touch-manipulation relative overflow-hidden group"
                   style={{ 
@@ -614,7 +612,9 @@ const Navbar = () => {
                 </button>
                 
                 {/* User Dropdown */}
-                <div className={`absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl border py-2 z-50 transition-all duration-300 ease-out ${userDropdownOpen ? 'block opacity-100' : 'hidden opacity-0'}`} style={{ borderColor: '#E5E7EB' }}>
+                <div className={`absolute right-0 top-full mt-2 w-64 backdrop-blur-md rounded-xl shadow-xl border py-2 z-50 transition-all duration-300 ease-out ${
+                  isScrolled ? 'bg-white/80' : 'bg-white/95'
+                } ${userDropdownOpen ? 'block opacity-100' : 'hidden opacity-0'}`} style={{ borderColor: '#E5E7EB' }}>
                   <div className="px-4 py-3 border-b" style={{ borderColor: '#E5E7EB' }}>
                     <div className="font-semibold text-gray-800" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       {user?.name || 'User'}
@@ -628,16 +628,6 @@ const Navbar = () => {
                       </div>
                     )}
                   </div>
-                  <button
-                    onClick={() => {
-                      navigate("/dashboard");
-                      setUserDropdownOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors duration-200 text-sm"
-                    style={{ fontFamily: 'Roboto, sans-serif' }}
-                  >
-                    Dashboard
-                  </button>
                   <button
                     onClick={() => {
                       navigate("/profile");

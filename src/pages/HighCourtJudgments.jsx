@@ -281,30 +281,30 @@ export default function HighCourtJudgments() {
                 >
                   <option value="">All High Courts</option>
                   <option value="Allahabad High Court">Allahabad High Court</option>
-                  <option value="Andhra Pradesh High Court">Andhra Pradesh High Court</option>
                   <option value="Bombay High Court">Bombay High Court</option>
                   <option value="Calcutta High Court">Calcutta High Court</option>
-                  <option value="Chhattisgarh High Court">Chhattisgarh High Court</option>
-                  <option value="Delhi High Court">Delhi High Court</option>
                   <option value="Gauhati High Court">Gauhati High Court</option>
-                  <option value="Gujarat High Court">Gujarat High Court</option>
-                  <option value="Himachal Pradesh High Court">Himachal Pradesh High Court</option>
-                  <option value="Jammu & Kashmir and Ladakh High Court">Jammu & Kashmir and Ladakh High Court</option>
-                  <option value="Jharkhand High Court">Jharkhand High Court</option>
-                  <option value="Karnataka High Court">Karnataka High Court</option>
-                  <option value="Kerala High Court">Kerala High Court</option>
-                  <option value="Madhya Pradesh High Court">Madhya Pradesh High Court</option>
+                  <option value="High Court for State of Telangana">High Court for State of Telangana</option>
+                  <option value="High Court of Andhra Pradesh">High Court of Andhra Pradesh</option>
+                  <option value="High Court of Chhattisgarh">High Court of Chhattisgarh</option>
+                  <option value="High Court of Delhi">High Court of Delhi</option>
+                  <option value="High Court of Gujarat">High Court of Gujarat</option>
+                  <option value="High Court of Himachal Pradesh">High Court of Himachal Pradesh</option>
+                  <option value="High Court of Jammu and Kashmir">High Court of Jammu and Kashmir</option>
+                  <option value="High Court of Jharkhand">High Court of Jharkhand</option>
+                  <option value="High Court of Karnataka">High Court of Karnataka</option>
+                  <option value="High Court of Kerala">High Court of Kerala</option>
+                  <option value="High Court of Madhya Pradesh">High Court of Madhya Pradesh</option>
+                  <option value="High Court of Manipur">High Court of Manipur</option>
+                  <option value="High Court of Meghalaya">High Court of Meghalaya</option>
+                  <option value="High Court of Orissa">High Court of Orissa</option>
+                  <option value="High Court of Punjab and Haryana">High Court of Punjab and Haryana</option>
+                  <option value="High Court of Rajasthan">High Court of Rajasthan</option>
+                  <option value="High Court of Sikkim">High Court of Sikkim</option>
+                  <option value="High Court of Tripura">High Court of Tripura</option>
+                  <option value="High Court of Uttarakhand">High Court of Uttarakhand</option>
                   <option value="Madras High Court">Madras High Court</option>
-                  <option value="Manipur High Court">Manipur High Court</option>
-                  <option value="Meghalaya High Court">Meghalaya High Court</option>
-                  <option value="Orissa High Court">Orissa High Court</option>
                   <option value="Patna High Court">Patna High Court</option>
-                  <option value="Punjab and Haryana High Court">Punjab and Haryana High Court</option>
-                  <option value="Rajasthan High Court">Rajasthan High Court</option>
-                  <option value="Sikkim High Court">Sikkim High Court</option>
-                  <option value="Telangana High Court">Telangana High Court</option>
-                  <option value="Tripura High Court">Tripura High Court</option>
-                  <option value="Uttarakhand High Court">Uttarakhand High Court</option>
                 </select>
               </div>
 
@@ -393,7 +393,7 @@ export default function HighCourtJudgments() {
               </div>
               <div className="text-right">
                 <span className="text-sm text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                  {totalCount} judgments found
+                  Showing {judgments.length} of {totalCount} judgments
                 </span>
                 {(filters.search || filters.cnr || filters.highCourt || filters.decisionDateFrom) && (
                   <div className="mt-1">
@@ -470,7 +470,7 @@ export default function HighCourtJudgments() {
                   </svg>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-700 mb-2" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                  No High Court Judgments Found
+                  Showing 0 of {totalCount} judgments
                 </h3>
                 <p className="text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   No High Court judgments found matching your search criteria. Please try different filters or check your connection.
@@ -583,7 +583,7 @@ export default function HighCourtJudgments() {
                 {totalPages > 1 && (
                   <div className="mt-8 flex items-center justify-between">
                     <div className="text-sm text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} results
+                      Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} judgments
                     </div>
                     
                     <div className="flex items-center space-x-2">
@@ -640,6 +640,77 @@ export default function HighCourtJudgments() {
                 )}
               </div>
             )}
+          </div>
+
+          {/* Related Links Section */}
+          <div className="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-xl font-bold mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+              Explore More Legal Resources
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <button
+                onClick={() => navigate('/supreme-court-judgments')}
+                className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 hover:shadow-md transition-all duration-300 group"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div className="text-left">
+                    <h4 className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      Supreme Court Judgments
+                    </h4>
+                    <p className="text-sm text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      Access judgments from the Supreme Court of India
+                    </p>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => navigate('/browse-acts')}
+                className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200 hover:shadow-md transition-all duration-300 group"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                  </div>
+                  <div className="text-left">
+                    <h4 className="font-semibold text-gray-800 group-hover:text-green-600 transition-colors" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      Law Library
+                    </h4>
+                    <p className="text-sm text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      Browse Central and State Acts
+                    </p>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => navigate('/legal-chatbot')}
+                className="p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg border border-purple-200 hover:shadow-md transition-all duration-300 group"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                  </div>
+                  <div className="text-left">
+                    <h4 className="font-semibold text-gray-800 group-hover:text-purple-600 transition-colors" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      Legal Chatbot
+                    </h4>
+                    <p className="text-sm text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      Get instant legal assistance and support
+                    </p>
+                  </div>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </div>
