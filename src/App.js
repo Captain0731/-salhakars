@@ -19,6 +19,7 @@ import LegalTemplate from "./pages/LegalTemplate";
 import YoutubeVideoSummary from "./pages/YoutubeVideoSummary";
 import LegalChatbot from "./pages/LegalChatbot";
 import Profile from "./pages/Profile";
+import Bookmarks from "./pages/Bookmarks";
 import About from "./pages/About";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
@@ -70,7 +71,7 @@ function AppLayout() {
         
         {/* Additional Routes for Navigation */}
         <Route path="/judgment-access" element={<SupremeCourtJudgments />} />
-        <Route path="/bookmarks" element={<Profile />} />
+        <Route path="/bookmarks" element={<Bookmarks />} />
         <Route path="/invite-friends" element={<InviteFriends />} />
         <Route path="/earn-rewards" element={<EarnRewards />} />
         <Route path="/track-referrals" element={<TrackReferrals />} />
