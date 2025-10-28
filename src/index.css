@@ -1,4 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Hide scrollbars but keep scrolling functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Custom Color Scheme */
+:root {
+  --primary-blue: #1E65AD;
+  --accent-gold: #CF9B63;
+  --neutral-gray: #8C969F;
+  --background: #F9FAFC;
+}
+
+/* Typography */
+.font-primary {
+  font-family: 'Heebo', 'Helvetica Hebrew Bold', sans-serif;
+  font-weight: 700;
+}
+
+.font-secondary {
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Custom Button Styles */
+.btn-primary {
+  background-color: var(--primary-blue);
+  color: white;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #1a5a9a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 101, 173, 0.3);
+}
+
+.btn-accent {
+  background-color: var(--accent-gold);
+  color: white;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-accent:hover {
+  background-color: #b8894f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(207, 155, 99, 0.3);
+}
+
+/* Language Selector Animations */
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-15px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(30, 101, 173, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(30, 101, 173, 0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.animate-in {
+  animation: slideInFromTop 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pulse-glow {
+  animation: pulseGlow 2s infinite;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
 

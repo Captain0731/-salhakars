@@ -1,7 +1,7 @@
 # Integration Summary - Landing Page & Login/Signup
 
 ## Overview
-Successfully integrated the landing page and login/signup functionality into the main सलाहकार application.
+Successfully integrated the landing page and login/signup functionality into the main सलहाकार application.
 
 ## What Was Done
 
@@ -95,7 +95,7 @@ Feature Pages (with sidebar)
 
 ### 6. Additional Updates
 - Added Font Awesome CDN to `public/index.html`
-- Updated page title to "सलाहकार - AI Legal Platform"
+- Updated page title to "सलहाकार - AI Legal Platform"
 - Added custom animations to `tailwind.config.js` (bounce-slow, bounce-slower)
 
 ## File Structure
@@ -140,7 +140,7 @@ npm start
 - **Responsive**: Works on mobile, tablet, and desktop
 - **Accessible**: Proper ARIA labels and semantic HTML
 - **User-Friendly**: Clear navigation and intuitive interface
-- **Bilingual**: Hindi and English text (सलाहकार branding)
+- **Bilingual**: Hindi and English text (सलहाकार branding)
 
 ## Technical Features
 - React Router v6 for navigation

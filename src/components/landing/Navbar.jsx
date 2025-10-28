@@ -1,135 +1,482 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import logo from "../../assets/logo.png"
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import LanguageSelector from "../LanguageSelector";
 
 const navItems = [
   {
-    label: "Judgment Access",
-    path: "/judgments",
+    label: "Home",
+    path: "/",
+  },
+  {
+    label: "Services",
     links: [
-      { label: "High Court", path: "/judgments" },
-      { label: "Supreme Court", path: "/judgments" },
+      { 
+        label: "Legal Judgment", 
+        path: "/high-court-judgments",
+        subLinks: [
+          { label: "Supreme Court", path: "/supreme-court-judgments" },
+          { label: "High Court", path: "/high-court-judgments" },
+        ]
+      },
+      { 
+        label: "Law Library", 
+        path: "/browse-acts",
+        subLinks: [
+          { label: "Central Acts", path: "/central-acts" },
+          { label: "State Acts", path: "/state-acts" },
+        ]
+      },
+      { 
+        label: "Law Mapping", 
+        path: "/old-to-new-mapping",
+        subLinks: [
+          { label: "All Mappings", path: "/old-to-new-mapping" },
+          { label: "IPC", path: "/ipc-bns-mapping", arrow: "⇄", targetLabel: "BNS" },
+          { label: "IEA", path: "/iea-bsa-mapping", arrow: "⇄", targetLabel: "BSA" },
+        ]
+      },
+      { 
+        label: "Legal Template", 
+        path: "/legal-template" 
+      },
+      { 
+        label: "YouTube Summarizer", 
+        path: "/youtube-summary",
+      },
     ],
   },
   {
-    label: "Browse Acts",
+    label: "About",
+    path: "/about",
+  },
+  {
+    label: "Support",
+    path: "/legal-chatbot",
+  },
+  {
+    label: "More",
     links: [
-      { label: "Central Acts", path: "#" },
-      { label: "State Acts", path: "#" },
+      { 
+        label: "Our Team", 
+        path: "/our-team"
+      },
+      { 
+        label: "Referral Program", 
+        path: "/referral",
+        subLinks: [
+          { label: "Invite Friends", path: "/invite-friends" },
+          { label: "Earn Rewards", path: "/earn-rewards" },
+          { label: "Track Referrals", path: "/track-referrals" },
+        ]
+      },
     ],
-  },
-  {
-    label: "Old To New Law Mapping",
-    path: "/mapping",
-    links: [
-      {label: "BNS To IEA",path: "#"},
-      {label: "BNSS To CrPC" ,path: "#"},
-      {label: "BNS To IPC" ,path: "#"},
-
-    ]
-  },
-  {
-    label: "Legal Template",
-    path: "/template",
-  },
-  {
-    label: "Others",
-    links: [{ label: "YouTube Summary", path: "/videos" }],
   },
 ];
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user, isAuthenticated, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(null); // index of main dropdown
+  // Changed: track both main index and sub index to avoid collisions
+  const [subDropdownOpen, setSubDropdownOpen] = useState({ main: null, sub: null });
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const navRef = useRef(null);
+  const hoverTimeoutRef = useRef(null);
+  const subHoverTimeoutRef = useRef(null);
 
-  const handleNavClick = (path) => {
+  const handleNavClick = (path, filter = null) => {
     if (path && path !== "#") {
-      navigate(path);
+      if (path.startsWith("/#")) {
+        const anchorId = path.substring(2);
+        const element = document.getElementById(anchorId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else {
+        // All routes are now public - no authentication required
+        
+        if (filter) {
+          navigate(path, { state: { filter } });
+        } else {
+          navigate(path);
+        }
+      }
       setMenuOpen(false);
+      setDropdownOpen(null);
+      setSubDropdownOpen({ main: null, sub: null });
     }
   };
 
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (navRef.current && !navRef.current.contains(event.target)) {
+        setDropdownOpen(null);
+        setSubDropdownOpen({ main: null, sub: null });
+        setUserDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      // Clear timeouts on cleanup
+      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+      if (subHoverTimeoutRef.current) clearTimeout(subHoverTimeoutRef.current);
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    await logout();
+    setUserDropdownOpen(false);
+    navigate("/");
+  };
+
+  // Helper classes for smooth animation
+  const animatedDropdownClass = (isOpen) =>
+    `transition-all duration-300 ease-out transform ${
+      isOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"
+    }`;
+
+  const animatedSubDropdownClass = (isOpen) =>
+    `transition-all duration-300 ease-out transform ${
+      isOpen ? "opacity-100 translate-x-0 pointer-events-auto" : "opacity-0 -translate-x-2 pointer-events-none"
+    }`;
+
   return (
-    <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-5 md:px-10 py-3 flex justify-between items-center">
+    <nav ref={navRef} className="bg-white sticky top-0 z-50 border-b shadow-lg" style={{ borderColor: '#E5E7EB', zIndex: 9998 }}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 md:py-4 flex justify-between items-center">
         
-        {/* Logo */}
+        {/* Brand Logo */}
         <div
-          className="flex items-center gap-3 cursor-pointer"
+          className="cursor-pointer group"
           onClick={() => navigate("/")}
         >
           <img
-             src={logo}
-            alt="सलाहकार Logo"
-            className="h-10 w-auto object-contain"
+            src="/logo4.png"
+            alt="सलहाकार Logo"
+            className="h-12 sm:h-14 md:h-16 w-auto group-hover:scale-110 transition-all duration-500 ease-out"
+            onError={(e) => {
+              if (e.target.src.includes('logo4.png')) {
+                e.target.src = '/logo.png';
+              } else if (e.target.src.includes('logo.png')) {
+                e.target.src = '/logo 3.PNG';
+              } else {
+                e.target.style.display = 'none';
+              }
+            }}
           />
-          <span className="text-2xl font-bold text-slate-800 tracking-tight">
-            सलाहकार
-          </span>
         </div>
 
         {/* Hamburger Button */}
         <div
-          className="md:hidden flex flex-col gap-1 cursor-pointer"
+          className="md:hidden flex flex-col gap-1.2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-all duration-900"
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <span
-            className={`h-1 w-6 bg-sky-500 rounded transition-transform ${
-              menuOpen ? "rotate-45 translate-y-2" : ""
-            }`}
+            className={`h-0.5 w-6 rounded-full transition-all ease-out ${menuOpen ? "rotate-45 translate-y-2.5" : ""}`}
+            style={{ backgroundColor: '#1E65AD' }}
           ></span>
           <span
-            className={`h-1 w-6 bg-sky-500 rounded transition-opacity ${
-              menuOpen ? "opacity-0" : ""
-            }`}
+            className={`h-0.5 w-6 rounded-full transition-all duration-900 ease-out ${menuOpen ? "opacity-0 scale-0" : "opacity-100 scale-100"}`}
+            style={{ backgroundColor: '#1E65AD' }}
           ></span>
           <span
-            className={`h-1 w-6 bg-sky-500 rounded transition-transform ${
-              menuOpen ? "-rotate-45 -translate-y-2" : ""
-            }`}
+            className={`h-0.5 w-6 rounded-full transition-all duration-900 ease-out ${menuOpen ? "-rotate-45 -translate-y-2.5" : ""}`}
+            style={{ backgroundColor: '#1E65AD' }}
           ></span>
         </div>
 
         {/* Nav Links */}
         <ul
-          className={`flex-col md:flex-row md:flex gap-4 items-center absolute md:static top-16 left-0 w-full md:w-auto bg-white md:bg-transparent p-6 md:p-0 transition-all duration-300 ${
-            menuOpen ? "flex" : "hidden md:flex"
-          }`}
+          className={`flex-col md:flex-row md:flex gap-1 sm:gap-2 items-center absolute md:static top-20 sm:top-24 left-0 w-full md:w-auto bg-white md:bg-transparent p-6 sm:p-8 md:p-0 transition-all duration-300 ease-out shadow-2xl md:shadow-none rounded-2xl md:rounded-none border-t md:border-t-0 z-40 ${menuOpen ? "flex opacity-100 translate-y-0" : "hidden md:flex opacity-0 md:opacity-100 -translate-y-2 md:translate-y-0"}`}
+          style={{ borderTopColor: '#E5E7EB', zIndex: 9999 }}
         >
           {navItems.map((item, idx) => (
-            <li key={idx} className="relative group">
+            <li 
+              key={idx} 
+              className="relative group w-full md:w-auto"
+              style={{ position: 'relative' }}
+              onMouseEnter={() => {
+                if (window.innerWidth >= 768 && item.links && item.links.length > 0) {
+                  // Clear any existing timeout
+                  if (hoverTimeoutRef.current) {
+                    clearTimeout(hoverTimeoutRef.current);
+                  }
+                  setDropdownOpen(idx);
+                }
+              }}
+              onMouseLeave={() => {
+                if (window.innerWidth >= 768) {
+                  // Clear any existing timeout
+                  if (hoverTimeoutRef.current) {
+                    clearTimeout(hoverTimeoutRef.current);
+                  }
+                  hoverTimeoutRef.current = setTimeout(() => {
+                    setDropdownOpen(null);
+                    setSubDropdownOpen({ main: null, sub: null });
+                  }, 150);
+                }
+              }}
+            >
               <button
                 onClick={() => {
                   if (item.links && item.links.length > 0) {
                     setDropdownOpen(dropdownOpen === idx ? null : idx);
+                    setSubDropdownOpen({ main: null, sub: null });
                   } else if (item.path) {
                     handleNavClick(item.path);
                   }
                 }}
-                className="flex items-center justify-between w-full md:w-auto py-2 px-4 rounded-lg text-slate-700 hover:text-sky-600 hover:bg-indigo-50 md:hover:bg-transparent transition font-medium"
+                className={`flex items-center justify-between w-full md:w-auto py-3 sm:py-3 px-4 sm:px-4 rounded-xl transition-all duration-300 font-medium hover:scale-105 text-sm sm:text-base touch-manipulation relative overflow-hidden group ${(item.path && location.pathname === item.path) ? 'bg-blue-50 text-blue-600' : ''}`}
+                style={{ 
+                  color: (item.path && location.pathname === item.path) ? '#1E65AD' : '#8C969F', 
+                  fontFamily: 'Roboto, sans-serif',
+                  minHeight: '44px'
+                }}
+                onMouseEnter={(e) => {
+                  if (window.innerWidth >= 768) {
+                    const isSelected = item.path && location.pathname === item.path;
+                    e.currentTarget.style.color = isSelected ? '#1E65AD' : '#1E65AD';
+                    e.currentTarget.style.backgroundColor = isSelected ? '#E3F2FD' : '#F8FAFC';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(30, 101, 173, 0.15)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (window.innerWidth >= 768) {
+                    const isSelected = item.path && location.pathname === item.path;
+                    e.currentTarget.style.color = isSelected ? '#1E65AD' : '#8C969F';
+                    e.currentTarget.style.backgroundColor = isSelected ? '#E3F2FD' : 'transparent';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }
+                }}
               >
-                {item.label}{" "}
+                <span className="text-left">{item.label}</span>
                 {item.links && item.links.length > 0 && (
-                  <span className="ml-1 text-slate-500">▾</span>
+                  <span 
+                    className={`ml-2 ${dropdownOpen === idx ? 'rotate-180 scale-110' : 'scale-100'}`}
+                    style={{ 
+                      color: '#CF9B63',
+                      transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                      transformOrigin: 'center',
+                      display: 'inline-block'
+                    }}
+                  >
+                    ▼
+                  </span>
                 )}
               </button>
 
-              {/* Dropdown */}
-              {item.links && item.links.length > 0 && (
-                <ul
-                  className={`absolute left-0 top-full bg-white shadow-lg rounded-xl py-2 mt-2 min-w-[200px] border border-gray-100 md:opacity-0 md:invisible md:group-hover:opacity-100 md:group-hover:visible transition-all ${
-                    dropdownOpen === idx ? "block md:block" : "hidden md:absolute"
-                  }`}
+                {/* Main Dropdown - uses smooth animation class */}
+                {item.links && item.links.length > 0 && (
+                  <ul
+                    className={`w-full md:absolute md:left-0 md:top-full bg-white shadow-2xl rounded-2xl py-3 mt-3 md:min-w-[300px] border ${
+                      dropdownOpen === idx ? "block" : "hidden"
+                    } ${animatedDropdownClass(dropdownOpen === idx)}`}
+                  style={{ 
+                    borderColor: '#E5E7EB',
+                    zIndex: 1000,
+                    backgroundColor: 'white',
+                    color: '#1f2937'
+                  }}
+                  onMouseEnter={() => {
+                    if (window.innerWidth >= 768) {
+                      // Clear any existing timeout
+                      if (hoverTimeoutRef.current) {
+                        clearTimeout(hoverTimeoutRef.current);
+                      }
+                      setDropdownOpen(idx);
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    if (window.innerWidth >= 768) {
+                      // Clear any existing timeout
+                      if (hoverTimeoutRef.current) {
+                        clearTimeout(hoverTimeoutRef.current);
+                      }
+                      hoverTimeoutRef.current = setTimeout(() => {
+                        setDropdownOpen(null);
+                        setSubDropdownOpen({ main: null, sub: null });
+                      }, 150);
+                    }
+                  }}
                 >
                   {item.links.map((link, i) => (
-                    <li key={i}>
-                      <button
-                        onClick={() => handleNavClick(link.path)}
-                        className="block w-full text-left px-4 py-2 text-slate-700 hover:bg-gradient-to-r hover:from-sky-500 hover:to-indigo-500 hover:text-white transition"
-                      >
-                        {link.label}
-                      </button>
+                    <li 
+                      key={i} 
+                      className="relative"
+                      style={{
+                        position: 'relative',
+                        transition: 'opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                      }}
+                      onMouseEnter={() => {
+                        if (window.innerWidth >= 768 && link.subLinks && link.subLinks.length > 0) {
+                          // Clear any existing timeout
+                          if (subHoverTimeoutRef.current) {
+                            clearTimeout(subHoverTimeoutRef.current);
+                          }
+                          // set both main and sub for correct matching
+                          setSubDropdownOpen({ main: idx, sub: i });
+                        }
+                      }}
+                      onMouseLeave={() => {
+                        if (window.innerWidth >= 768) {
+                          // Clear any existing timeout
+                          if (subHoverTimeoutRef.current) {
+                            clearTimeout(subHoverTimeoutRef.current);
+                          }
+                          subHoverTimeoutRef.current = setTimeout(() => {
+                            setSubDropdownOpen({ main: null, sub: null });
+                          }, 150);
+                        }
+                      }}
+                    >
+                      <div className="flex items-center">
+                        <button
+                          onClick={() => {
+                            if (link.subLinks && link.subLinks.length > 0) {
+                              // toggle using composite main/sub keys
+                              setSubDropdownOpen(prev => (
+                                prev.main === idx && prev.sub === i ? { main: null, sub: null } : { main: idx, sub: i }
+                              ));
+                            } else {
+                              handleNavClick(link.path, link.filter);
+                            }
+                          }}
+                          className="flex items-center justify-between w-full text-left px-4 py-3 text-sm sm:text-base touch-manipulation rounded-lg mx-2 group"
+                          style={{ 
+                            color: '#1f2937', 
+                            fontFamily: 'Roboto, sans-serif',
+                            minHeight: '44px',
+                            transition: 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                          }}
+                          onMouseEnter={(e) => {
+                            if (window.innerWidth >= 768) {
+                              e.currentTarget.style.color = 'white';
+                              e.currentTarget.style.backgroundColor = '#1E65AD';
+                              e.currentTarget.style.transform = 'translateX(4px)';
+                              e.currentTarget.style.boxShadow = '0 4px 12px rgba(30, 101, 173, 0.2)';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (window.innerWidth >= 768) {
+                              e.currentTarget.style.color = '#8C969F';
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                              e.currentTarget.style.transform = 'translateX(0)';
+                              e.currentTarget.style.boxShadow = 'none';
+                            }
+                          }}
+                        >
+                          <span style={{ color: '#1f2937' }}>{link.label}</span>
+                          {link.subLinks && link.subLinks.length > 0 && (
+                            <span 
+                              className={`ml-2 ${(subDropdownOpen.main === idx && subDropdownOpen.sub === i) ? 'rotate-90 scale-110' : 'scale-100'}`}
+                              style={{ 
+                                color: '#CF9B63',
+                                transition: 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                                display: 'inline-block'
+                              }}
+                            >
+                              ▶
+                            </span>
+                          )}
+                        </button>
+                      </div>
+
+                        {/* Sub-dropdown for services with sub-links - uses composite check */}
+                        {link.subLinks && link.subLinks.length > 0 && (
+                          <ul
+                            // On md+: absolute flyout; on mobile: static block below parent
+                            className={`w-full bg-white shadow-2xl rounded-2xl py-3 ml-0 md:ml-2 md:min-w-[220px] border 
+                              ${window.innerWidth >= 768 ? "md:absolute md:left-full md:top-0" : "static"} 
+                              ${(subDropdownOpen.main === idx && subDropdownOpen.sub === i) ? "block" : "hidden"}
+                              ${animatedSubDropdownClass(subDropdownOpen.main === idx && subDropdownOpen.sub === i)}`}
+                          style={{ 
+                            borderColor: '#E5E7EB',
+                            zIndex: 1001,
+                            backgroundColor: 'white',
+                            color: '#1f2937'
+                          }}
+                          onMouseEnter={() => {
+                            if (window.innerWidth >= 768) {
+                              // Clear any existing timeout
+                              if (subHoverTimeoutRef.current) {
+                                clearTimeout(subHoverTimeoutRef.current);
+                              }
+                              setSubDropdownOpen({ main: idx, sub: i });
+                            }
+                          }}
+                          onMouseLeave={() => {
+                            if (window.innerWidth >= 768) {
+                              // Clear any existing timeout
+                              if (subHoverTimeoutRef.current) {
+                                clearTimeout(subHoverTimeoutRef.current);
+                              }
+                              subHoverTimeoutRef.current = setTimeout(() => {
+                                setSubDropdownOpen({ main: null, sub: null });
+                              }, 150);
+                            }
+                          }}
+                        >
+                          {link.subLinks.map((subLink, j) => (
+                            <li 
+                              key={j}
+                              className=""
+                              style={{
+                                transition: 'opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                              }}
+                            >
+                              <button
+                                onClick={() => handleNavClick(subLink.path, subLink.filter)}
+                                className="block w-full text-left px-4 py-3 text-sm sm:text-base touch-manipulation rounded-lg mx-2 group"
+                                style={{ 
+                                  color: '#1f2937', 
+                                  fontFamily: 'Roboto, sans-serif',
+                                  minHeight: '44px',
+                                  transition: 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (window.innerWidth >= 768) {
+                                    e.currentTarget.style.color = 'white';
+                                    e.currentTarget.style.backgroundColor = '#CF9B63';
+                                    e.currentTarget.style.transform = 'translateX(4px)';
+                                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(207, 155, 99, 0.2)';
+                                  }
+                                }}
+                                onMouseLeave={(e) => {
+                                  if (window.innerWidth >= 768) {
+                                    e.currentTarget.style.color = '#8C969F';
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                    e.currentTarget.style.transform = 'translateX(0)';
+                                    e.currentTarget.style.boxShadow = 'none';
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <span className="font-medium" style={{ color: '#1f2937' }}>{subLink.label}</span>
+                                  {subLink.arrow && (
+                                    <span className="text-blue-600 font-bold text-lg group-hover:scale-110 group-hover:rotate-12"
+                                      style={{
+                                        transition: 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                                        display: 'inline-block'
+                                      }}>
+                                      {subLink.arrow}
+                                    </span>
+                                  )}
+                                  {subLink.targetLabel && (
+                                    <span className="font-medium" style={{ color: '#1f2937' }}>{subLink.targetLabel}</span>
+                                  )}
+                                </div>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -137,16 +484,205 @@ const Navbar = () => {
             </li>
           ))}
 
-          {/* Login Button */}
-          <li>
+          {/* Language Selector - Mobile */}
+          <li className="w-full md:hidden mt-4">
+            <div className="mb-3">
+              <LanguageSelector />
+            </div>
+          </li>
+
+          {/* User Profile or Login Button - Mobile */}
+          <li className="w-full md:hidden mt-2">
+            {isAuthenticated ? (
+              <div className="w-full">
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg mb-2">
+                  <div>
+                    <div className="font-semibold text-gray-800" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      {user?.name || 'User'}
+                    </div>
+                    <div className="text-sm text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      {user?.email || user?.phone || 'No email'}
+                    </div>
+                  </div>
+                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
+                    {(user?.name || 'U').charAt(0).toUpperCase()}
+                  </div>
+                </div>
+                
+                <button
+                  onClick={() => {
+                    navigate("/dashboard");
+                    setMenuOpen(false);
+                  }}
+                  className="text-white px-6 sm:px-8 py-3 sm:py-3 rounded-full font-semibold hover:shadow-xl hover:scale-110 transition-all duration-500 ease-out transform w-full text-sm sm:text-base touch-manipulation relative overflow-hidden group mb-2"
+                  style={{ 
+                    backgroundColor: '#1E65AD', 
+                    fontFamily: 'Roboto, sans-serif',
+                    boxShadow: '0 4px 15px rgba(30, 101, 173, 0.3)',
+                    minHeight: '44px'
+                  }}
+                >
+                  Dashboard
+                </button>
+                
+                <button
+                  onClick={() => {
+                    navigate("/profile");
+                    setMenuOpen(false);
+                  }}
+                  className="text-white px-6 sm:px-8 py-3 sm:py-3 rounded-full font-semibold hover:shadow-xl hover:scale-110 transition-all duration-500 ease-out transform w-full text-sm sm:text-base touch-manipulation relative overflow-hidden group mb-2"
+                  style={{ 
+                    backgroundColor: '#8C969F', 
+                    fontFamily: 'Roboto, sans-serif',
+                    boxShadow: '0 4px 15px rgba(140, 150, 159, 0.3)',
+                    minHeight: '44px'
+                  }}
+                >
+                  Profile
+                </button>
+                
+                <button
+                  onClick={handleLogout}
+                  className="text-white px-6 sm:px-8 py-3 sm:py-3 rounded-full font-semibold hover:shadow-xl hover:scale-110 transition-all duration-500 ease-out transform w-full text-sm sm:text-base touch-manipulation relative overflow-hidden group"
+                  style={{ 
+                    backgroundColor: '#CF9B63', 
+                    fontFamily: 'Roboto, sans-serif',
+                    boxShadow: '0 4px 15px rgba(207, 155, 99, 0.3)',
+                    minHeight: '44px'
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate("/login")}
+                className="text-white px-6 sm:px-8 py-3 sm:py-3 rounded-full font-semibold hover:shadow-xl hover:scale-110 transition-all duration-500 ease-out transform w-full text-sm sm:text-base touch-manipulation relative overflow-hidden group"
+                style={{ 
+                  backgroundColor: '#1E65AD', 
+                  fontFamily: 'Roboto, sans-serif',
+                  boxShadow: '0 4px 15px rgba(30, 101, 173, 0.3)',
+                  minHeight: '44px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#CF9B63';
+                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(207, 155, 99, 0.4)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#1E65AD';
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(30, 101, 173, 0.3)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                Login
+              </button>
+            )}
+          </li>
+        </ul>
+
+        {/* User Profile or Login Button - Right Side */}
+        <div className="hidden md:flex items-center gap-3">
+          {/* Language Selector */}
+          <LanguageSelector />
+          
+          {isAuthenticated ? (
+            <div className="relative">
+                <button
+                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                  className="flex items-center gap-3 px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200"
+                >
+                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    {(user?.name || 'U').charAt(0).toUpperCase()}
+                  </div>
+                  <div className="text-left">
+                    <div className="font-semibold text-gray-800 text-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      {user?.name || 'User'}
+                    </div>
+                    <div className="text-xs text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      {user?.email || user?.phone || 'No email'}
+                    </div>
+                  </div>
+                  <svg 
+                    className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${userDropdownOpen ? 'rotate-180' : ''}`}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {/* User Dropdown */}
+                <div className={`absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl border py-2 z-50 transition-all duration-300 ease-out ${userDropdownOpen ? 'block opacity-100' : 'hidden opacity-0'}`} style={{ borderColor: '#E5E7EB' }}>
+                  <div className="px-4 py-3 border-b" style={{ borderColor: '#E5E7EB' }}>
+                    <div className="font-semibold text-gray-800" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      {user?.name || 'User'}
+                    </div>
+                    <div className="text-sm text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      {user?.email || user?.phone || 'No email'}
+                    </div>
+                    {user?.profession && (
+                      <div className="text-xs text-blue-600 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                        {user.profession}
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => {
+                      navigate("/dashboard");
+                      setUserDropdownOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors duration-200 text-sm"
+                    style={{ fontFamily: 'Roboto, sans-serif' }}
+                  >
+                    Dashboard
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigate("/profile");
+                      setUserDropdownOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors duration-200 text-sm"
+                    style={{ fontFamily: 'Roboto, sans-serif' }}
+                  >
+                    View Profile
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 transition-colors duration-200 text-sm"
+                    style={{ fontFamily: 'Roboto, sans-serif' }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+          ) : (
             <button
               onClick={() => navigate("/login")}
-              className="bg-gradient-to-r from-sky-500 to-indigo-500 text-white px-6 py-2 rounded-full font-semibold hover:shadow-md hover:scale-[1.03] transition-transform duration-200"
+              className="text-white px-6 sm:px-8 py-3 sm:py-3 rounded-full font-semibold hover:shadow-xl hover:scale-110 transition-all duration-500 ease-out transform text-sm sm:text-base touch-manipulation relative overflow-hidden group"
+              style={{ 
+                backgroundColor: '#1E65AD', 
+                fontFamily: 'Roboto, sans-serif',
+                boxShadow: '0 4px 15px rgba(30, 101, 173, 0.3)',
+                minHeight: '44px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#CF9B63';
+                e.currentTarget.style.boxShadow = '0 8px 25px rgba(207, 155, 99, 0.4)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#1E65AD';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(30, 101, 173, 0.3)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
             >
               Login
             </button>
-          </li>
-        </ul>
+          )}
+
+        </div>
       </div>
     </nav>
   );

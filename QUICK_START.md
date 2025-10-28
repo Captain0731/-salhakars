@@ -1,4 +1,4 @@
-# सलाहकार - Quick Start Guide
+# सलहाकार - Quick Start Guide
 
 ## 🚀 Getting Started
 
@@ -112,7 +112,7 @@ The app will open at `http://localhost:3000`
 ### Change Branding
 Edit `/src/components/landing/Navbar.jsx`:
 ```jsx
-<span className="text-2xl font-bold">सलाहकार</span>
+<span className="text-2xl font-bold">सलहाकार</span>
 // Change to your preferred name
 ```
 
@@ -220,7 +220,7 @@ salhakar/
 
 ## 🎉 You're All Set!
 
-Your सलाहकार app is now integrated with:
+Your सलहाकार app is now integrated with:
 - ✅ Beautiful landing page
 - ✅ Login/signup functionality
 - ✅ Complete navigation system

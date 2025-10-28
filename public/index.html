@@ -15,8 +15,174 @@
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    <!-- Google Translate Styles - Hide all UI elements -->
+    <style>
+      /* Hide Google Translate banner/bar - Multiple selectors */
+      .goog-te-banner-frame.skiptranslate,
+      .goog-te-banner-frame,
+      .skiptranslate,
+      .goog-te-banner-frame.skiptranslate iframe,
+      .goog-te-banner-frame iframe {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        width: 0 !important;
+        position: absolute !important;
+        left: -9999px !important;
+        top: -9999px !important;
+      }
+      
+      /* Hide Google Translate toolbar */
+      .goog-te-ftab,
+      .goog-te-ftab-link {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+      }
+      
+      /* Hide Google Translate gadget */
+      .goog-te-gadget,
+      .goog-te-gadget-simple {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        font-size: 0 !important;
+      }
+      
+      /* Hide Google Translate combo box */
+      .goog-te-combo {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+      }
+      
+      /* Hide Google Translate logo */
+      .goog-te-logo {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+      }
+      
+      /* Ensure body doesn't get shifted by Google Translate */
+      body {
+        top: 0px !important;
+        margin-top: 0px !important;
+        padding-top: 0px !important;
+      }
+      
+      /* Hide any Google Translate frames */
+      iframe.goog-te-banner-frame,
+      iframe[src*="translate.google.com"] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        width: 0 !important;
+      }
+      
+      /* Hide Google Translate banner completely - More aggressive */
+      .goog-te-banner-frame {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        width: 0 !important;
+        position: absolute !important;
+        left: -9999px !important;
+        top: -9999px !important;
+        z-index: -9999 !important;
+      }
+      
+      /* Hide any div with Google Translate classes */
+      div[class*="goog-te"],
+      div[class*="skiptranslate"] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+      }
+      
+      /* Hide Google Translate footer and links */
+      .goog-te-ftab-link,
+      .goog-te-ftab {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+      }
+      
+      /* Additional aggressive hiding */
+      *[class*="goog-te"] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+      }
+      
+      /* Hide any element with Google Translate in the class name */
+      [class*="goog-te-banner"],
+      [class*="goog-te-ftab"],
+      [class*="goog-te-gadget"] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        width: 0 !important;
+        position: absolute !important;
+        left: -9999px !important;
+        top: -9999px !important;
+      }
+    </style>
     <!-- Font Awesome -->
     <script src="https://kit.fontawesome.com/9ed711c3e8.js" crossorigin="anonymous"></script>
+    <!-- Immediate Google Translate Hiding Script -->
+    <script>
+      // Hide Google Translate elements immediately
+      (function() {
+        const hideGoogleElements = () => {
+          const selectors = [
+            '.goog-te-banner-frame',
+            '.goog-te-ftab',
+            '.goog-te-gadget',
+            '.goog-te-combo',
+            '.goog-te-logo',
+            '.skiptranslate',
+            '[class*="goog-te"]',
+            'iframe[src*="translate.google.com"]'
+          ];
+          
+          selectors.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(el => {
+              if (el) {
+                el.style.display = 'none';
+                el.style.visibility = 'hidden';
+                el.style.opacity = '0';
+                el.style.height = '0';
+                el.style.width = '0';
+                el.style.position = 'absolute';
+                el.style.left = '-9999px';
+                el.style.top = '-9999px';
+                el.style.zIndex = '-9999';
+              }
+            });
+          });
+        };
+        
+        // Hide immediately
+        hideGoogleElements();
+        
+        // Hide when DOM is ready
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', hideGoogleElements);
+        }
+        
+        // Hide periodically
+        setInterval(hideGoogleElements, 100);
+      })();
+    </script>
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -26,7 +192,7 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>सलाहकार - AI Legal Platform</title>
+    <title>सलहाकार - AI Legal Platform</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
