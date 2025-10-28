@@ -4,7 +4,6 @@ import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
 import useInfiniteScroll from "../hooks/useInfiniteScroll";
 import { ActSkeleton, InfiniteScrollLoader } from "../components/LoadingComponents";
-import BookmarkButton from "../components/BookmarkButton";
 
 export default function StateActs() {
   const navigate = useNavigate();
@@ -12,7 +11,6 @@ export default function StateActs() {
   const [filters, setFilters] = useState({
     state: "",
     act_number: "",
-    short_title: "",
     year: "",
     department: ""
   });
@@ -48,13 +46,18 @@ export default function StateActs() {
   ];
   const years = Array.from({ length: 20 }, (_, i) => new Date().getFullYear() - i);
 
-  const handleSearch = async (offset = 0) => {
+  const handleSearch = useCallback(async (offset = 0) => {
+    console.log('handleSearch called with offset:', offset);
+    console.log('Current searchQuery:', searchQuery);
+    console.log('Current filters:', filters);
+    
     setLoading(true);
     setError("");
     
     // Validate filters before making API call
     const validationWarnings = validateFilters();
     if (validationWarnings.length > 0) {
+      console.log('Validation warnings:', validationWarnings);
       setError(validationWarnings.join('. '));
       setLoading(false);
       return;
@@ -72,33 +75,51 @@ export default function StateActs() {
         apiParams.short_title = searchQuery.trim();
       }
 
-      // Add filters only if they have values
+      // Add filters only if they have values - using correct API parameter names
       if (filters.state && filters.state.trim()) {
         apiParams.state = filters.state.trim();
       }
       if (filters.act_number && filters.act_number.trim()) {
         apiParams.act_number = filters.act_number.trim();
       }
-      if (filters.short_title && filters.short_title.trim()) {
-        apiParams.short_title = filters.short_title.trim();
-      }
       if (filters.year && filters.year.trim()) {
-        // Convert year to string to avoid backend type issues
-        apiParams.year = filters.year.trim().toString();
+        // Convert year to integer for API consistency
+        const yearValue = parseInt(filters.year);
+        console.log('Year filter applied:', filters.year, 'converted to:', yearValue);
+        if (!isNaN(yearValue)) {
+          apiParams.year = yearValue;
+          console.log('Year parameter added to API call:', yearValue);
+        } else {
+          console.error('Year conversion failed:', filters.year);
+        }
+      } else {
+        console.log('No year filter applied. Current year filter:', filters.year);
       }
       if (filters.department && filters.department.trim()) {
         apiParams.department = filters.department.trim();
       }
 
-      const data = await apiService.getStateActs(apiParams);
+      console.log('Making State Acts API call with params:', apiParams);
+      const queryString = new URLSearchParams(apiParams).toString();
+      console.log('API URL will be:', `${apiService.baseURL}/api/acts/state-acts?${queryString}`);
+      console.log('Query string breakdown:', queryString);
       
+      // Test API call
+      const data = await apiService.getStateActs(apiParams);
+      console.log('State Acts API response received:', data);
+      
+      // Handle response data
       if (offset === 0) {
         setActs(data.data || []);
       } else {
         setActs(prev => [...prev, ...(data.data || [])]);
       }
       
-      setPagination(data.pagination_info);
+      // Update pagination info
+      setPagination(data.pagination_info || data.pagination);
+      
+      // Clear any previous errors
+      setError("");
     } catch (err) {
       let errorMessage = "Failed to fetch state acts. Please try again.";
       
@@ -120,7 +141,7 @@ export default function StateActs() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery, filters]);
 
   // Function to load more data for infinite scroll
   const loadMoreData = useCallback(async () => {
@@ -136,18 +157,35 @@ export default function StateActs() {
   });
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    console.log('Filter changed:', key, '=', value);
+    if (key === 'year') {
+      console.log('Year filter specifically changed to:', value, 'type:', typeof value);
+    }
+    setFilters(prev => {
+      const newFilters = { ...prev, [key]: value };
+      console.log('New filters:', newFilters);
+      return newFilters;
+    });
   };
 
   // Validate filters before sending to API
   const validateFilters = () => {
+    console.log('Validating filters:', filters);
     const warnings = [];
     
     // Check if year is valid
     if (filters.year && filters.year.trim()) {
       const year = parseInt(filters.year);
-      if (isNaN(year) || year < 1800 || year > new Date().getFullYear() + 1) {
-        warnings.push('Please enter a valid year between 1800 and ' + (new Date().getFullYear() + 1));
+      console.log('Validating year:', filters.year, 'parsed as:', year, 'isNaN:', isNaN(year));
+      const currentYear = new Date().getFullYear();
+      const maxYear = currentYear + 1;
+      console.log('Year validation range: 1800 to', maxYear, 'for year:', year);
+      
+      if (isNaN(year) || year < 1800 || year > maxYear) {
+        console.log('Year validation failed for:', year, 'Range: 1800 to', maxYear);
+        warnings.push('Please enter a valid year between 1800 and ' + maxYear);
+      } else {
+        console.log('Year validation passed for:', year);
       }
     }
     
@@ -159,6 +197,7 @@ export default function StateActs() {
       }
     }
     
+    console.log('Validation warnings:', warnings);
     return warnings;
   };
 
@@ -208,7 +247,6 @@ export default function StateActs() {
     setFilters({
       state: "",
       act_number: "",
-      short_title: "",
       year: "",
       department: ""
     });
@@ -241,7 +279,7 @@ export default function StateActs() {
     }, isInitialLoad ? 100 : 500); // Shorter delay for initial load
 
     return () => clearTimeout(timeoutId);
-  }, [searchQuery, filters, isInitialLoad]);
+  }, [handleSearch, isInitialLoad]);
 
   // Load total count on component mount
   useEffect(() => {
@@ -249,6 +287,30 @@ export default function StateActs() {
       getTotalCount();
     }
   }, [totalCountLoaded]);
+
+  // Test API call on mount
+  useEffect(() => {
+    const testAPI = async () => {
+      try {
+        console.log('Testing State Acts API with basic call...');
+        const testData = await apiService.getStateActs({ limit: 5 });
+        console.log('Test API call successful:', testData);
+        
+        // Test with year filter
+        console.log('Testing State Acts API with year filter...');
+        const testDataWithYear = await apiService.getStateActs({ limit: 5, year: 2023 });
+        console.log('Test API call with year successful:', testDataWithYear);
+        
+        // Test with different year
+        console.log('Testing State Acts API with year 2020...');
+        const testDataWithYear2020 = await apiService.getStateActs({ limit: 5, year: 2020 });
+        console.log('Test API call with year 2020 successful:', testDataWithYear2020);
+      } catch (error) {
+        console.error('Test API call failed:', error);
+      }
+    };
+    testAPI();
+  }, []);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
@@ -287,7 +349,10 @@ export default function StateActs() {
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    console.log('Search query changed:', e.target.value);
+                    setSearchQuery(e.target.value);
+                  }}
                   placeholder="Search by act title, state, department, or any keyword..."
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 pl-10 sm:pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm sm:text-base lg:text-lg"
                   style={{ fontFamily: 'Roboto, sans-serif' }}
@@ -377,6 +442,14 @@ export default function StateActs() {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <button
+                onClick={() => handleSearch(0)}
+                disabled={loading}
+                className="px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                style={{ fontFamily: 'Roboto, sans-serif' }}
+              >
+                {loading ? 'Searching...' : 'Search'}
+              </button>
+              <button
                 onClick={clearFilters}
                 disabled={loading}
                 className="px-4 sm:px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
@@ -448,12 +521,12 @@ export default function StateActs() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-3 sm:gap-0">
               <div className="flex-1">
                 <h2 className="text-lg sm:text-xl lg:text-2xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                  {searchQuery || filters.state || filters.act_number || filters.year || filters.department || filters.location 
+                  {searchQuery || filters.state || filters.act_number || filters.year || filters.department 
                     ? 'Search Results - State Acts' 
                     : 'Latest State Acts'}
                 </h2>
                 <p className="text-xs sm:text-sm text-gray-600 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                  {searchQuery || filters.state || filters.act_number || filters.year || filters.department || filters.location 
+                  {searchQuery || filters.state || filters.act_number || filters.year || filters.department 
                     ? 'Showing State Acts matching your search and filter criteria' 
                     : 'Showing the most recent State Acts first'}
                 </p>
@@ -593,12 +666,6 @@ export default function StateActs() {
                       </div>
 
                       <div className="flex-shrink-0 flex flex-col sm:flex-row gap-2">
-                        <BookmarkButton
-                          item={act}
-                          type="state_act"
-                          size="default"
-                          showText={true}
-                        />
                         <button
                           onClick={() => viewActDetails(act)}
                           className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow-md"

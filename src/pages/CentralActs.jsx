@@ -4,7 +4,6 @@ import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
 import useInfiniteScroll from "../hooks/useInfiniteScroll";
 import { ActSkeleton, InfiniteScrollLoader } from "../components/LoadingComponents";
-import BookmarkButton from "../components/BookmarkButton";
 
 // Add custom CSS animations
 const customStyles = `
@@ -667,12 +666,6 @@ export default function CentralActs() {
                       </div>
 
                       <div className="flex-shrink-0 flex flex-col sm:flex-row gap-2">
-                        <BookmarkButton
-                          item={act}
-                          type="central_act"
-                          size="default"
-                          showText={true}
-                        />
                         <button
                           onClick={() => viewActDetails(act)}
                           className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow-md text-sm sm:text-base"

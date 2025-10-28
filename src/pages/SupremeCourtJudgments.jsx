@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
@@ -63,7 +63,7 @@ export default function SupremeCourtJudgments() {
   const [filters, setFilters] = useState({
     search: '',
     cnr: '',
-    // highCourt: '',
+    highCourt: '',
     decisionDateFrom: ''
   });
 
@@ -95,7 +95,7 @@ export default function SupremeCourtJudgments() {
         limit: 1,
       };
       
-      const data = await apiService.getJudgements(params);
+      const data = await apiService.getSupremeCourtJudgements(params);
       console.log('Supreme Court total count API response:', data);
       
       // Try to extract total count from various possible fields
@@ -155,9 +155,12 @@ export default function SupremeCourtJudgments() {
       return;
     }
     
-    setIsSearching(true);
-    setLoading(true);
-    setError("");
+    if (loadMore) {
+      setIsSearching(true);
+    } else {
+      setLoading(true);
+      setError("");
+    }
     
     try {
       // Prepare API parameters with filters - for Supreme Court judgments
@@ -322,25 +325,25 @@ export default function SupremeCourtJudgments() {
       
       {/* Clean Header Section */}
       <div className="bg-white border-b border-gray-200 pt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="text-center">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3 sm:mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+            <h1 className="text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
               Supreme Court Judgments
             </h1>
-            <div className="w-16 sm:w-20 h-1 mx-auto mb-4 sm:mb-6" style={{ backgroundColor: '#CF9B63' }}></div>
-            <p className="text-sm sm:text-base lg:text-lg max-w-3xl mx-auto px-4" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}>
+            <div className="w-20 h-1 mx-auto mb-6" style={{ backgroundColor: '#CF9B63' }}></div>
+            <p className="text-lg max-w-3xl mx-auto" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}>
               Search and access legal judgments from the Supreme Court of India
             </p>
           </div>
         </div>
       </div>
 
-      <div className="p-3 sm:p-4 lg:p-6">
+      <div className="p-6">
         <div className="max-w-7xl mx-auto">
 
           {/* Search and Filter Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold mb-4 sm:mb-6" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
+            <h2 className="text-2xl font-bold mb-6" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
               Search & Filter Supreme Court Judgments
             </h2>
             
@@ -372,7 +375,7 @@ export default function SupremeCourtJudgments() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               {/* CNR Filter */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   CNR Number
                 </label>
                 <input
@@ -380,20 +383,20 @@ export default function SupremeCourtJudgments() {
                   value={filters.cnr}
                   onChange={(e) => handleFilterChange('cnr', e.target.value)}
                   placeholder="e.g., SC-123456-2023"
-                  className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   style={{ fontFamily: 'Roboto, sans-serif' }}
                 />
               </div>
 
               {/* High Court Filter */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   High Court
                 </label>
                 <select
                   value={filters.highCourt}
                   onChange={(e) => handleFilterChange('highCourt', e.target.value)}
-                  className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   style={{ fontFamily: 'Roboto, sans-serif' }}
                 >
                   <option value="">All High Courts</option>
@@ -422,14 +425,14 @@ export default function SupremeCourtJudgments() {
 
               {/* Decision Date From */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   Decision Date From
                 </label>
                 <input
                   type="date"
                   value={filters.decisionDateFrom}
                   onChange={(e) => handleFilterChange('decisionDateFrom', e.target.value)}
-                  className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   style={{ fontFamily: 'Roboto, sans-serif' }}
                 />
               </div>
@@ -503,10 +506,10 @@ export default function SupremeCourtJudgments() {
                     : 'Showing the most recent Supreme Court judgments first'}
                 </p>
               </div>
-              <div className="text-right">
-                <span className="text-sm text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                  Showing {judgments.length} of {totalCount > 0 ? totalCount.toLocaleString() : '500,000'} judgments
-                </span>
+                <div className="text-right">
+                  <span className="text-sm text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    Showing {judgments.length} of {totalCount > 0 ? totalCount.toLocaleString() : '500,000'} judgments
+                  </span>
                 {(filters.search || filters.cnr || filters.highCourt || filters.decisionDateFrom) && (
                   <div className="mt-1">
                     <button
