@@ -390,10 +390,10 @@ class ApiService {
       // Add search and filter parameters
       if (params.search) queryParams.append('search', params.search);
       if (params.cnr) queryParams.append('cnr', params.cnr);
-      if (params.highCourt) queryParams.append('court_name', params.highCourt);
+      if (params.court_name) queryParams.append('court_name', params.court_name);
       if (params.decisionDateFrom) queryParams.append('decisionDateFrom', params.decisionDateFrom);
       
-      const url = `${this.baseURL}/api/judgements?${queryParams.toString()}`;
+      const url = `${this.baseURL}/api/high-court-judgements?${queryParams.toString()}`;
       console.log('🌐 API URL:', url);
       
       // Check authentication token

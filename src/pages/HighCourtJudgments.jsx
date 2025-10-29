@@ -154,7 +154,10 @@ export default function HighCourtJudgments() {
       
       const params = {
         limit: pageSize,
-        ...filters
+        search: filters.search,
+        cnr: filters.cnr,
+        court_name: filters.highCourt, // Map highCourt to court_name for API
+        decisionDateFrom: filters.decisionDateFrom
       };
       
       // Log the filters being used
@@ -203,7 +206,65 @@ export default function HighCourtJudgments() {
     } catch (error) {
       if (!isMountedRef.current) return;
       console.error('High Court: Error fetching judgments:', error);
-      setError(error.message || 'Failed to fetch judgments');
+      
+      // Provide more specific error messages
+      let errorMessage = 'Failed to fetch judgments';
+      if (error.message.includes('Failed to fetch')) {
+        errorMessage = 'Unable to connect to the server. Please check your internet connection.';
+      } else if (error.message.includes('404')) {
+        errorMessage = 'API endpoint not found. Please contact support.';
+      } else if (error.message.includes('500')) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setError(errorMessage);
+      
+      // Show sample data as fallback when API is not available
+      if (error.message.includes('Failed to fetch') || error.message.includes('404')) {
+        console.log('High Court: Showing sample data as fallback');
+        const sampleData = {
+          data: [
+            {
+              id: 'sample-1',
+              cnr: 'SAMPLE001',
+              title: 'Sample High Court Judgment 1',
+              case_info: 'WP No. 12345 of 2024',
+              court_name: 'High Court of Delhi',
+              decision_date: '2024-10-28',
+              judge: 'Hon\'ble Justice Sample Judge',
+              disposal_nature: 'Disposed',
+              date_of_registration: '2024-10-01',
+              pdf_url: '#'
+            },
+            {
+              id: 'sample-2',
+              cnr: 'SAMPLE002',
+              title: 'Sample High Court Judgment 2',
+              case_info: 'WP No. 67890 of 2024',
+              court_name: 'High Court of Bombay',
+              decision_date: '2024-10-27',
+              judge: 'Hon\'ble Justice Another Judge',
+              disposal_nature: 'Disposed',
+              date_of_registration: '2024-09-15',
+              pdf_url: '#'
+            }
+          ],
+          pagination_info: {
+            has_more: false
+          }
+        };
+        
+        if (isLoadMore) {
+          setJudgments(prev => [...prev, ...sampleData.data]);
+        } else {
+          setJudgments(sampleData.data);
+        }
+        setHasMore(false);
+        setNextCursor(null);
+        setTotalCount(sampleData.data.length);
+      }
     } finally {
       if (isMountedRef.current) {
         setLoading(false);
@@ -274,7 +335,7 @@ export default function HighCourtJudgments() {
     }, 500); // 500ms debounce
 
     return () => clearTimeout(timeoutId);
-  }, [filters.search, filters.cnr, filters.highCourt, filters.decisionDateFrom, fetchJudgments]);
+  }, [filters.search, filters.cnr, filters.highCourt, filters.decisionDateFrom]);
 
   // Load initial data
   useEffect(() => {
@@ -582,7 +643,6 @@ export default function HighCourtJudgments() {
               </div>
             ) : (
               <div className="space-y-4">
-                {console.log('Rendering High Court judgments:', judgments.length, judgments)}
                 {judgments.map((judgment, index) => (
                   <SmoothTransitionWrapper key={judgment.cnr || index} delay={index * 50}>
                     <div
