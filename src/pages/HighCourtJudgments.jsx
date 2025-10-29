@@ -154,10 +154,7 @@ export default function HighCourtJudgments() {
       
       const params = {
         limit: pageSize,
-        search: filters.search,
-        cnr: filters.cnr,
-        court_name: filters.highCourt, // Map highCourt to court_name for API
-        decisionDateFrom: filters.decisionDateFrom
+        ...filters
       };
       
       // Log the filters being used
@@ -183,10 +180,28 @@ export default function HighCourtJudgments() {
       console.log('High Court: Data length:', data?.data?.length);
       console.log('High Court: Has more data?', data?.pagination_info?.has_more);
       
+      // Validate API response structure
+      if (!data || typeof data !== 'object') {
+        throw new Error('Invalid API response: Expected object but got ' + typeof data);
+      }
+      
+      if (!Array.isArray(data.data)) {
+        console.warn('High Court: API response data is not an array:', data.data);
+        data.data = [];
+      }
+      
       if (!isMountedRef.current) return;
       
-      const newJudgments = data.data || [];
+      // Ensure data structure is valid
+      const newJudgments = Array.isArray(data.data) ? data.data : [];
       const paginationInfo = data.pagination_info || {};
+      
+      console.log('High Court: Processing judgments:', {
+        newJudgmentsLength: newJudgments.length,
+        paginationInfo,
+        hasMore: paginationInfo.has_more,
+        nextCursor: data.next_cursor
+      });
       
       if (isLoadMore) {
         setJudgments(prev => [...prev, ...newJudgments]);
@@ -206,65 +221,7 @@ export default function HighCourtJudgments() {
     } catch (error) {
       if (!isMountedRef.current) return;
       console.error('High Court: Error fetching judgments:', error);
-      
-      // Provide more specific error messages
-      let errorMessage = 'Failed to fetch judgments';
-      if (error.message.includes('Failed to fetch')) {
-        errorMessage = 'Unable to connect to the server. Please check your internet connection.';
-      } else if (error.message.includes('404')) {
-        errorMessage = 'API endpoint not found. Please contact support.';
-      } else if (error.message.includes('500')) {
-        errorMessage = 'Server error. Please try again later.';
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      setError(errorMessage);
-      
-      // Show sample data as fallback when API is not available
-      if (error.message.includes('Failed to fetch') || error.message.includes('404')) {
-        console.log('High Court: Showing sample data as fallback');
-        const sampleData = {
-          data: [
-            {
-              id: 'sample-1',
-              cnr: 'SAMPLE001',
-              title: 'Sample High Court Judgment 1',
-              case_info: 'WP No. 12345 of 2024',
-              court_name: 'High Court of Delhi',
-              decision_date: '2024-10-28',
-              judge: 'Hon\'ble Justice Sample Judge',
-              disposal_nature: 'Disposed',
-              date_of_registration: '2024-10-01',
-              pdf_url: '#'
-            },
-            {
-              id: 'sample-2',
-              cnr: 'SAMPLE002',
-              title: 'Sample High Court Judgment 2',
-              case_info: 'WP No. 67890 of 2024',
-              court_name: 'High Court of Bombay',
-              decision_date: '2024-10-27',
-              judge: 'Hon\'ble Justice Another Judge',
-              disposal_nature: 'Disposed',
-              date_of_registration: '2024-09-15',
-              pdf_url: '#'
-            }
-          ],
-          pagination_info: {
-            has_more: false
-          }
-        };
-        
-        if (isLoadMore) {
-          setJudgments(prev => [...prev, ...sampleData.data]);
-        } else {
-          setJudgments(sampleData.data);
-        }
-        setHasMore(false);
-        setNextCursor(null);
-        setTotalCount(sampleData.data.length);
-      }
+      setError(error.message || 'Failed to fetch judgments');
     } finally {
       if (isMountedRef.current) {
         setLoading(false);
@@ -335,7 +292,7 @@ export default function HighCourtJudgments() {
     }, 500); // 500ms debounce
 
     return () => clearTimeout(timeoutId);
-  }, [filters.search, filters.cnr, filters.highCourt, filters.decisionDateFrom]);
+  }, [filters.search, filters.cnr, filters.highCourt, filters.decisionDateFrom, fetchJudgments]);
 
   // Load initial data
   useEffect(() => {
@@ -627,7 +584,7 @@ export default function HighCourtJudgments() {
 
             {loading ? (
               <SkeletonGrid count={3} />
-            ) : judgments.length === 0 ? (
+            ) : judgments.length === 0 && !error ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
                   <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -652,7 +609,7 @@ export default function HighCourtJudgments() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <h3 className="text-xl font-semibold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                            {judgment.title || judgment.case_info || 'Untitled Judgment'}
+                            {judgment.title || judgment.case_info || judgment.case_title || 'Untitled Judgment'}
                           </h3>
                           {index === 0 && (
                             <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
@@ -662,10 +619,10 @@ export default function HighCourtJudgments() {
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
-                          {judgment.court_name && (
+                          {(judgment.court_name || judgment.court) && (
                             <div>
                               <span className="font-medium text-gray-800">Court:</span>
-                              <span className="ml-2" style={{ color: '#8C969F' }}>{judgment.court_name}</span>
+                              <span className="ml-2" style={{ color: '#8C969F' }}>{judgment.court_name || judgment.court}</span>
                             </div>
                           )}
                           
