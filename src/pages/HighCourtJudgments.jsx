@@ -123,6 +123,8 @@ export default function HighCourtJudgments() {
   const [hasMore, setHasMore] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
   const [nextCursor, setNextCursor] = useState(null);
+  const nextCursorRef = useRef(null);
+  const fetchJudgmentsRef = useRef(null);
 
   // Filter states
   const [filters, setFilters] = useState({
@@ -146,17 +148,23 @@ export default function HighCourtJudgments() {
         setError(null);
       }
       
-      console.log('High Court: Fetching judgments with params:', { isLoadMore, filters, nextCursor });
+      // Get current nextCursor value from ref
+      const currentNextCursor = nextCursorRef.current;
+      console.log('High Court: Fetching judgments with params:', { isLoadMore, filters, currentNextCursor });
       
       const params = {
         limit: pageSize,
         ...filters
       };
+      
+      // Log the filters being used
+      console.log('High Court: Current filters state:', filters);
+      console.log('High Court: All filters empty?', !filters.search && !filters.cnr && !filters.highCourt && !filters.decisionDateFrom);
 
       // Add cursor for pagination if loading more
-      if (isLoadMore && nextCursor) {
-        params.cursor_decision_date = nextCursor.decision_date;
-        params.cursor_id = nextCursor.id;
+      if (isLoadMore && currentNextCursor) {
+        params.cursor_decision_date = currentNextCursor.decision_date;
+        params.cursor_id = currentNextCursor.id;
       }
 
       // Remove empty filters
@@ -169,6 +177,8 @@ export default function HighCourtJudgments() {
       console.log('High Court: Final API params:', params);
       const data = await apiService.getJudgements(params);
       console.log('High Court: API response:', data);
+      console.log('High Court: Data length:', data?.data?.length);
+      console.log('High Court: Has more data?', data?.pagination_info?.has_more);
       
       if (!isMountedRef.current) return;
       
@@ -200,7 +210,12 @@ export default function HighCourtJudgments() {
         setIsSearching(false);
       }
     }
-  }, [filters, pageSize, nextCursor]);
+  }, [filters, pageSize]);
+
+  // Store fetchJudgments in ref to avoid dependency issues
+  useEffect(() => {
+    fetchJudgmentsRef.current = fetchJudgments;
+  }, [fetchJudgments]);
 
   // Filter handling functions
   const handleFilterChange = (filterName, value) => {
@@ -211,15 +226,24 @@ export default function HighCourtJudgments() {
   };
 
   const clearFilters = () => {
+    console.log('High Court: Clearing filters...');
+    
+    // Clear all filters
     setFilters({
       search: '',
       cnr: '',
       highCourt: '',
       decisionDateFrom: ''
     });
+    
+    // Reset pagination state
     setJudgments([]);
     setHasMore(true);
     setNextCursor(null);
+    
+    // Immediately fetch data without waiting for debounce
+    console.log('High Court: Fetching data after clearing filters...');
+    fetchJudgments(false);
   };
 
   const applyFilters = () => {
@@ -229,10 +253,19 @@ export default function HighCourtJudgments() {
     fetchJudgments(false);
   };
 
+  // Sync nextCursor ref with state
+  useEffect(() => {
+    nextCursorRef.current = nextCursor;
+  }, [nextCursor]);
+
   // Auto-apply filters when they change (with debounce)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (filters.search || filters.cnr || filters.highCourt || filters.decisionDateFrom) {
+      // Only trigger search if there are active filters or if this is the initial load
+      const hasActiveFilters = filters.search || filters.cnr || filters.highCourt || filters.decisionDateFrom;
+      
+      if (hasActiveFilters) {
+        console.log('High Court: Auto-applying filters with active filters:', filters);
         setJudgments([]);
         setHasMore(true);
         setNextCursor(null);
@@ -241,7 +274,7 @@ export default function HighCourtJudgments() {
     }, 500); // 500ms debounce
 
     return () => clearTimeout(timeoutId);
-  }, [filters.search, filters.cnr, filters.highCourt, filters.decisionDateFrom]);
+  }, [filters.search, filters.cnr, filters.highCourt, filters.decisionDateFrom, fetchJudgments]);
 
   // Load initial data
   useEffect(() => {
@@ -251,8 +284,10 @@ export default function HighCourtJudgments() {
   // Enhanced infinite scroll logic with cursor-based pagination
   const loadMoreData = useCallback(async () => {
     if (!hasMore || loading || isSearching || !isMountedRef.current) return;
-    await fetchJudgments(true);
-  }, [hasMore, loading, isSearching, fetchJudgments]);
+    if (fetchJudgmentsRef.current) {
+      await fetchJudgmentsRef.current(true);
+    }
+  }, [hasMore, loading, isSearching]);
 
   // Enhanced infinite scroll hook with smooth animations
   // Optimized for 10-item batches with smooth loading
@@ -285,10 +320,6 @@ export default function HighCourtJudgments() {
     };
   }, []);
 
-  useEffect(() => {
-    console.log('useEffect triggered.');
-    console.log('Loading High Court data...');
-  }, []);
 
   return (
     <div className="min-h-screen animate-fade-in-up" style={{ backgroundColor: '#F9FAFC' }}>
