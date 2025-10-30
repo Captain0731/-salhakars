@@ -420,10 +420,10 @@ export default function StateActs() {
                 </select>
               </div>
 
-              {/* Filter ID */}
+              {/* ACT ID */}
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                  Filter ID
+                  ACT ID
                 </label>
                 <input
                   type="text"
@@ -519,7 +519,7 @@ export default function StateActs() {
                   )}
                   {filters.act_number && (
                     <span className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm bg-blue-100 text-blue-800">
-                      Filter ID: {filters.act_number}
+                      ACT ID: {filters.act_number}
                     </span>
                   )}
                   {filters.department && (
