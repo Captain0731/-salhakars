@@ -728,16 +728,17 @@ export default function HighCourtJudgments() {
 
                       </div>
 
-                      <div className="flex-shrink-0 flex flex-col sm:flex-row gap-2">
+                      <div className="flex-shrink-0 flex flex-col gap-3 w-full lg:w-48">
                         <BookmarkButton
                           item={judgment}
                           type="judgement"
                           size="default"
                           showText={true}
+                          className="w-full"
                         />
                         <button
                           onClick={() => viewJudgment(judgment)}
-                          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow-md"
+                          className="w-full px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm hover:shadow-md"
                           style={{ fontFamily: 'Roboto, sans-serif' }}
                         >
                           View Details

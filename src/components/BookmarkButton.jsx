@@ -15,7 +15,8 @@ const BookmarkButton = ({
   showText = true,
   onBookmarkChange = null,
   autoCheckStatus = true,
-  showNotifications = true
+  showNotifications = true,
+  className = ''
 }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -224,11 +225,11 @@ const BookmarkButton = ({
   };
 
   return (
-    <div className="relative">
+    <div className={`relative ${className}`}>
       <button
         onClick={handleBookmarkToggle}
         disabled={isLoading || isCheckingStatus}
-        className={`${getButtonStyles()} ${getButtonColors()}`}
+        className={`${getButtonStyles()} ${getButtonColors()} w-full`}
         title={isBookmarked ? 'Remove from bookmarks' : 'Add to bookmarks'}
         aria-label={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
       >

@@ -1,5 +1,5 @@
 // API Service for Legal Platform - Complete Integration
-const API_BASE_URL = 'https://f95e3cf6dd91.ngrok-free.app';
+const API_BASE_URL = 'https://a61933b14086.ngrok-free.app';
 
 // Fallback URLs in case the primary one fails
 const FALLBACK_URLS = [
@@ -1039,13 +1039,59 @@ class ApiService {
 
   // State Acts API (public access)
   async getStateActs(params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    const response = await fetch(`${this.baseURL}/api/acts/state-acts?${queryString}`, {
-      method: 'GET',
-      headers: this.getPublicHeaders()
-    });
+    console.log('🌐 getStateActs called with params:', params);
+    
+    try {
+      console.log('🌐 Making real API call for State Acts');
+      const queryParams = new URLSearchParams();
+      
+      // Add pagination parameters
+      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.offset) queryParams.append('offset', params.offset);
+      
+      // Add search and filter parameters
+      if (params.search) queryParams.append('search', params.search);
+      if (params.short_title) queryParams.append('short_title', params.short_title);
+      if (params.state) queryParams.append('state', params.state);
+      if (params.act_number) queryParams.append('act_number', params.act_number);
+      if (params.year) queryParams.append('year', params.year);
+      if (params.department) queryParams.append('department', params.department);
+      
+      const url = `${this.baseURL}/api/acts/state-acts?${queryParams.toString()}`;
+      console.log('🌐 State Acts API URL:', url);
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: this.getPublicHeaders()
+      });
+      
+      console.log('🌐 Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('🌐 State Acts API Error Response:', errorText);
+        throw new Error(`State Acts API request failed: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('🌐 State Acts API response:', data);
+      
+      return data;
+    } catch (error) {
+      console.error('🌐 State Acts API call failed:', error);
+      throw error;
+    }
+  }
 
-    return await this.handleResponse(response);
+  // Enhanced State Acts API with offset-based pagination
+  async getStateActsWithOffset(offset = 0, limit = 20, filters = {}) {
+    const params = {
+      limit,
+      offset,
+      ...filters
+    };
+    
+    return await this.getStateActs(params);
   }
 
   // Enhanced Judgements API with cursor-based pagination
