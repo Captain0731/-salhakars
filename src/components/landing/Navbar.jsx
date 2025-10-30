@@ -48,6 +48,19 @@ const navItems = [
         label: "My Bookmarks", 
         path: "/bookmarks",
       },
+      { 
+        label: "🎨 Design Variants", 
+        path: "#",
+        subLinks: [
+          { label: "⬛ Minimalist", path: "/designs/minimalist" },
+          { label: "🔮 Glassmorphism", path: "/designs/glassmorphism" },
+          { label: "🎨 Material Design", path: "/designs/material" },
+          { label: "🍎 Neumorphism", path: "/designs/neumorphism" },
+          { label: "👔 Premium", path: "/designs/premium" },
+          { label: "♿ Accessible", path: "/designs/accessible" },
+          { label: "💬 Conversational", path: "/designs/conversational" },
+        ]
+      },
     ],
   },
   {

@@ -34,6 +34,14 @@ import Dashboard from "./pages/Dashboard";
 import LanguageSelectorDemo from "./pages/LanguageSelectorDemo";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+// Design Variants - Minimalist
+import MinimalistShowcase from "./pages/designs/minimalist/index";
+import MinimalistHighCourt from "./pages/designs/minimalist/HighCourtJudgments";
+import MinimalistSupremeCourt from "./pages/designs/minimalist/SupremeCourtJudgments";
+
+// Design Variants - Glassmorphism
+import GlassmorphismShowcase from "./pages/designs/glassmorphism/index";
+
 function AppLayout() {
   return (
     <div style={{ minHeight: "100vh", overflowY: "auto" }}>
@@ -84,6 +92,14 @@ function AppLayout() {
         <Route path="/referral/invite" element={<InviteFriends />} />
         <Route path="/referral/rewards" element={<EarnRewards />} />
         <Route path="/referral/track" element={<TrackReferrals />} />
+        
+        {/* Design Variant Routes - Minimalist */}
+        <Route path="/designs/minimalist" element={<MinimalistShowcase />} />
+        <Route path="/designs/minimalist/high-court" element={<MinimalistHighCourt />} />
+        <Route path="/designs/minimalist/supreme-court" element={<MinimalistSupremeCourt />} />
+        
+        {/* Design Variant Routes - Glassmorphism */}
+        <Route path="/designs/glassmorphism" element={<GlassmorphismShowcase />} />
       </Routes>
     </div>
   );

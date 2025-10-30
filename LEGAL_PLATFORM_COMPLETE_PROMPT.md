@@ -176,7 +176,7 @@ ngrok http 8000
 - **Bookmark List**: All user bookmarks
 - **Folder Management**: Create and organize folders
 - **Analytics**: Usage statistics and insights
-- **Import/Export**: Data backup and restore
+- 
 
 ---
 

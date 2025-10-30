@@ -62,8 +62,11 @@ export default function SupremeCourtJudgments() {
   // Filter states
   const [filters, setFilters] = useState({
     search: '',
+    title: '',
     cnr: '',
-    highCourt: '',
+    judge: '',
+    petitioner: '',
+    respondent: '',
     decisionDateFrom: ''
   });
 
@@ -78,8 +81,11 @@ export default function SupremeCourtJudgments() {
   const clearFilters = () => {
     setFilters({
       search: '',
+      title: '',
       cnr: '',
-      highCourt: '',
+      judge: '',
+      petitioner: '',
+      respondent: '',
       decisionDateFrom: ''
     });
     // Trigger search with cleared filters
@@ -140,7 +146,7 @@ export default function SupremeCourtJudgments() {
   // Auto-apply filters when they change (with debounce)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (filters.search || filters.cnr || filters.highCourt || filters.decisionDateFrom) {
+      if (filters.search || filters.title || filters.cnr || filters.judge || filters.petitioner || filters.respondent || filters.decisionDateFrom) {
         applyFilters();
       }
     }, 500); // 500ms debounce
@@ -174,21 +180,32 @@ export default function SupremeCourtJudgments() {
         params.search = filters.search.trim();
       }
       
+      if (filters.title.trim()) {
+        params.title = filters.title.trim();
+      }
+      
       if (filters.cnr.trim()) {
         params.cnr = filters.cnr.trim();
       }
       
-      if (filters.highCourt.trim()) {
-        params.court_name = filters.highCourt.trim();
+      if (filters.judge.trim()) {
+        params.judge = filters.judge.trim();
+      }
+      
+      if (filters.petitioner.trim()) {
+        params.petitioner = filters.petitioner.trim();
+      }
+      
+      if (filters.respondent.trim()) {
+        params.respondent = filters.respondent.trim();
       }
       
       if (filters.decisionDateFrom) {
         params.decision_date_from = filters.decisionDateFrom;
       }
 
-      // Add cursor for pagination
+      // Add cursor for pagination (Supreme Court uses cursor_id only)
       if (loadMore && nextCursor) {
-        params.cursor_decision_date = nextCursor.decision_date;
         params.cursor_id = nextCursor.id;
       }
 
@@ -371,6 +388,81 @@ export default function SupremeCourtJudgments() {
                 Search across case titles, parties, judges, and other judgment details
               </p>
             </div>
+
+            {/* Title, Judge, Petitioner, Respondent Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              {/* Title Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  Case Title
+                </label>
+                <input
+                  type="text"
+                  value={filters.title}
+                  onChange={(e) => handleFilterChange('title', e.target.value)}
+                  placeholder="e.g., State vs John Doe"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  style={{ fontFamily: 'Roboto, sans-serif' }}
+                />
+                <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  Search by specific case title
+                </p>
+              </div>
+
+              {/* Judge Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  Judge Name
+                </label>
+                <input
+                  type="text"
+                  value={filters.judge}
+                  onChange={(e) => handleFilterChange('judge', e.target.value)}
+                  placeholder="e.g., Justice Singh"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  style={{ fontFamily: 'Roboto, sans-serif' }}
+                />
+                <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  Search by judge name
+                </p>
+              </div>
+
+              {/* Petitioner Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  Petitioner
+                </label>
+                <input
+                  type="text"
+                  value={filters.petitioner}
+                  onChange={(e) => handleFilterChange('petitioner', e.target.value)}
+                  placeholder="e.g., State of Maharashtra"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  style={{ fontFamily: 'Roboto, sans-serif' }}
+                />
+                <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  Search by petitioner name
+                </p>
+              </div>
+
+              {/* Respondent Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  Respondent
+                </label>
+                <input
+                  type="text"
+                  value={filters.respondent}
+                  onChange={(e) => handleFilterChange('respondent', e.target.value)}
+                  placeholder="e.g., Union of India"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  style={{ fontFamily: 'Roboto, sans-serif' }}
+                />
+                <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  Search by respondent name
+                </p>
+              </div>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               {/* CNR Filter */}
@@ -434,7 +526,11 @@ export default function SupremeCourtJudgments() {
                   onChange={(e) => handleFilterChange('decisionDateFrom', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   style={{ fontFamily: 'Roboto, sans-serif' }}
+                  placeholder="DD-MM-YYYY"
                 />
+                <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  Format: DD-MM-YYYY (e.g., 17-10-2025)
+                </p>
               </div>
             </div>
 
@@ -460,7 +556,7 @@ export default function SupremeCourtJudgments() {
             </div>
 
             {/* Active Filters Display */}
-            {(filters.search || filters.cnr || filters.highCourt || filters.decisionDateFrom) && (
+            {(filters.search || filters.title || filters.cnr || filters.judge || filters.petitioner || filters.respondent || filters.decisionDateFrom) && (
               <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <h3 className="text-sm font-medium text-blue-800 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   Active Filters:
@@ -471,14 +567,29 @@ export default function SupremeCourtJudgments() {
                       Search: "{filters.search}"
                     </span>
                   )}
+                  {filters.title && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                      Title: "{filters.title}"
+                    </span>
+                  )}
                   {filters.cnr && (
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
                       CNR: {filters.cnr}
                     </span>
                   )}
-                  {filters.highCourt && (
+                  {filters.judge && (
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
-                      Court: {filters.highCourt}
+                      Judge: "{filters.judge}"
+                    </span>
+                  )}
+                  {filters.petitioner && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                      Petitioner: "{filters.petitioner}"
+                    </span>
+                  )}
+                  {filters.respondent && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                      Respondent: "{filters.respondent}"
                     </span>
                   )}
                   {filters.decisionDateFrom && (
@@ -496,12 +607,12 @@ export default function SupremeCourtJudgments() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                  {filters.search || filters.cnr || filters.highCourt || filters.decisionDateFrom 
+                  {filters.search || filters.title || filters.cnr || filters.judge || filters.petitioner || filters.respondent || filters.decisionDateFrom 
                     ? 'Search Results - Supreme Court Judgments' 
                     : 'Latest Supreme Court Judgments'}
                 </h2>
                 <p className="text-sm text-gray-600 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                  {filters.search || filters.cnr || filters.highCourt || filters.decisionDateFrom 
+                  {filters.search || filters.title || filters.cnr || filters.judge || filters.petitioner || filters.respondent || filters.decisionDateFrom 
                     ? 'Showing Supreme Court judgments matching your search and filter criteria' 
                     : 'Showing the most recent Supreme Court judgments first'}
                 </p>

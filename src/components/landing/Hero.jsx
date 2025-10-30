@@ -5,15 +5,25 @@ const Hero = () => {
   return (
     <section
       className="relative min-h-[90vh] flex flex-col items-center justify-center text-center overflow-hidden px-4 sm:px-6 lg:px-8"
-      style={{ backgroundColor: '#F9FAFC' }}
+      // style={{ backgroundColor: '#F9FAFC' }}
     >
       {/* Enhanced Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat "
+          style={{ 
+            backgroundImage: 'url(/bg.PNG)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        ></div>
+        
         {/* Floating geometric shapes */}
-        <div className="absolute top-20 left-20 w-32 h-32 rounded-full opacity-10 animate-float" style={{ backgroundColor: '#1E65AD' }}></div>
+        {/* <div className="absolute top-20 left-20 w-32 h-32 rounded-full opacity-10 animate-float" style={{ backgroundColor: '#1E65AD' }}></div>
         <div className="absolute top-40 right-32 w-24 h-24 rounded-full opacity-10 animate-float animation-delay-1000" style={{ backgroundColor: '#CF9B63' }}></div>
         <div className="absolute bottom-32 left-40 w-40 h-40 rounded-full opacity-10 animate-float animation-delay-2000" style={{ backgroundColor: '#8C969F' }}></div>
-        <div className="absolute bottom-20 right-20 w-28 h-28 rounded-full opacity-10 animate-float animation-delay-3000" style={{ backgroundColor: '#1E65AD' }}></div>
+        <div className="absolute bottom-20 right-20 w-28 h-28 rounded-full opacity-10 animate-float animation-delay-3000" style={{ backgroundColor: '#1E65AD' }}></div> */}
         
         {/* Gradient orbs */}
         <div className="absolute w-80 h-80 rounded-full top-10 left-10 blur-3xl animate-pulse-slow opacity-20" style={{ backgroundColor: '#1E65AD' }}></div>

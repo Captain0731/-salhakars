@@ -129,8 +129,10 @@ export default function HighCourtJudgments() {
   // Filter states
   const [filters, setFilters] = useState({
     search: '',
+    title: '',
     cnr: '',
     highCourt: '',
+    judge: '',
     decisionDateFrom: ''
   });
 
@@ -249,8 +251,10 @@ export default function HighCourtJudgments() {
     // Clear all filters
     setFilters({
       search: '',
+      title: '',
       cnr: '',
       highCourt: '',
+      judge: '',
       decisionDateFrom: ''
     });
     
@@ -280,7 +284,7 @@ export default function HighCourtJudgments() {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       // Only trigger search if there are active filters or if this is the initial load
-      const hasActiveFilters = filters.search || filters.cnr || filters.highCourt || filters.decisionDateFrom;
+      const hasActiveFilters = filters.search || filters.title || filters.cnr || filters.highCourt || filters.judge || filters.decisionDateFrom;
       
       if (hasActiveFilters) {
         console.log('High Court: Auto-applying filters with active filters:', filters);
@@ -292,7 +296,7 @@ export default function HighCourtJudgments() {
     }, 500); // 500ms debounce
 
     return () => clearTimeout(timeoutId);
-  }, [filters.search, filters.cnr, filters.highCourt, filters.decisionDateFrom, fetchJudgments]);
+  }, [filters.search, filters.title, filters.cnr, filters.highCourt, filters.judge, filters.decisionDateFrom, fetchJudgments]);
 
   // Load initial data
   useEffect(() => {
@@ -391,6 +395,45 @@ export default function HighCourtJudgments() {
                 Search across case titles, parties, judges, and other judgment details
               </p>
             </div>
+
+            {/* Title and Judge Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              {/* Title Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  Case Title
+                </label>
+                <input
+                  type="text"
+                  value={filters.title}
+                  onChange={(e) => handleFilterChange('title', e.target.value)}
+                  placeholder="e.g., State vs John Doe"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  style={{ fontFamily: 'Roboto, sans-serif' }}
+                />
+                <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  Search by specific case title
+                </p>
+              </div>
+
+              {/* Judge Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  Judge Name
+                </label>
+                <input
+                  type="text"
+                  value={filters.judge}
+                  onChange={(e) => handleFilterChange('judge', e.target.value)}
+                  placeholder="e.g., Justice Singh"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  style={{ fontFamily: 'Roboto, sans-serif' }}
+                />
+                <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  Search by judge name
+                </p>
+              </div>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               {/* CNR Filter */}
@@ -462,10 +505,10 @@ export default function HighCourtJudgments() {
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   style={{ fontFamily: 'Roboto, sans-serif' }}
-                  placeholder="YYYY-MM-DD"
+                  placeholder="DD-MM-YYYY"
                 />
                 <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                  Format: YYYY-MM-DD (e.g., 2025-10-17)
+                  Format: DD-MM-YYYY (e.g., 17-10-2025)
                 </p>
               </div>
             </div>
@@ -492,7 +535,7 @@ export default function HighCourtJudgments() {
             </div>
 
             {/* Active Filters Display */}
-            {(filters.search || filters.cnr || filters.highCourt || filters.decisionDateFrom) && (
+            {(filters.search || filters.title || filters.cnr || filters.highCourt || filters.judge || filters.decisionDateFrom) && (
               <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <h3 className="text-sm font-medium text-blue-800 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   Active Filters:
@@ -503,6 +546,11 @@ export default function HighCourtJudgments() {
                       Search: "{filters.search}"
                     </span>
                   )}
+                  {filters.title && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                      Title: "{filters.title}"
+                    </span>
+                  )}
                   {filters.cnr && (
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
                       CNR: {filters.cnr}
@@ -511,6 +559,11 @@ export default function HighCourtJudgments() {
                   {filters.highCourt && (
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
                       Court: {filters.highCourt}
+                    </span>
+                  )}
+                  {filters.judge && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                      Judge: "{filters.judge}"
                     </span>
                   )}
                   {filters.decisionDateFrom && (
@@ -528,12 +581,12 @@ export default function HighCourtJudgments() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif', animationDelay: '1.2s' }}>
-                  {filters.search || filters.cnr || filters.highCourt || filters.decisionDateFrom 
+                  {filters.search || filters.title || filters.cnr || filters.highCourt || filters.judge || filters.decisionDateFrom 
                     ? 'Search Results - High Court Judgments' 
                     : 'Latest High Court Judgments'}
                 </h2>
                 <p className="text-sm text-gray-600 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                  {filters.search || filters.cnr || filters.highCourt || filters.decisionDateFrom 
+                  {filters.search || filters.title || filters.cnr || filters.highCourt || filters.judge || filters.decisionDateFrom 
                     ? 'Showing High Court judgments matching your search and filter criteria' 
                     : 'Showing the most recent High Court judgments first'}
                 </p>
@@ -545,7 +598,7 @@ export default function HighCourtJudgments() {
                     : `Showing ${judgments.length} judgments`
                   }
                 </span>
-                {(filters.search || filters.cnr || filters.highCourt || filters.decisionDateFrom) && (
+                {(filters.search || filters.title || filters.cnr || filters.highCourt || filters.judge || filters.decisionDateFrom) && (
                   <div className="mt-1">
                     <button
                       onClick={clearFilters}
