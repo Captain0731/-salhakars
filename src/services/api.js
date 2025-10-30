@@ -1053,7 +1053,8 @@ class ApiService {
       if (params.search) queryParams.append('search', params.search);
       if (params.short_title) queryParams.append('short_title', params.short_title);
       if (params.state) queryParams.append('state', params.state);
-      if (params.act_number) queryParams.append('act_number', params.act_number);
+      if (params.act_number) queryParams.append('act_id', params.act_number); // Changed to act_id for State Acts API
+      if (params.act_id) queryParams.append('act_id', params.act_id); // Support direct act_id parameter
       if (params.year) queryParams.append('year', params.year);
       if (params.department) queryParams.append('department', params.department);
       

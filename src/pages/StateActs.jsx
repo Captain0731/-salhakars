@@ -176,6 +176,7 @@ export default function StateActs() {
       
       if (filters.act_number.trim()) {
         params.act_number = filters.act_number.trim();
+        console.log('ACT ID filter applied:', filters.act_number.trim());
       }
       
       if (filters.year.trim()) {
