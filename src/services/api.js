@@ -1,5 +1,5 @@
 // API Service for Legal Platform - Complete Integration
-const API_BASE_URL = 'https://ed58e4a973bb.ngrok-free.app';
+const API_BASE_URL = 'https://893a5f0d70ec.ngrok-free.app';
 
 // Fallback URLs in case the primary one fails
 const FALLBACK_URLS = [
@@ -387,23 +387,28 @@ class ApiService {
       if (params.limit) queryParams.append('limit', params.limit);
       if (params.offset) queryParams.append('offset', params.offset);
       
+      // Add cursor-based pagination parameters for High Court
+      if (params.cursor_decision_date) queryParams.append('cursor_decision_date', params.cursor_decision_date);
+      if (params.cursor_id) queryParams.append('cursor_id', params.cursor_id);
+      
       // Add search and filter parameters
       if (params.search) queryParams.append('search', params.search);
       if (params.title) queryParams.append('title', params.title);
       if (params.cnr) queryParams.append('cnr', params.cnr);
-      if (params.highCourt) queryParams.append('court_name', params.highCourt);
+      // Support both highCourt (for backward compatibility) and court_name (preferred)
+      if (params.court_name) {
+        queryParams.append('court_name', params.court_name);
+      } else if (params.highCourt) {
+        queryParams.append('court_name', params.highCourt);
+      }
       if (params.judge) queryParams.append('judge', params.judge);
-      if (params.decisionDateFrom) {
-        // Convert from yyyy-mm-dd to dd-mm-yyyy format
-        const dateParts = params.decisionDateFrom.split('-');
-        if (dateParts.length === 3) {
-          const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
-          queryParams.append('decision_date_from', formattedDate);
-        } else {
-          queryParams.append('decision_date_from', params.decisionDateFrom);
-        }
+      if (params.decisionDateFrom || params.decision_date_from) {
+        // Keep date in YYYY-MM-DD format as per API documentation
+        const dateValue = params.decisionDateFrom || params.decision_date_from;
+        queryParams.append('decision_date_from', dateValue);
       }
       
+      // Note: Using /api/judgements endpoint for High Court judgments as per API documentation
       const url = `${this.baseURL}/api/judgements?${queryParams.toString()}`;
       console.log('🌐 API URL:', url);
       
@@ -458,9 +463,8 @@ class ApiService {
         name: error.name
       });
       
-      // Return mock data when API fails
-      console.log('🔄 Returning mock data due to API failure');
-      return this.getMockJudgementsData(params);
+      // Throw error instead of returning mock data
+      throw error;
     }
   }
 
@@ -630,6 +634,8 @@ class ApiService {
       // Add pagination parameters
       if (params.limit) queryParams.append('limit', params.limit);
       if (params.offset) queryParams.append('offset', params.offset);
+      
+      // Add cursor-based pagination for Supreme Court
       if (params.cursor_id) queryParams.append('cursor_id', params.cursor_id);
       
       // Add search and filter parameters
@@ -639,25 +645,10 @@ class ApiService {
       if (params.judge) queryParams.append('judge', params.judge);
       if (params.petitioner) queryParams.append('petitioner', params.petitioner);
       if (params.respondent) queryParams.append('respondent', params.respondent);
-      if (params.decisionDateFrom) {
-        // Convert from yyyy-mm-dd to dd-mm-yyyy format
-        const dateParts = params.decisionDateFrom.split('-');
-        if (dateParts.length === 3) {
-          const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
-          queryParams.append('decision_date_from', formattedDate);
-        } else {
-          queryParams.append('decision_date_from', params.decisionDateFrom);
-        }
-      }
-      if (params.decision_date_from) {
-        // Convert from yyyy-mm-dd to dd-mm-yyyy format
-        const dateParts = params.decision_date_from.split('-');
-        if (dateParts.length === 3) {
-          const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
-          queryParams.append('decision_date_from', formattedDate);
-        } else {
-          queryParams.append('decision_date_from', params.decision_date_from);
-        }
+      if (params.decisionDateFrom || params.decision_date_from) {
+        // Keep date in YYYY-MM-DD format as per API documentation
+        const dateValue = params.decisionDateFrom || params.decision_date_from;
+        queryParams.append('decision_date_from', dateValue);
       }
       
       const url = `${this.baseURL}/api/supreme-court-judgements?${queryParams.toString()}`;
@@ -714,9 +705,8 @@ class ApiService {
         name: error.name
       });
       
-      // Return mock data when API fails
-      console.log('🔄 Returning mock data due to API failure');
-      return this.getMockSupremeCourtJudgementsData(params);
+      // Throw error instead of returning mock data
+      throw error;
     }
   }
 
@@ -1141,11 +1131,16 @@ class ApiService {
       
       // Add search and filter parameters
       if (params.search) queryParams.append('search', params.search);
+      if (params.title) queryParams.append('title', params.title);
       if (params.cnr) queryParams.append('cnr', params.cnr);
       if (params.court_name) queryParams.append('court_name', params.court_name);
       if (params.decision_date_from) queryParams.append('decision_date_from', params.decision_date_from);
       if (params.judge) queryParams.append('judge', params.judge);
       if (params.year) queryParams.append('year', params.year);
+      
+      // Add cursor-based pagination parameters for High Court
+      if (params.cursor_decision_date) queryParams.append('cursor_decision_date', params.cursor_decision_date);
+      if (params.cursor_id) queryParams.append('cursor_id', params.cursor_id);
       
       const url = `${this.baseURL}/api/high-court-judgements?${queryParams.toString()}`;
       console.log('🌐 High Court API URL:', url);

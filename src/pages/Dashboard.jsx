@@ -4,6 +4,7 @@ import {
   Download, 
   Calendar as CalendarIcon, 
   Bookmark, 
+  // Note,
   Menu, 
   X, 
   Search,
@@ -242,6 +243,7 @@ const Dashboard = () => {
     { id: 'downloads', label: 'My Downloads', icon: Download },
     { id: 'calendar', label: 'Calendar', icon: CalendarIcon },
     { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark },
+    // { id: 'notes', label: 'Notes', icon: Note },
   ];
 
   return (

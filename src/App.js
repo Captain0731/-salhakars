@@ -7,10 +7,12 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import SupremeCourtJudgments from "./pages/SupremeCourtJudgments";
 import HighCourtJudgments from "./pages/HighCourtJudgments";
+import LegalJudgments from "./pages/LegalJudgments";
 import ViewPDF from "./pages/ViewPDF";
 import BrowseActs from "./pages/BrowseActs";
 import CentralActs from "./pages/CentralActs";
 import StateActs from "./pages/StateActs";
+import LawLibrary from "./pages/LawLibrary";
 import ActDetails from "./pages/ActDetails";
 import OldToNewLawMapping from "./pages/OldToNewLawMapping";
 import IPCBNSMapping from "./pages/IPCBNSMapping";
@@ -66,6 +68,7 @@ function AppLayout() {
         <Route path="/supreme-court-judgments" element={<SupremeCourtJudgments />} />
         <Route path="/high-court-judgments" element={<HighCourtJudgments />} />
         <Route path="/view-pdf" element={<ViewPDF />} />
+        <Route path="/law-library" element={<LawLibrary />} />
         <Route path="/browse-acts" element={<BrowseActs />} />
         <Route path="/central-acts" element={<CentralActs />} />
         <Route path="/state-acts" element={<StateActs />} />
@@ -80,7 +83,7 @@ function AppLayout() {
         <Route path="/profile" element={<Profile />} />
         
         {/* Additional Routes for Navigation */}
-        <Route path="/judgment-access" element={<SupremeCourtJudgments />} />
+        <Route path="/judgment-access" element={<LegalJudgments />} />
         <Route path="/bookmarks" element={<Bookmarks />} />
         <Route path="/invite-friends" element={<InviteFriends />} />
         <Route path="/earn-rewards" element={<EarnRewards />} />

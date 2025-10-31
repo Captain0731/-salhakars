@@ -14,18 +14,10 @@ const navItems = [
       { 
         label: "Legal Judgment", 
         path: "/judgment-access",
-        subLinks: [
-          { label: "Supreme Court", path: "/supreme-court-judgments" },
-          { label: "High Court", path: "/high-court-judgments" },
-        ]
       },
       { 
         label: "Law Library", 
-        path: "/browse-acts",
-        subLinks: [
-          { label: "Central Acts", path: "/central-acts" },
-          { label: "State Acts", path: "/state-acts" },
-        ]
+        path: "/law-library"
       },
       { 
         label: "Law Mapping", 

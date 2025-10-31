@@ -20,7 +20,7 @@ const PDFTranslator = ({ pdfUrl, onTranslatedUrlChange }) => {
   const [translationTimeout, setTranslationTimeout] = useState(null);
   const [preloadedUrls, setPreloadedUrls] = useState({});
 
-  // Get current language from cookie
+  // Get current language from cookie - supports all languages
   const getCurrentLanguage = () => {
     if (typeof window === 'undefined') return 'en';
     
@@ -30,8 +30,10 @@ const PDFTranslator = ({ pdfUrl, onTranslatedUrlChange }) => {
     
     if (cookie) {
       const value = cookie.split('=')[1];
-      if (value === '/en/hi') return 'hi';
-      if (value === '/en/gu') return 'gu';
+      // Extract language code from /en/xx format
+      if (value && value.startsWith('/en/')) {
+        return value.replace('/en/', '').toLowerCase();
+      }
     }
     return 'en';
   };
