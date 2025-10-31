@@ -138,7 +138,7 @@ export const EnhancedInfiniteScrollLoader = ({
   error, 
   onRetry,
   retryCount = 0,
-  isFetching = false
+  isFetching = true
 }) => {
   if (error) {
     return (
@@ -207,7 +207,7 @@ export const EnhancedInfiniteScrollLoader = ({
 };
 
 // Skeleton grid for initial loading
-export const SkeletonGrid = ({ count = 3, className = "" }) => (
+export const SkeletonGrid = ({ count = 10, className = "" }) => (
   <div className={`space-y-4 ${className}`}>
     {[...Array(count)].map((_, index) => (
       <EnhancedJudgmentSkeleton key={index} />

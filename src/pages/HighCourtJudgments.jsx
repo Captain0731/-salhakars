@@ -265,7 +265,7 @@ export default function HighCourtJudgments() {
     
     // Immediately fetch data without waiting for debounce
     console.log('High Court: Fetching data after clearing filters...');
-    fetchJudgments(false);
+    fetchJudgments(true);
   };
 
   const applyFilters = () => {

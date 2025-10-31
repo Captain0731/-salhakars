@@ -352,7 +352,7 @@ export default function Profile() {
       `}</style>
       <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#F9FAFC' }}>
         {/* Background Elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none pt-5">
           <div className="absolute top-20 left-20 w-32 h-32 rounded-full opacity-5 animate-float" style={{ backgroundColor: '#1E65AD' }}></div>
           <div className="absolute top-40 right-32 w-24 h-24 rounded-full opacity-5 animate-float animation-delay-1000" style={{ backgroundColor: '#CF9B63' }}></div>
           <div className="absolute bottom-32 left-40 w-40 h-40 rounded-full opacity-5 animate-float animation-delay-2000" style={{ backgroundColor: '#8C969F' }}></div>

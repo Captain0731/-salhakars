@@ -34,6 +34,7 @@ const navItems = [
           { label: "All Mappings", path: "/old-to-new-mapping" },
           { label: "IPC", path: "/ipc-bns-mapping", arrow: "⇄", targetLabel: "BNS" },
           { label: "IEA", path: "/iea-bsa-mapping", arrow: "⇄", targetLabel: "BSA" },
+          { label: "CrPC", path: "/bnss-crpc-mapping", arrow: "⇄", targetLabel: "BNSS" },
         ]
       },
       { 
@@ -551,7 +552,7 @@ const Navbar = () => {
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg mb-2">
                   <div>
                     <div className="font-semibold text-gray-800" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      {user?.name || 'User'}
+                      {user?.name || 'name'}
                     </div>
                     <div className="text-sm text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       {user?.email || user?.phone || 'No email'}
@@ -561,6 +562,38 @@ const Navbar = () => {
                     {(user?.name || 'U').charAt(0).toUpperCase()}
                   </div>
                 </div>
+                
+                <button
+                  onClick={() => {
+                    navigate("/profile");
+                    setMenuOpen(false);
+                  }}
+                  className="text-white px-6 sm:px-8 py-3 sm:py-3 rounded-full font-semibold hover:shadow-xl hover:scale-110 transition-all duration-500 ease-out transform w-full text-sm sm:text-base touch-manipulation relative overflow-hidden group mb-2"
+                  style={{ 
+                    backgroundColor: '#1E65AD', 
+                    fontFamily: 'Roboto, sans-serif',
+                    boxShadow: '0 4px 15px rgba(30, 101, 173, 0.3)',
+                    minHeight: '44px'
+                  }}
+                >
+                  View Profile
+                </button>
+                
+                <button
+                  onClick={() => {
+                    navigate("/dashboard");
+                    setMenuOpen(false);
+                  }}
+                  className="text-white px-6 sm:px-8 py-3 sm:py-3 rounded-full font-semibold hover:shadow-xl hover:scale-110 transition-all duration-500 ease-out transform w-full text-sm sm:text-base touch-manipulation relative overflow-hidden group mb-2"
+                  style={{ 
+                    backgroundColor: '#1E65AD', 
+                    fontFamily: 'Roboto, sans-serif',
+                    boxShadow: '0 4px 15px rgba(30, 101, 173, 0.3)',
+                    minHeight: '44px'
+                  }}
+                >
+                  Dashboard
+                </button>
                 
                 <button
                   onClick={handleLogout}
@@ -618,7 +651,7 @@ const Navbar = () => {
                   </div>
                   <div className="text-left">
                     <div className="font-semibold text-gray-800 text-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      {user?.name || 'User'}
+                      {user?.name || 'name'}
                     </div>
                     <div className="text-xs text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       {user?.email || user?.phone || 'No email'}
@@ -640,7 +673,7 @@ const Navbar = () => {
                 } ${userDropdownOpen ? 'block opacity-100' : 'hidden opacity-0'}`} style={{ borderColor: '#E5E7EB' }}>
                   <div className="px-4 py-3 border-b" style={{ borderColor: '#E5E7EB' }}>
                     <div className="font-semibold text-gray-800" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      {user?.name || 'User'}
+                      {user?.name || 'name'}
                     </div>
                     <div className="text-sm text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       {user?.email || user?.phone || 'No email'}
@@ -660,6 +693,16 @@ const Navbar = () => {
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   >
                     View Profile
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigate("/dashboard");
+                      setUserDropdownOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors duration-200 text-sm"
+                    style={{ fontFamily: 'Roboto, sans-serif' }}
+                  >
+                    Dashboard
                   </button>
                   <button
                     onClick={handleLogout}

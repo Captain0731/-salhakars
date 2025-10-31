@@ -4,55 +4,48 @@ import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
 import useInfiniteScroll from "../hooks/useInfiniteScroll";
 import { ActSkeleton, InfiniteScrollLoader } from "../components/LoadingComponents";
+import BookmarkButton from "../components/BookmarkButton";
 
-export default function OldToNewLawMapping() {
+export default function BNSSCrPCMapping() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedMappingType, setSelectedMappingType] = useState("bns_ipc");
   const [mappings, setMappings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [selectedSection, setSelectedSection] = useState(null);
-  const [showSectionDetails, setShowSectionDetails] = useState(false);
-  const [showHelpTooltip, setShowHelpTooltip] = useState(false);
+  const [selectedMapping, setSelectedMapping] = useState(null);
+  const [showMappingDetails, setShowMappingDetails] = useState(false);
   const [pagination, setPagination] = useState(null);
   const [filters, setFilters] = useState({
-    section: "",
     subject: "",
     source_section: "",
     target_section: ""
   });
-
-
-  const mappingTypes = [
-    { value: "bns_ipc", label: "BNS ↔ IPC (Criminal Law)", description: "Bharatiya Nyaya Sanhita to Indian Penal Code" },
-    { value: "bsa_iea", label: "BSA ↔ IEA (Evidence Law)", description: "Bharatiya Sakshya Adhiniyam to Indian Evidence Act" },
-    { value: "bnss_crpc", label: "BNSS ↔ CrPC (Criminal Procedure)", description: "Bharatiya Nagarik Suraksha Sanhita to Code of Criminal Procedure" }
-  ];
 
   const handleSearch = async (offset = 0) => {
     setLoading(true);
     setError("");
     
     try {
-      const params = {
+      // Build API parameters according to documentation
+      const apiParams = {
+        mapping_type: 'bnss_crpc',
         limit: 20,
-        offset,
-        ...filters
+        offset
       };
 
-      // Remove empty filters
-      Object.keys(params).forEach(key => {
-        if (params[key] === "" || params[key] === null) {
-          delete params[key];
-        }
-      });
+      // Add filters only if they have values
+      if (filters.subject && filters.subject.trim()) {
+        apiParams.subject = filters.subject.trim();
+      }
+      if (filters.source_section && filters.source_section.trim()) {
+        apiParams.source_section = filters.source_section.trim();
+      }
+      if (filters.target_section && filters.target_section.trim()) {
+        apiParams.target_section = filters.target_section.trim();
+      }
 
-      const data = await apiService.getLawMappings({
-        mapping_type: selectedMappingType,
-        ...params
-      });
+      const data = await apiService.getLawMappingsWithOffset(offset, 20, apiParams);
 
       if (offset === 0) {
         setMappings(data.data);
@@ -62,7 +55,7 @@ export default function OldToNewLawMapping() {
 
       setPagination(data.pagination);
     } catch (err) {
-      setError(err.message || "Failed to fetch law mappings");
+      setError(err.message || "Failed to fetch BNSS-CrPC mappings");
       setMappings([]);
       setPagination(null);
     } finally {
@@ -71,10 +64,8 @@ export default function OldToNewLawMapping() {
   };
 
   const clearFilters = () => {
-    setSelectedMappingType("bns_ipc");
     setSearchQuery("");
     setFilters({
-      section: "",
       subject: "",
       source_section: "",
       target_section: ""
@@ -88,13 +79,13 @@ export default function OldToNewLawMapping() {
   // Auto-apply filters when they change (with debounce)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (Object.values(filters).some(value => value.trim()) || selectedMappingType) {
+      if (Object.values(filters).some(value => value.trim())) {
         handleSearch(0);
       }
     }, 500); // 500ms debounce
 
     return () => clearTimeout(timeoutId);
-  }, [filters, selectedMappingType]);
+  }, [filters]);
 
   const loadMore = () => {
     if (pagination?.has_more) {
@@ -115,34 +106,20 @@ export default function OldToNewLawMapping() {
     isLoading: loading
   });
 
-  const viewSectionDetails = (section, mapping) => {
-    setSelectedSection({ ...section, mapping });
-    setShowSectionDetails(true);
+  const viewMappingDetails = (mapping) => {
+    setSelectedMapping(mapping);
+    setShowMappingDetails(true);
   };
 
-  const closeSectionDetails = () => {
-    setShowSectionDetails(false);
-    setSelectedSection(null);
+  const closeMappingDetails = () => {
+    setShowMappingDetails(false);
+    setSelectedMapping(null);
   };
 
   const downloadMapping = (mapping) => {
-    // In a real app, this would trigger a download
-    console.log("Downloading mapping:", mapping.title);
-    alert(`Downloading: ${mapping.title}\n\nThis would download the complete mapping document in a real application.`);
+    console.log("Downloading mapping:", mapping.subject);
+    alert(`Downloading: ${mapping.subject}\n\nThis would download the complete mapping document in a real application.`);
   };
-
-  // Handle initial load and navigation filter
-  useEffect(() => {
-    // Check if there's a filter from navigation
-    if (location.state?.filter) {
-      setSelectedMappingType(location.state.filter);
-    }
-  }, [location.state?.filter]);
-
-  // Load mappings when mapping type changes
-  useEffect(() => {
-    handleSearch();
-  }, [selectedMappingType]);
 
   // Update filters when search query changes
   useEffect(() => {
@@ -159,6 +136,11 @@ export default function OldToNewLawMapping() {
     }
   }, [searchQuery]);
 
+  // Load initial mappings
+  useEffect(() => {
+    handleSearch();
+  }, []);
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
@@ -167,82 +149,25 @@ export default function OldToNewLawMapping() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-              Old to New Law Mapping
+              CrPC ↔ BNSS Mapping
             </h1>
             <p className="text-lg mb-2" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}>
-              Understand the transition from old legal frameworks to new ones with detailed section-wise mapping
+              Comprehensive mapping between Code of Criminal Procedure (CrPC) and Bharatiya Nagarik Suraksha Sanhita (BNSS)
             </p>
-            <div className="flex items-center justify-between">
-              <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium" 
-                   style={{ 
-                     backgroundColor: selectedMappingType === 'bns_ipc' ? '#FEF3C7' : selectedMappingType === 'bsa_iea' ? '#DBEAFE' : '#FEE2E2',
-                     color: selectedMappingType === 'bns_ipc' ? '#92400E' : selectedMappingType === 'bsa_iea' ? '#1E40AF' : '#991B1B'
-                   }}>
-                <span className="mr-2">📋</span>
-                Currently viewing: {mappingTypes.find(t => t.value === selectedMappingType)?.label}
-              </div>
-              
-              {/* Help Icon */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowHelpTooltip(!showHelpTooltip)}
-                  className="w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-200 hover:scale-110"
-                  style={{ backgroundColor: '#E3F2FD' }}
-                  onMouseEnter={() => setShowHelpTooltip(true)}
-                  onMouseLeave={() => setShowHelpTooltip(false)}
-                >
-                  <svg className="w-5 h-5" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </button>
-                
-                {/* Help Tooltip */}
-                {showHelpTooltip && (
-                  <div className="absolute right-0 top-12 w-80 bg-white rounded-lg shadow-xl border p-6 z-50"
-                       style={{ borderColor: '#E5E7EB' }}
-                       onMouseEnter={() => setShowHelpTooltip(true)}
-                       onMouseLeave={() => setShowHelpTooltip(false)}>
-                    <div className="absolute -top-2 right-4 w-4 h-4 bg-white border-l border-t transform rotate-45"
-                         style={{ borderColor: '#E5E7EB' }}></div>
-                    
-                    <h3 className="text-lg font-bold mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                      How to Use This Tool
-                    </h3>
-                    
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="font-semibold mb-2" style={{ color: '#10B981', fontFamily: 'Roboto, sans-serif' }}>
-                          Search by Section Number
-                        </h4>
-                        <ul className="text-sm space-y-1" style={{ color: '#6B7280', fontFamily: 'Roboto, sans-serif' }}>
-                          <li>• Enter IPC section numbers (e.g., 109, 203, 302)</li>
-                          <li>• Enter BNS section numbers (e.g., 48, 224, 302)</li>
-                          <li>• View corresponding sections in both acts</li>
-                        </ul>
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-semibold mb-2" style={{ color: '#F59E0B', fontFamily: 'Roboto, sans-serif' }}>
-                          Search by Keywords
-                        </h4>
-                        <ul className="text-sm space-y-1" style={{ color: '#6B7280', fontFamily: 'Roboto, sans-serif' }}>
-                          <li>• Enter legal terms (e.g., murder, fraud, abetment)</li>
-                          <li>• Search offense types (e.g., domestic violence, rape)</li>
-                          <li>• Find sections by common names</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+            <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium" 
+                 style={{ 
+                   backgroundColor: '#FEE2E2',
+                   color: '#991B1B'
+                 }}>
+              <span className="mr-2">📋</span>
+              Currently viewing: CrPC ↔ BNSS (Criminal Procedure)
             </div>
           </div>
-
 
           {/* Search Section */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
             <h2 className="text-xl font-semibold mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-              Search Law Mappings
+              Search CrPC-BNSS Mappings
             </h2>
             
             {/* Main Search Bar */}
@@ -253,7 +178,7 @@ export default function OldToNewLawMapping() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search by act name, section number, or keywords..."
+                    placeholder="Search by section number, subject, or keywords..."
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
                     style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -270,50 +195,30 @@ export default function OldToNewLawMapping() {
               </div>
             </div>
 
-            {/* Mapping Type Filter */}
-            <div className="mb-6">
-              <label className="block text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
-                Law Mapping Type
-              </label>
-              <select
-                value={selectedMappingType}
-                onChange={(e) => setSelectedMappingType(e.target.value)}
-                className="w-full sm:w-80 px-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
-                style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
-              >
-                {mappingTypes.map(type => (
-                  <option key={type.value} value={type.value}>{type.label}</option>
-                ))}
-              </select>
-              <p className="text-sm text-gray-600 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                {mappingTypes.find(t => t.value === selectedMappingType)?.description}
-              </p>
-            </div>
-
             {/* Advanced Filters */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
-                  Section Number
+                  CrPC Section (Source)
                 </label>
                 <input
                   type="text"
-                  value={filters.section}
-                  onChange={(e) => setFilters(prev => ({ ...prev, section: e.target.value }))}
-                  placeholder="e.g., 302, 34(1)"
+                  value={filters.source_section}
+                  onChange={(e) => setFilters(prev => ({ ...prev, source_section: e.target.value }))}
+                  placeholder="e.g., 154, 156, 160"
                   className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
                   style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
                 />
               </div>
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
-                  Source Section
+                  BNSS Section (Target)
                 </label>
                 <input
                   type="text"
-                  value={filters.source_section}
-                  onChange={(e) => setFilters(prev => ({ ...prev, source_section: e.target.value }))}
-                  placeholder={selectedMappingType === 'bns_ipc' ? 'IPC Section' : selectedMappingType === 'bsa_iea' ? 'IEA Section' : 'CrPC Section'}
+                  value={filters.target_section}
+                  onChange={(e) => setFilters(prev => ({ ...prev, target_section: e.target.value }))}
+                  placeholder="e.g., 173, 175, 179"
                   className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
                   style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
                 />
@@ -348,7 +253,7 @@ export default function OldToNewLawMapping() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                {mappingTypes.find(t => t.value === selectedMappingType)?.label} Mappings
+                CrPC ↔ BNSS Mappings
               </h2>
               <div className="text-sm" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}>
                 {pagination ? (
@@ -389,18 +294,14 @@ export default function OldToNewLawMapping() {
                   <div
                     key={mapping.id}
                     className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200 cursor-pointer"
-                    onClick={() => viewSectionDetails(mapping)}
+                    onClick={() => viewMappingDetails(mapping)}
                   >
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                      {/* Source Section */}
-                      <div className="bg-red-50 p-4 rounded-lg">
+                      {/* CrPC Section */}
+                      <div className="bg-blue-50 p-4 rounded-lg">
                         <div className="text-center">
-                          <div className="text-sm font-medium text-gray-600 mb-1">
-                            {selectedMappingType === 'bns_ipc' ? 'IPC Section' : selectedMappingType === 'bsa_iea' ? 'IEA Section' : 'CrPC Section'}
-                          </div>
-                          <div className="text-2xl font-bold text-red-600 mb-2">
-                            {selectedMappingType === 'bns_ipc' ? mapping.ipc_section : selectedMappingType === 'bsa_iea' ? mapping.iea_section : mapping.crpc_section}
-                          </div>
+                          <div className="text-sm font-medium text-gray-600 mb-1">CrPC Section</div>
+                          <div className="text-2xl font-bold text-blue-600 mb-2">{mapping.crpc_section}</div>
                         </div>
                       </div>
 
@@ -412,30 +313,38 @@ export default function OldToNewLawMapping() {
                         <div className="text-xs text-gray-500 mt-1">Maps to</div>
                       </div>
 
-                      {/* Target Section */}
-                      <div className="bg-green-50 p-4 rounded-lg">
+                      {/* BNSS Section */}
+                      <div className="bg-indigo-50 p-4 rounded-lg">
                         <div className="text-center">
-                          <div className="text-sm font-medium text-gray-600 mb-1">
-                            {selectedMappingType === 'bns_ipc' ? 'BNS Section' : selectedMappingType === 'bsa_iea' ? 'BSA Section' : 'BNSS Section'}
-                          </div>
-                          <div className="text-2xl font-bold text-green-600 mb-2">
-                            {selectedMappingType === 'bns_ipc' ? mapping.bns_section : selectedMappingType === 'bsa_iea' ? mapping.bsa_section : mapping.bnss_section}
-                          </div>
+                          <div className="text-sm font-medium text-gray-600 mb-1">BNSS Section</div>
+                          <div className="text-2xl font-bold text-indigo-600 mb-2">{mapping.bnss_section}</div>
                         </div>
                       </div>
                     </div>
 
                     {/* Subject and Summary */}
                     <div className="mt-4">
-                      <h3 className="text-lg font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                        {mapping.subject}
-                      </h3>
-                      <p className="text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                        {mapping.summary}
-                      </p>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                            {mapping.subject}
+                          </h3>
+                          <p className="text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                            {mapping.summary}
+                          </p>
+                        </div>
+                        <div className="ml-4 flex-shrink-0">
+                          <BookmarkButton
+                            item={mapping}
+                            type="bnss_crpc_mapping"
+                            size="default"
+                            showText={true}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
-                )                )}
+                ))}
 
                 {/* Infinite Scroll Loader */}
                 {mappings.length > 0 && (
@@ -454,17 +363,17 @@ export default function OldToNewLawMapping() {
         </div>
       </div>
 
-      {/* Section Details Modal */}
-      {showSectionDetails && selectedSection && (
+      {/* Mapping Details Modal */}
+      {showMappingDetails && selectedMapping && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                  Section Mapping Details
+                  CrPC-BNSS Mapping Details
                 </h2>
                 <button
-                  onClick={closeSectionDetails}
+                  onClick={closeMappingDetails}
                   className="text-gray-400 hover:text-gray-600 p-2"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -474,51 +383,66 @@ export default function OldToNewLawMapping() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div className="bg-red-50 p-6 rounded-lg">
-                  <h3 className="font-semibold mb-4 text-lg" style={{ color: '#1E65AD' }}>
-                    {selectedMappingType === 'bns_ipc' ? 'IPC Section' : selectedMappingType === 'bsa_iea' ? 'IEA Section' : 'CrPC Section'}
-                  </h3>
+                <div className="bg-blue-50 p-6 rounded-lg">
+                  <h3 className="font-semibold mb-4 text-lg" style={{ color: '#1E65AD' }}>CrPC Section</h3>
                   <div className="text-center mb-4">
-                    <div className="text-4xl font-bold text-red-600 mb-2">
-                      {selectedMappingType === 'bns_ipc' ? selectedSection.ipc_section : selectedMappingType === 'bsa_iea' ? selectedSection.iea_section : selectedSection.crpc_section}
-                    </div>
+                    <div className="text-4xl font-bold text-blue-600 mb-2">{selectedMapping.crpc_section}</div>
                   </div>
                   <div className="text-sm text-gray-600">
-                    <strong>Act:</strong> {selectedMappingType === 'bns_ipc' ? 'Indian Penal Code, 1860' : selectedMappingType === 'bsa_iea' ? 'Indian Evidence Act, 1872' : 'Code of Criminal Procedure, 1973'}
+                    <strong>Act:</strong> Code of Criminal Procedure, 1973
                   </div>
+                  {selectedMapping.crpc_text_extract && (
+                    <div className="mt-4">
+                      <div className="text-sm font-semibold text-gray-700 mb-2">Text Extract:</div>
+                      <div className="text-sm text-gray-600 bg-white p-3 rounded-lg">
+                        {selectedMapping.crpc_text_extract}
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className="bg-green-50 p-6 rounded-lg">
-                  <h3 className="font-semibold mb-4 text-lg" style={{ color: '#1E65AD' }}>
-                    {selectedMappingType === 'bns_ipc' ? 'BNS Section' : selectedMappingType === 'bsa_iea' ? 'BSA Section' : 'BNSS Section'}
-                  </h3>
+                <div className="bg-indigo-50 p-6 rounded-lg">
+                  <h3 className="font-semibold mb-4 text-lg" style={{ color: '#1E65AD' }}>BNSS Section</h3>
                   <div className="text-center mb-4">
-                    <div className="text-4xl font-bold text-green-600 mb-2">
-                      {selectedMappingType === 'bns_ipc' ? selectedSection.bns_section : selectedMappingType === 'bsa_iea' ? selectedSection.bsa_section : selectedSection.bnss_section}
-                    </div>
+                    <div className="text-4xl font-bold text-indigo-600 mb-2">{selectedMapping.bnss_section}</div>
                   </div>
                   <div className="text-sm text-gray-600">
-                    <strong>Act:</strong> {selectedMappingType === 'bns_ipc' ? 'Bharatiya Nyaya Sanhita, 2023' : selectedMappingType === 'bsa_iea' ? 'Bharatiya Sakshya Adhiniyam, 2023' : 'Bharatiya Nagarik Suraksha Sanhita, 2023'}
+                    <strong>Act:</strong> Bharatiya Nagarik Suraksha Sanhita, 2023
                   </div>
+                  {selectedMapping.bnss_text_extract && (
+                    <div className="mt-4">
+                      <div className="text-sm font-semibold text-gray-700 mb-2">Text Extract:</div>
+                      <div className="text-sm text-gray-600 bg-white p-3 rounded-lg">
+                        {selectedMapping.bnss_text_extract}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
               <div className="mb-6">
                 <h3 className="font-semibold mb-3 text-lg" style={{ color: '#1E65AD' }}>Subject</h3>
                 <p className="text-gray-800 p-4 bg-gray-50 rounded-lg text-lg" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                  {selectedSection.subject}
+                  {selectedMapping.subject}
                 </p>
               </div>
 
               <div className="mb-6">
                 <h3 className="font-semibold mb-3 text-lg" style={{ color: '#1E65AD' }}>Summary</h3>
                 <p className="text-gray-600 p-4 bg-blue-50 rounded-lg" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                  {selectedSection.summary}
+                  {selectedMapping.summary}
                 </p>
               </div>
 
               <div className="flex gap-3">
                 <button
-                  onClick={closeSectionDetails}
+                  onClick={() => downloadMapping(selectedMapping)}
+                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                  style={{ fontFamily: 'Roboto, sans-serif' }}
+                >
+                  Download PDF
+                </button>
+                <button
+                  onClick={closeMappingDetails}
                   className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                   style={{ fontFamily: 'Roboto, sans-serif' }}
                 >
@@ -532,3 +456,4 @@ export default function OldToNewLawMapping() {
     </div>
   );
 }
+

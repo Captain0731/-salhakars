@@ -1004,6 +1004,14 @@ class ApiService {
     });
   }
 
+  // Get BNSS-CrPC mappings
+  async getBnssCrpcMappings(params = {}) {
+    return await this.getLawMappings({
+      mapping_type: 'bnss_crpc',
+      ...params
+    });
+  }
+
   // Judgment filtering APIs with enhanced filters
   async getJudgmentsWithFilters(params = {}) {
     const queryString = new URLSearchParams(params).toString();

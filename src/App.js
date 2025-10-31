@@ -15,6 +15,7 @@ import ActDetails from "./pages/ActDetails";
 import OldToNewLawMapping from "./pages/OldToNewLawMapping";
 import IPCBNSMapping from "./pages/IPCBNSMapping";
 import IEABSAMapping from "./pages/IEABSAMapping";
+import BNSSCrPCMapping from "./pages/BNSSCrPCMapping";
 import LegalTemplate from "./pages/LegalTemplate";
 import YoutubeVideoSummary from "./pages/YoutubeVideoSummary";
 import LegalChatbot from "./pages/LegalChatbot";
@@ -72,6 +73,7 @@ function AppLayout() {
         <Route path="/old-to-new-mapping" element={<OldToNewLawMapping />} />
         <Route path="/ipc-bns-mapping" element={<IPCBNSMapping />} />
         <Route path="/iea-bsa-mapping" element={<IEABSAMapping />} />
+        <Route path="/bnss-crpc-mapping" element={<BNSSCrPCMapping />} />
         <Route path="/legal-template" element={<LegalTemplate />} />
         <Route path="/youtube-summary" element={<YoutubeVideoSummary />} />
         <Route path="/legal-chatbot" element={<LegalChatbot />} />
