@@ -463,8 +463,17 @@ export default function LawMapping() {
         <div className="max-w-7xl mx-auto">
 
           {/* Mapping Type Selector */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-            <div className="flex items-center gap-4">
+          {/* <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+            
+          </div> */}
+
+          {/* Enhanced Search and Filter Section */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                Search {mappingTypeLabel}
+              </h2>
+              <div className="flex items-center gap-4">
               <label className="text-sm font-medium text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
                 Select Mapping Type:
               </label>
@@ -483,15 +492,7 @@ export default function LawMapping() {
                 </select>
               </div>
             </div>
-          </div>
-
-          {/* Enhanced Search and Filter Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                Search {mappingTypeLabel}
-              </h2>
-              <button
+              {/* <button
                 onClick={() => setShowFilters(!showFilters)}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors font-medium"
                 style={{ fontFamily: 'Roboto, sans-serif' }}
@@ -505,14 +506,14 @@ export default function LawMapping() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                 </svg>
                 <span>Filters</span>
-              </button>
+              </button> */}
             </div>
             
             {/* Search Bar */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+              {/* <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                 Search Mappings
-              </label>
+              </label> */}
               <div className="relative">
                 <input
                   type="text"
@@ -785,17 +786,13 @@ export default function LawMapping() {
                   const subject = mapping.subject || mapping.title || 'Mapping';
                   const summary = mapping.summary || mapping.description || mapping.source_description || '';
                   
-                  // Get colors based on mapping type
+                  // Get colors based on mapping type - all use red and green pattern
                   const getSourceColor = () => {
-                    if (mappingType === 'bns_ipc') return { bg: 'bg-red-50', text: 'text-red-600' };
-                    if (mappingType === 'bsa_iea') return { bg: 'bg-purple-50', text: 'text-purple-600' };
-                    return { bg: 'bg-blue-50', text: 'text-blue-600' };
+                    return { bg: 'bg-red-50', text: 'text-red-600' };
                   };
                   
                   const getTargetColor = () => {
-                    if (mappingType === 'bns_ipc') return { bg: 'bg-green-50', text: 'text-green-600' };
-                    if (mappingType === 'bsa_iea') return { bg: 'bg-orange-50', text: 'text-orange-600' };
-                    return { bg: 'bg-emerald-50', text: 'text-emerald-600' };
+                    return { bg: 'bg-green-50', text: 'text-green-600' };
                   };
                   
                   const sourceColor = getSourceColor();
@@ -815,7 +812,10 @@ export default function LawMapping() {
                   
                   return (
                     <SmoothTransitionWrapper key={mapping.id || `mapping-${index}`} delay={index * 50}>
-                      <div className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-300 bg-white group">
+                      <div 
+                        onClick={() => viewMappingDetails(mapping)}
+                        className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-300 bg-white group cursor-pointer"
+                      >
                         {/* Section Mapping Display */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center mb-4">
                           {/* Source Section */}
@@ -862,7 +862,10 @@ export default function LawMapping() {
                           
                           <div className="flex-shrink-0 flex flex-col gap-3 w-full lg:w-48">
                             <button
-                              onClick={() => viewMappingDetails(mapping)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                viewMappingDetails(mapping);
+                              }}
                               className="w-full px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                               style={{ fontFamily: 'Roboto, sans-serif' }}
                             >

@@ -59,7 +59,7 @@ export default function Bookmarks() {
     if (filter === 'all') return true;
     if (filter === 'judgements') return bookmark.type === 'judgement';
     if (filter === 'acts') return bookmark.type === 'central_act' || bookmark.type === 'state_act';
-    if (filter === 'mappings') return bookmark.type === 'bsa_iea_mapping' || bookmark.type === 'bns_ipc_mapping';
+    if (filter === 'mappings') return bookmark.type === 'bsa_iea_mapping' || bookmark.type === 'bns_ipc_mapping' || bookmark.type === 'bnss_crpc_mapping';
     return true;
   });
 
@@ -76,6 +76,8 @@ export default function Bookmarks() {
         await apiService.removeMappingBookmark('bsa_iea', itemId);
       } else if (type === 'bns_ipc_mapping') {
         await apiService.removeMappingBookmark('bns_ipc', itemId);
+      } else if (type === 'bnss_crpc_mapping') {
+        await apiService.removeMappingBookmark('bnss_crpc', itemId);
       }
       
       // Remove from local state
@@ -86,20 +88,36 @@ export default function Bookmarks() {
     }
   };
 
-  // Handle view item
-  const handleViewItem = (bookmark) => {
+  // Handle view item - fetch full details for judgments
+  const handleViewItem = async (bookmark) => {
     const item = bookmark.item || bookmark;
     
     if (bookmark.type === 'judgement') {
-      navigate('/view-pdf', { state: { judgment: item } });
+      // For judgments, fetch full details including PDF link
+      try {
+        setLoading(true);
+        const fullJudgment = await apiService.getJudgementById(item.id);
+        
+        // Navigate with full judgment data including PDF link
+        navigate('/view-pdf', { state: { judgment: fullJudgment } });
+      } catch (err) {
+        console.error('Error fetching judgment details:', err);
+        setError('Failed to load judgment details. Please try again.');
+        // Fallback to navigate with basic data if full fetch fails
+        navigate('/view-pdf', { state: { judgment: item } });
+      } finally {
+        setLoading(false);
+      }
     } else if (bookmark.type === 'central_act') {
       navigate('/central-acts', { state: { highlightId: item.id } });
     } else if (bookmark.type === 'state_act') {
       navigate('/state-acts', { state: { highlightId: item.id } });
-    } else if (bookmark.type === 'bsa_iea_mapping') {
-      navigate('/iea-bsa-mapping', { state: { highlightId: item.id } });
+    } else if (bookmark.type === 'bsa_iea_mapping' || bookmark.type === 'bnss_crpc_mapping') {
+      // For mappings, navigate to law-mapping page with the mapping type
+      const mappingType = bookmark.type === 'bsa_iea_mapping' ? 'bsa_iea' : 'bnss_crpc';
+      navigate(`/law-mapping?type=${mappingType}`, { state: { highlightId: item.id } });
     } else if (bookmark.type === 'bns_ipc_mapping') {
-      navigate('/ipc-bns-mapping', { state: { highlightId: item.id } });
+      navigate(`/law-mapping?type=bns_ipc`, { state: { highlightId: item.id } });
     }
   };
 
@@ -108,11 +126,11 @@ export default function Bookmarks() {
     const item = bookmark.item || bookmark;
     
     if (bookmark.type === 'judgement') {
-      return item.title || item.case_title || 'Untitled Judgment';
+      return item.title || item.case_title || item.case_info || 'Untitled Judgment';
     } else if (bookmark.type === 'central_act' || bookmark.type === 'state_act') {
       return item.short_title || item.title || item.act_name || 'Untitled Act';
-    } else if (bookmark.type === 'bsa_iea_mapping' || bookmark.type === 'bns_ipc_mapping') {
-      return item.title || item.mapping_title || 'Untitled Mapping';
+    } else if (bookmark.type === 'bsa_iea_mapping' || bookmark.type === 'bns_ipc_mapping' || bookmark.type === 'bnss_crpc_mapping') {
+      return item.title || item.subject || item.mapping_title || 'Untitled Mapping';
     }
     
     return 'Untitled Item';
@@ -123,11 +141,12 @@ export default function Bookmarks() {
     const item = bookmark.item || bookmark;
     
     if (bookmark.type === 'judgement') {
-      return item.court_name || item.judge || 'Supreme Court Judgment';
+      // Handle different field names that might exist in the API response
+      return item.court_name || item.court || item.judge || item.title || 'Supreme Court Judgment';
     } else if (bookmark.type === 'central_act' || bookmark.type === 'state_act') {
       return item.ministry || item.department || 'Government Act';
-    } else if (bookmark.type === 'bsa_iea_mapping' || bookmark.type === 'bns_ipc_mapping') {
-      return item.description || 'Legal Mapping';
+    } else if (bookmark.type === 'bsa_iea_mapping' || bookmark.type === 'bns_ipc_mapping' || bookmark.type === 'bnss_crpc_mapping') {
+      return item.description || item.summary || 'Legal Mapping';
     }
     
     return 'Bookmarked Item';
@@ -141,6 +160,7 @@ export default function Bookmarks() {
       case 'state_act': return 'State Act';
       case 'bsa_iea_mapping': return 'BSA-IEA Mapping';
       case 'bns_ipc_mapping': return 'BNS-IPC Mapping';
+      case 'bnss_crpc_mapping': return 'BNSS-CrPC Mapping';
       default: return 'Bookmark';
     }
   };
@@ -154,7 +174,7 @@ export default function Bookmarks() {
       <Navbar />
       
       {/* Header Section */}
-      <div className="bg-white border-b border-gray-200 pt-20">
+      <div className="bg-white border-b border-gray-200 pt-24">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="text-center">
             <h1 className="text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
@@ -171,6 +191,31 @@ export default function Bookmarks() {
       <div className="p-6">
         <div className="max-w-7xl mx-auto">
           
+          {/* Error Display - Moved to top */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-center gap-3">
+                <div className="text-red-600">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-red-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    {error}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setError('')}
+                  className="px-3 py-1 bg-red-600 text-white rounded text-sm font-medium hover:bg-red-700 transition-colors"
+                  style={{ fontFamily: 'Roboto, sans-serif' }}
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Filter Section */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
             <h2 className="text-xl font-bold mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
@@ -198,31 +243,6 @@ export default function Bookmarks() {
               ))}
             </div>
           </div>
-
-          {/* Error Display */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="text-red-600">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <p className="text-red-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                    {error}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setError('')}
-                  className="px-3 py-1 bg-red-600 text-white rounded text-sm font-medium hover:bg-red-700 transition-colors"
-                  style={{ fontFamily: 'Roboto, sans-serif' }}
-                >
-                  Dismiss
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* Bookmarks List */}
           {loading ? (
@@ -276,10 +296,11 @@ export default function Bookmarks() {
                         <div className="flex items-center gap-3">
                           <button
                             onClick={() => handleViewItem(bookmark)}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                            disabled={loading}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                             style={{ fontFamily: 'Roboto, sans-serif' }}
                           >
-                            View Details
+                            {loading && bookmark.type === 'judgement' ? 'Loading...' : 'View Details'}
                           </button>
                           <button
                             onClick={() => handleRemoveBookmark(bookmark.id, bookmark.type, item.id)}

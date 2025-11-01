@@ -10,7 +10,7 @@ import {
   Grid, 
   List, 
   Eye, 
-  Trash2, 
+  Trash2,   
   Edit3,
   Archive,
   Calendar,
@@ -193,7 +193,7 @@ const MyDownloads = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pt-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
         <div>

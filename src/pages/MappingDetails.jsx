@@ -147,8 +147,8 @@ export default function MappingDetails() {
         targetLabel: 'BSA Section',
         sourceAct: 'Indian Evidence Act, 1872',
         targetAct: 'Bharatiya Sakshya Adhiniyam, 2023',
-        sourceColor: { bg: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-200' },
-        targetColor: { bg: 'bg-orange-50', text: 'text-orange-600', border: 'border-orange-200' }
+        sourceColor: { bg: 'bg-red-50', text: 'text-red-600', border: 'border-red-200' },
+        targetColor: { bg: 'bg-green-50', text: 'text-green-600', border: 'border-green-200' }
       };
     } else {
       return {
@@ -157,8 +157,8 @@ export default function MappingDetails() {
         targetLabel: 'BNSS Section',
         sourceAct: 'Code of Criminal Procedure, 1973',
         targetAct: 'Bharatiya Nagarik Suraksha Sanhita, 2023',
-        sourceColor: { bg: 'bg-blue-50', text: 'text-blue-600', border: 'border-blue-200' },
-        targetColor: { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-200' }
+        sourceColor: { bg: 'bg-red-50', text: 'text-red-600', border: 'border-red-200' },
+        targetColor: { bg: 'bg-green-50', text: 'text-green-600', border: 'border-green-200' }
       };
     }
   };
@@ -323,15 +323,15 @@ export default function MappingDetails() {
                   Complete Mapping Information
                 </h3>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> */}
                   {/* Left Column - Source Details */}
-                  <div className="space-y-4">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                  {/* <div className="space-y-4"> */}
+                    {/* <h4 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                       Source Section Details
-                    </h4>
+                    </h4> */}
                     
                     {/* IPC Section Fields */}
-                    {mapping.ipc_section && (
+                    {/* {mapping.ipc_section && (
                       <div>
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">IPC Section Number</h5>
                         <p className="text-sm text-gray-900 font-medium">{mapping.ipc_section}</p>
@@ -342,10 +342,10 @@ export default function MappingDetails() {
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">IPC Description</h5>
                         <p className="text-sm text-gray-600 leading-relaxed">{mapping.ipc_description}</p>
                       </div>
-                    )}
+                    )} */}
                     
                     {/* IEA Section Fields */}
-                    {mapping.iea_section && (
+                    {/* {mapping.iea_section && (
                       <div>
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">IEA Section Number</h5>
                         <p className="text-sm text-gray-900 font-medium">{mapping.iea_section}</p>
@@ -356,10 +356,10 @@ export default function MappingDetails() {
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">IEA Description</h5>
                         <p className="text-sm text-gray-600 leading-relaxed">{mapping.iea_description}</p>
                       </div>
-                    )}
+                    )} */}
                     
                     {/* CrPC Section Fields */}
-                    {mapping.crpc_section && (
+                    {/* {mapping.crpc_section && (
                       <div>
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">CrPC Section Number</h5>
                         <p className="text-sm text-gray-900 font-medium">{mapping.crpc_section}</p>
@@ -370,10 +370,10 @@ export default function MappingDetails() {
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">CrPC Description</h5>
                         <p className="text-sm text-gray-600 leading-relaxed">{mapping.crpc_description}</p>
                       </div>
-                    )}
+                    )} */}
                     
                     {/* Generic Source Fields */}
-                    {mapping.source_section && !mapping.ipc_section && !mapping.iea_section && !mapping.crpc_section && (
+                    {/* {mapping.source_section && !mapping.ipc_section && !mapping.iea_section && !mapping.crpc_section && (
                       <div>
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">Source Section</h5>
                         <p className="text-sm text-gray-900 font-medium">{mapping.source_section}</p>
@@ -384,17 +384,17 @@ export default function MappingDetails() {
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">Source Description</h5>
                         <p className="text-sm text-gray-600 leading-relaxed">{mapping.source_description}</p>
                       </div>
-                    )}
-                  </div>
+                    )} */}
+                  {/* </div> */}
 
                   {/* Right Column - Target Details */}
-                  <div className="space-y-4">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                  {/* <div className="space-y-4"> */}
+                    {/* <h4 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                       Target Section Details
-                    </h4>
+                    </h4> */}
                     
                     {/* BNS Section Fields */}
-                    {mapping.bns_section && (
+                    {/* {mapping.bns_section && (
                       <div>
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">BNS Section Number</h5>
                         <p className="text-sm text-gray-900 font-medium">{mapping.bns_section}</p>
@@ -405,10 +405,10 @@ export default function MappingDetails() {
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">BNS Description</h5>
                         <p className="text-sm text-gray-600 leading-relaxed">{mapping.bns_description}</p>
                       </div>
-                    )}
+                    )} */}
                     
                     {/* BSA Section Fields */}
-                    {mapping.bsa_section && (
+                    {/* {mapping.bsa_section && (
                       <div>
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">BSA Section Number</h5>
                         <p className="text-sm text-gray-900 font-medium">{mapping.bsa_section}</p>
@@ -419,10 +419,10 @@ export default function MappingDetails() {
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">BSA Description</h5>
                         <p className="text-sm text-gray-600 leading-relaxed">{mapping.bsa_description}</p>
                       </div>
-                    )}
+                    )} */}
                     
                     {/* BNSS Section Fields */}
-                    {mapping.bnss_section && (
+                    {/* {mapping.bnss_section && (
                       <div>
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">BNSS Section Number</h5>
                         <p className="text-sm text-gray-900 font-medium">{mapping.bnss_section}</p>
@@ -433,10 +433,10 @@ export default function MappingDetails() {
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">BNSS Description</h5>
                         <p className="text-sm text-gray-600 leading-relaxed">{mapping.bnss_description}</p>
                       </div>
-                    )}
+                    )} */}
                     
                     {/* Generic Target Fields */}
-                    {mapping.target_section && !mapping.bns_section && !mapping.bsa_section && !mapping.bnss_section && (
+                    {/* {mapping.target_section && !mapping.bns_section && !mapping.bsa_section && !mapping.bnss_section && (
                       <div>
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">Target Section</h5>
                         <p className="text-sm text-gray-900 font-medium">{mapping.target_section}</p>
@@ -447,22 +447,22 @@ export default function MappingDetails() {
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">Target Description</h5>
                         <p className="text-sm text-gray-600 leading-relaxed">{mapping.target_description}</p>
                       </div>
-                    )}
-                  </div>
-                </div>
+                    )} */}
+                  {/* </div> */}
+                {/* </div> */}
 
                 {/* Additional Fields Section */}
-                <div className="mt-8 pt-6 border-t border-gray-200">
-                  <h4 className="text-lg font-semibold text-gray-800 mb-4" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                <div>
+                  {/* <h4 className="text-lg font-semibold text-gray-800 mb-4" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                     Additional Information
-                  </h4>
+                  </h4> */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {mapping.id && (
+                    {/* {mapping.id && (
                       <div>
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">Mapping ID</h5>
                         <p className="text-sm text-gray-600">{mapping.id}</p>
                       </div>
-                    )}
+                    )} */}
                     {mapping.mapping_type && (
                       <div>
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">Mapping Type</h5>
@@ -522,9 +522,9 @@ export default function MappingDetails() {
                       'notes', 'comments', 'remarks', 'created_at', 'updated_at'].includes(key)
                     && mapping[key] !== null && mapping[key] !== undefined && mapping[key] !== ''
                   ).length > 0 && (
-                    <div className="mt-6 pt-6 border-t border-gray-200">
+                    <div >
                       <h4 className="text-lg font-semibold text-gray-800 mb-4" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                        Other Fields
+                        Acts Details 
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                         {Object.keys(mapping)

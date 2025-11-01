@@ -341,7 +341,7 @@ const Dashboard = () => {
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
           {/* Content Area */}
-          <main className="flex-1 px-4 py-6 overflow-y-auto" style={{ backgroundColor: '#F9FAFC', marginTop: '30px' }}>
+          <main className="flex-1 px-4 py-6 overflow-y-auto pt-24" style={{ backgroundColor: '#F9FAFC' }}>
             {renderContent()}
           </main>
         </div>

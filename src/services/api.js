@@ -1372,6 +1372,15 @@ class ApiService {
     return await this.handleResponse(response);
   }
 
+  // Get full judgment details by ID (for viewing bookmarked judgments)
+  async getJudgementById(judgementId) {
+    const response = await fetch(`${this.baseURL}/api/judgements/${judgementId}`, {
+      method: 'GET',
+      headers: this.getAuthHeaders()
+    });
+    return await this.handleResponse(response);
+  }
+
   // Bookmark an act (central or state)
   async bookmarkAct(actType, actId) {
     const response = await fetch(`${this.baseURL}/api/bookmarks/acts/${actType}/${actId}`, {
