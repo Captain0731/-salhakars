@@ -2,10 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
+import BookmarkButton from "../components/BookmarkButton";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function ActDetails() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
   const [act, setAct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -90,9 +93,19 @@ export default function ActDetails() {
             <div className="lg:col-span-1 order-2 lg:order-1">
               <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 h-full max-h-96 lg:max-h-none overflow-y-auto">
                 <div className="mb-6">
-                  <h3 className="text-xl font-bold mb-3" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                    Act Details
-                  </h3>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                      Act Details
+                    </h3>
+                    {isAuthenticated && (
+                      <BookmarkButton
+                        item={act}
+                        type={act.location ? "state_act" : "central_act"}
+                        size="small"
+                        showText={false}
+                      />
+                    )}
+                  </div>
                   <div className="w-12 h-1 bg-gradient-to-r" style={{ background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)' }}></div>
                 </div>
 

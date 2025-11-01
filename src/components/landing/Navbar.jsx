@@ -21,13 +21,7 @@ const navItems = [
       },
       { 
         label: "Law Mapping", 
-        path: "/old-to-new-mapping",
-        subLinks: [
-          { label: "All Mappings", path: "/old-to-new-mapping" },
-          { label: "IPC", path: "/ipc-bns-mapping", arrow: "⇄", targetLabel: "BNS" },
-          { label: "IEA", path: "/iea-bsa-mapping", arrow: "⇄", targetLabel: "BSA" },
-          { label: "CrPC", path: "/bnss-crpc-mapping", arrow: "⇄", targetLabel: "BNSS" },
-        ]
+        path: "/law-mapping"
       },
       { 
         label: "Legal Template", 
@@ -36,10 +30,6 @@ const navItems = [
       { 
         label: "YouTube Summarizer", 
         path: "/youtube-summary",
-      },
-      { 
-        label: "My Bookmarks", 
-        path: "/bookmarks",
       },
       { 
         label: "🎨 Design Variants", 

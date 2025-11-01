@@ -2,10 +2,13 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import PDFTranslator from "../components/PDFTranslator";
+import BookmarkButton from "../components/BookmarkButton";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function ViewPDF() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
   const [pdfUrl, setPdfUrl] = useState("");
   const [translatedPdfUrl, setTranslatedPdfUrl] = useState("");
   const [isTranslating, setIsTranslating] = useState(false);
@@ -147,9 +150,19 @@ export default function ViewPDF() {
             <div className="lg:col-span-1 order-2 lg:order-1">
               <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 h-full max-h-96 lg:max-h-none overflow-y-auto">
                 <div className="mb-6">
-                  <h3 className="text-xl font-bold mb-3" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                    {location.state?.act ? 'Act Details' : 'Judgment Details'}
-                  </h3>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                      {location.state?.act ? 'Act Details' : 'Judgment Details'}
+                    </h3>
+                    {isAuthenticated && !location.state?.act && judgmentInfo && (
+                      <BookmarkButton
+                        item={judgmentInfo}
+                        type="judgement"
+                        size="small"
+                        showText={false}
+                      />
+                    )}
+                  </div>
                   <div className="w-12 h-1 bg-gradient-to-r" style={{ background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)' }}></div>
                 </div>
 

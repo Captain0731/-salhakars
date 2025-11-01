@@ -103,6 +103,10 @@ const BookmarkButton = ({
             await apiService.removeMappingBookmark('bns_ipc', item.id);
             message = 'BNS-IPC mapping removed from bookmarks';
             break;
+          case 'bnss_crpc_mapping':
+            await apiService.removeMappingBookmark('bnss_crpc', item.id);
+            message = 'BNSS-CrPC mapping removed from bookmarks';
+            break;
           default:
             throw new Error(`Unsupported bookmark type: ${type}`);
         }
@@ -134,6 +138,10 @@ const BookmarkButton = ({
           case 'bns_ipc_mapping':
             response = await apiService.bookmarkMapping('bns_ipc', item.id);
             message = 'BNS-IPC mapping added to bookmarks';
+            break;
+          case 'bnss_crpc_mapping':
+            response = await apiService.bookmarkMapping('bnss_crpc', item.id);
+            message = 'BNSS-CrPC mapping added to bookmarks';
             break;
           default:
             throw new Error(`Unsupported bookmark type: ${type}`);

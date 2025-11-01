@@ -2,8 +2,6 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
-import { useAuth } from "../contexts/AuthContext";
-import BookmarkButton from "../components/BookmarkButton";
 import useSmoothInfiniteScroll from "../hooks/useSmoothInfiniteScroll";
 import { 
   EnhancedJudgmentSkeleton, 
@@ -65,7 +63,6 @@ if (typeof document !== 'undefined') {
 
 export default function LegalJudgments() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const isMountedRef = useRef(true);
 
   // Court type state - defaults to highcourt
@@ -983,13 +980,6 @@ export default function LegalJudgments() {
                         </div>
 
                         <div className="flex-shrink-0 flex flex-col gap-3 w-full lg:w-48">
-                          <BookmarkButton
-                            item={judgment}
-                            type="judgement"
-                            size="default"
-                            showText={true}
-                            className="w-full"
-                          />
                           <button
                             onClick={() => viewJudgment(judgment)}
                             className="w-full px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"

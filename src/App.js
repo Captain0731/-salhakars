@@ -14,7 +14,9 @@ import CentralActs from "./pages/CentralActs";
 import StateActs from "./pages/StateActs";
 import LawLibrary from "./pages/LawLibrary";
 import ActDetails from "./pages/ActDetails";
+import MappingDetails from "./pages/MappingDetails";
 import OldToNewLawMapping from "./pages/OldToNewLawMapping";
+import LawMapping from "./pages/LawMapping";
 import IPCBNSMapping from "./pages/IPCBNSMapping";
 import IEABSAMapping from "./pages/IEABSAMapping";
 import BNSSCrPCMapping from "./pages/BNSSCrPCMapping";
@@ -73,6 +75,8 @@ function AppLayout() {
         <Route path="/central-acts" element={<CentralActs />} />
         <Route path="/state-acts" element={<StateActs />} />
         <Route path="/act-details" element={<ActDetails />} />
+        <Route path="/mapping-details" element={<MappingDetails />} />
+        <Route path="/law-mapping" element={<LawMapping />} />
         <Route path="/old-to-new-mapping" element={<OldToNewLawMapping />} />
         <Route path="/ipc-bns-mapping" element={<IPCBNSMapping />} />
         <Route path="/iea-bsa-mapping" element={<IEABSAMapping />} />

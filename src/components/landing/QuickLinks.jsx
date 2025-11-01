@@ -4,8 +4,9 @@ const QuickLinks = () => {
   const navigate = useNavigate();
   
   const links = [
-    { label: "Legal Judgment", path: "/high-court-judgments" },
-    { label: "Law Mapping", path: "/old-to-new-mapping" },
+    { label: "Legal Judgment", path: "/judgment-access" },
+    { label: "Law Library", path: "/law-library" },
+    { label: "Law Mapping", path: "/law-mapping" },
     { label: "Legal Templates", path: "/legal-template" },
     { label: "YouTube Summarizer", path: "/youtube-summary" }
   ];

@@ -2,8 +2,6 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
-import { useAuth } from "../contexts/AuthContext";
-import BookmarkButton from "../components/BookmarkButton";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 import { SkeletonGrid, SmoothTransitionWrapper } from "../components/EnhancedLoadingComponents";
 import { InfiniteScrollLoader } from "../components/LoadingComponents";
@@ -54,7 +52,6 @@ if (typeof document !== 'undefined') {
 
 export default function LawLibrary() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const [activeSection, setActiveSection] = useState("central"); // Default to Central Acts
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -139,36 +136,42 @@ export default function LawLibrary() {
         offset: currentOffset
       };
 
-      // Add filter parameters
-      if (activeFilters.search && activeFilters.search.trim()) {
+      // Add filter parameters - search/short_title
+      if (activeFilters.search && typeof activeFilters.search === 'string' && activeFilters.search.trim()) {
         params.short_title = activeFilters.search.trim();
       }
       
+      // Central Acts specific filters
       if (activeSection === "central") {
-        if (activeFilters.act_id && activeFilters.act_id.trim()) {
+        if (activeFilters.act_id && typeof activeFilters.act_id === 'string' && activeFilters.act_id.trim()) {
           params.act_id = activeFilters.act_id.trim();
         }
+        if (activeFilters.ministry && typeof activeFilters.ministry === 'string' && activeFilters.ministry.trim()) {
+          params.ministry = activeFilters.ministry.trim();
+        }
       } else {
-        if (activeFilters.act_number && activeFilters.act_number.trim()) {
+        // State Acts specific filters
+        if (activeFilters.act_number && typeof activeFilters.act_number === 'string' && activeFilters.act_number.trim()) {
           params.act_number = activeFilters.act_number.trim();
         }
-        if (activeFilters.state && activeFilters.state.trim()) {
+        if (activeFilters.state && typeof activeFilters.state === 'string' && activeFilters.state.trim()) {
           params.state = activeFilters.state.trim();
         }
       }
       
-      if (activeSection === "central") {
-        if (activeFilters.ministry && activeFilters.ministry.trim()) {
-          params.ministry = activeFilters.ministry.trim();
-        }
-      }
-      
-      if (activeFilters.department && activeFilters.department.trim()) {
+      // Common filters
+      if (activeFilters.department && typeof activeFilters.department === 'string' && activeFilters.department.trim()) {
         params.department = activeFilters.department.trim();
       }
       
-      if (activeFilters.year && activeFilters.year.trim()) {
-        params.year = parseInt(activeFilters.year);
+      if (activeFilters.year) {
+        const yearValue = typeof activeFilters.year === 'string' ? activeFilters.year.trim() : String(activeFilters.year);
+        if (yearValue) {
+          const yearInt = parseInt(yearValue);
+          if (!isNaN(yearInt) && yearInt > 0) {
+            params.year = yearInt;
+          }
+        }
       }
 
       // Fetch data based on active section
@@ -237,11 +240,32 @@ export default function LawLibrary() {
     setActs([]);
     setPagination(null);
     setError(null);
+    // Reset offset when applying new filters
+    const currentFilters = filtersRef.current;
     setTimeout(() => {
-      const currentFilters = filtersRef.current;
       fetchActs(false, currentFilters);
     }, 100);
   };
+  
+  // Auto-apply filters when they change (with debounce) - but only for non-search filters
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      // Only auto-apply if filters panel is visible and filters have values
+      const hasActiveFilters = Object.entries(filtersRef.current).some(([key, value]) => {
+        if (key === 'search') return false; // Don't auto-apply search
+        if (!value) return false;
+        if (typeof value === 'string') return value.trim() !== '';
+        if (typeof value === 'number') return value !== 0;
+        return value !== '';
+      });
+      
+      if (hasActiveFilters && showFilters) {
+        applyFilters();
+      }
+    }, 800); // 800ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [filters, showFilters]);
 
   const clearFilters = () => {
     const emptyFilters = getInitialFilters(activeSection);
@@ -649,26 +673,35 @@ export default function LawLibrary() {
                 </div>
 
                 {/* Active Filters Display */}
-                {Object.values(filters).some(val => val && (typeof val === 'string' ? val.trim() !== '' : val !== '')) && (
+                {Object.values(filters).some(val => {
+                  if (!val) return false;
+                  if (typeof val === 'string') return val.trim() !== '';
+                  if (typeof val === 'number') return val !== 0;
+                  return val !== '';
+                }) && (
                   <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <h3 className="text-sm font-medium text-blue-800 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       Active Filters:
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {Object.entries(filters).map(([key, value]) => {
-                        if (value && (typeof value === 'string' ? value.trim() !== '' : value !== '')) {
-                          let label = key;
-                          if (key === 'act_id') label = 'Act ID';
-                          else if (key === 'act_number') label = 'Act Number';
-                          else label = key.charAt(0).toUpperCase() + key.slice(1);
-                          
-                          return (
-                            <span key={key} className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
-                              {label}: "{value}"
-                            </span>
-                          );
-                        }
-                        return null;
+                        const hasValue = value && (
+                          typeof value === 'string' ? value.trim() !== '' :
+                          typeof value === 'number' ? value !== 0 :
+                          value !== ''
+                        );
+                        if (!hasValue) return null;
+                        
+                        let label = key;
+                        if (key === 'act_id') label = 'Act ID';
+                        else if (key === 'act_number') label = 'Act Number';
+                        else label = key.charAt(0).toUpperCase() + key.slice(1);
+                        
+                        return (
+                          <span key={key} className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                            {label}: "{value}"
+                          </span>
+                        );
                       })}
                     </div>
                   </div>
@@ -682,12 +715,22 @@ export default function LawLibrary() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                  {Object.values(filters).some(val => val && val.trim() !== '') 
+                  {Object.values(filters).some(val => {
+                    if (!val) return false;
+                    if (typeof val === 'string') return val.trim() !== '';
+                    if (typeof val === 'number') return val !== 0;
+                    return val !== '';
+                  }) 
                     ? `Search Results - ${sectionLabel}` 
                     : `Latest ${sectionLabel}`}
                 </h2>
                 <p className="text-sm text-gray-600 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                  {Object.values(filters).some(val => val && val.trim() !== '') 
+                  {Object.values(filters).some(val => {
+                    if (!val) return false;
+                    if (typeof val === 'string') return val.trim() !== '';
+                    if (typeof val === 'number') return val !== 0;
+                    return val !== '';
+                  }) 
                     ? `Showing ${sectionLabel.toLowerCase()} matching your search criteria` 
                     : `Showing the most recent ${sectionLabel.toLowerCase()} first`}
                 </p>
@@ -753,11 +796,21 @@ export default function LawLibrary() {
                   No {sectionLabel.toLowerCase()} found
                 </h3>
                 <p className="text-gray-600 mb-6 max-w-md mx-auto" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                  {Object.values(filters).some(val => val && val.trim() !== '')
+                  {Object.values(filters).some(val => {
+                    if (!val) return false;
+                    if (typeof val === 'string') return val.trim() !== '';
+                    if (typeof val === 'number') return val !== 0;
+                    return val !== '';
+                  })
                     ? 'No acts match your current search criteria. Try adjusting your filters or search terms.'
                     : `No ${sectionLabel.toLowerCase()} are currently available. Please check back later.`}
                 </p>
-                {Object.values(filters).some(val => val && val.trim() !== '') && (
+                {Object.values(filters).some(val => {
+                  if (!val) return false;
+                  if (typeof val === 'string') return val.trim() !== '';
+                  if (typeof val === 'number') return val !== 0;
+                  return val !== '';
+                }) && (
                   <button
                     onClick={clearFilters}
                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
@@ -782,14 +835,6 @@ export default function LawLibrary() {
                               <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
                                 Latest
                               </span>
-                            )}
-                            {isAuthenticated && (
-                              <BookmarkButton
-                                item={act}
-                                type={activeSection === "central" ? "central_act" : "state_act"}
-                                size="small"
-                                showText={false}
-                              />
                             )}
                           </div>
                           
