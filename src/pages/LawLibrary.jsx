@@ -368,6 +368,7 @@ export default function LawLibrary() {
             <p className="text-lg max-w-3xl mx-auto animate-fade-in-up" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif', animationDelay: '0.4s' }}>
               Your comprehensive resource for accessing legal acts, regulations, and legislative documents from across India
             </p>
+            
           </div>
         </div>
       </div>
@@ -375,25 +376,52 @@ export default function LawLibrary() {
       <div className="p-6">
         <div className="max-w-7xl mx-auto">
 
-          {/* Section Type Selector */}
+          {/* Section Type Toggle Button */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center justify-between">
               <label className="text-sm font-medium text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
                 Select Section:
               </label>
-              <div className="relative">
-                <select
-                  value={activeSection}
-                  onChange={(e) => setActiveSection(e.target.value)}
-                  className="px-6 py-3 bg-white border-2 border-gray-300 rounded-lg shadow-sm hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium min-w-[250px]"
-                  style={{ fontFamily: 'Roboto, sans-serif', color: '#1E65AD' }}
+              
+              {/* Toggle Button */}
+              <div className="relative inline-flex items-center bg-gray-100 rounded-xl p-1 shadow-inner">
+                {/* Sliding background indicator */}
+                <div
+                  className={`absolute top-1 bottom-1 rounded-lg transition-all duration-300 ease-in-out z-0`}
+                  style={{
+                    left: activeSection === 'central' ? '4px' : 'calc(50% + 2px)',
+                    width: 'calc(50% - 4px)',
+                    backgroundColor: activeSection === 'central' ? '#1E65AD' : '#CF9B63',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                  }}
+                />
+                
+                <button
+                  onClick={() => setActiveSection('central')}
+                  className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 min-w-[180px] ${
+                    activeSection === 'central'
+                      ? 'text-white'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                  style={{
+                    fontFamily: 'Roboto, sans-serif',
+                  }}
                 >
-                  {librarySections.map((section) => (
-                    <option key={section.id} value={section.id}>
-                      {section.title}
-                    </option>
-                  ))}
-                </select>
+                  Central Acts
+                </button>
+                <button
+                  onClick={() => setActiveSection('state')}
+                  className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 min-w-[180px] ${
+                    activeSection === 'state'
+                      ? 'text-white'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                  style={{
+                    fontFamily: 'Roboto, sans-serif',
+                  }}
+                >
+                  State Acts
+                </button>
               </div>
             </div>
           </div>

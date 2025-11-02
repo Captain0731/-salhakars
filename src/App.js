@@ -35,7 +35,9 @@ import InviteFriends from "./pages/InviteFriends";
 import EarnRewards from "./pages/EarnRewards";
 import TrackReferrals from "./pages/TrackReferrals";
 import OurTeam from "./pages/OurTeam";
+import PricingPage from "./pages/PricingPage";
 import Dashboard from "./pages/Dashboard";
+import NotesPage from "./pages/NotesPage";
 import LanguageSelectorDemo from "./pages/LanguageSelectorDemo";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -59,6 +61,7 @@ function AppLayout() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/about" element={<About />} />
+        <Route path="/pricing" element={<PricingPage />} />
         <Route path="/our-team" element={<OurTeam />} />
         <Route path="/language-demo" element={<LanguageSelectorDemo />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -95,6 +98,7 @@ function AppLayout() {
         
         {/* Protected Routes - Authentication Required */}
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/notes/:id" element={<ProtectedRoute><NotesPage /></ProtectedRoute>} />
         
         {/* Referral Program Routes */}
         <Route path="/referral" element={<Referral />} />

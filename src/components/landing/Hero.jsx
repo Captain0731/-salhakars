@@ -1,12 +1,14 @@
+import React, { forwardRef } from "react";
 import SearchBar from "./SearchBar";
 import QuickLinks from "./QuickLinks";
 
-const Hero = () => {
+const Hero = forwardRef((props, ref) => {
   return (
     <section
-      className="relative min-h-[100vh] flex flex-col items-center justify-center text-center overflow-hidden px-4 sm:px-6 lg:px-8"
+      ref={ref}
+      className="relative min-h-screen flex flex-col items-center justify-center text-center overflow-hidden px-4 sm:px-6 lg:px-8"
       style={{ 
-        background: 'radial-gradient(ellipse at center, #B8D4E8 0%, #D8E8F0 30%, #FCFFFF 60%, #F5F5F0 100%)'
+        background: 'radial-gradient(ellipse at center, #B8D4E8 0%, #D8E8F0 30%, #FCFFFF 50%, #F5F5F0 100%)'
       }}
     >
       {/* Soft Radial Gradient Background */}
@@ -59,6 +61,8 @@ const Hero = () => {
 
     </section>
   );
-};
+});
+
+Hero.displayName = 'Hero';
 
 export default Hero;

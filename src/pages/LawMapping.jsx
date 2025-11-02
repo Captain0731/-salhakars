@@ -474,24 +474,64 @@ export default function LawMapping() {
                 Search {mappingTypeLabel}
               </h2>
               <div className="flex items-center gap-4">
-              <label className="text-sm font-medium text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                Select Mapping Type:
-              </label>
-              <div className="relative">
-                <select
-                  value={mappingType}
-                  onChange={(e) => setMappingType(e.target.value)}
-                  className="px-6 py-3 bg-white border-2 border-gray-300 rounded-lg shadow-sm hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium min-w-[300px]"
-                  style={{ fontFamily: 'Roboto, sans-serif', color: '#1E65AD' }}
-                >
-                  {mappingTypes.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
+                <label className="text-sm font-medium text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  Select Mapping Type:
+                </label>
+                
+                {/* Toggle Button - Three Options */}
+                <div className="relative inline-flex items-center bg-gray-100 rounded-xl p-1 shadow-inner">
+                  {/* Sliding background indicator */}
+                  <div
+                    className={`absolute top-1 bottom-1 rounded-lg transition-all duration-300 ease-in-out z-0`}
+                    style={{
+                      left: mappingType === 'bns_ipc' ? '4px' : mappingType === 'bsa_iea' ? 'calc(33.33% + 2px)' : 'calc(66.66% + 2px)',
+                      width: 'calc(33.33% - 4px)',
+                      backgroundColor: mappingType === 'bns_ipc' ? '#1E65AD' : mappingType === 'bsa_iea' ? '#CF9B63' : '#8C969F',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                    }}
+                  />
+                  
+                  <button
+                    onClick={() => setMappingType('bns_ipc')}
+                    className={`px-4 py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 min-w-[160px] text-sm ${
+                      mappingType === 'bns_ipc'
+                        ? 'text-white'
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                    style={{
+                      fontFamily: 'Roboto, sans-serif',
+                    }}
+                  >
+                    IPC ↔ BNS
+                  </button>
+                  <button
+                    onClick={() => setMappingType('bsa_iea')}
+                    className={`px-4 py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 min-w-[160px] text-sm ${
+                      mappingType === 'bsa_iea'
+                        ? 'text-white'
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                    style={{
+                      fontFamily: 'Roboto, sans-serif',
+                    }}
+                  >
+                    IEA ↔ BSA
+                  </button>
+                  <button
+                    onClick={() => setMappingType('bnss_crpc')}
+                    className={`px-4 py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 min-w-[160px] text-sm ${
+                      mappingType === 'bnss_crpc'
+                        ? 'text-white'
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                    style={{
+                      fontFamily: 'Roboto, sans-serif',
+                    }}
+                  >
+                    CrPC ↔ BNSS
+                  </button>
+                </div>
               </div>
-            </div>
               {/* <button
                 onClick={() => setShowFilters(!showFilters)}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors font-medium"

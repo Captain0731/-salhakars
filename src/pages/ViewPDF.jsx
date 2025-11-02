@@ -25,16 +25,9 @@ export default function ViewPDF() {
     // Get act or judgment data from location state
     const actData = location.state?.act;
     const judgmentData = location.state?.judgment;
-    
-    if (actData) {
-      setJudgmentInfo(actData);
-      // Use pdf_url from API data, fallback to empty string if not available
-      const originalPdfUrl = actData.pdf_url || "";
-      setPdfUrl(originalPdfUrl);
-      setTranslatedPdfUrl(originalPdfUrl); // Initialize with original URL
-      setTotalPages(25); // Default page count, could be enhanced with API data
-      setLoading(false);
-    } else if (judgmentData) {
+    console.log("=-=-=-=-=", judgmentData)
+   
+    if (judgmentData) {
       setJudgmentInfo(judgmentData);
       // Use pdf_link from judgment data, fallback to empty string if not available
       const originalPdfUrl = judgmentData.pdf_link || "";

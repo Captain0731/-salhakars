@@ -103,3 +103,144 @@
   display: none;  /* Safari and Chrome */
 }
 
+/* Scroll-triggered overlap animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideOverlap {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.95);
+    z-index: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    z-index: 10;
+  }
+}
+
+.scroll-fade-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.scroll-fade-down {
+  animation: fadeInDown 0.8s ease-out forwards;
+}
+
+.scroll-fade-left {
+  animation: fadeInLeft 0.8s ease-out forwards;
+}
+
+.scroll-fade-right {
+  animation: fadeInRight 0.8s ease-out forwards;
+}
+
+.scroll-scale-in {
+  animation: scaleIn 0.6s ease-out forwards;
+}
+
+.scroll-overlap {
+  animation: slideOverlap 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Ultra-smooth overlap scroll animation styles */
+.hero-section {
+  will-change: opacity, transform;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  /* Force GPU acceleration */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.next-section {
+  will-change: transform, opacity, border-radius, box-shadow;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  contain: layout style paint;
+  /* Force GPU acceleration */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Smooth rendering */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Performance optimization */
+@media (prefers-reduced-motion: reduce) {
+  .hero-section,
+  .next-section {
+    transition: none;
+  }
+}
+

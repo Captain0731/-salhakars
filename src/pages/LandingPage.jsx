@@ -1,3 +1,4 @@
+import React from "react";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero";
 import Features from "../components/landing/Features";
@@ -10,7 +11,7 @@ import Footer from "../components/landing/Footer";
 
 function LandingPage() {
   return (
-    <div className="font-sans bg-white overflow-x-hidden">
+    <div className="font-sans bg-white overflow-x-hidden" style={{ scrollBehavior: 'smooth' }}>
       <Navbar />
       <Hero />
       <div id="features">

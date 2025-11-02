@@ -55,6 +55,10 @@ const navItems = [
     path: "/legal-chatbot",
   },
   {
+    label: "Pricing",
+    path: "/pricing",
+  },
+  {
     label: "More",
     links: [
       { 

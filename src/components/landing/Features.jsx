@@ -1,8 +1,96 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import useScrollAnimation from "../../hooks/useScrollAnimation";
 
-const Features = () => {
+// Separate component for feature cards to use hooks properly
+const FeatureCard = ({ feature, index, onClick }) => {
+  const { ref: featureRef, isVisible: isFeatureVisible } = useScrollAnimation({ 
+    threshold: 0.2, 
+    rootMargin: '50px',
+    delay: index * 100 
+  });
+
+  return (
+    <div
+      ref={featureRef}
+      className={`group cursor-pointer transform hover:scale-105 transition-all duration-300 flex ${
+        isFeatureVisible 
+          ? 'opacity-100 translate-y-0 scale-100' 
+          : 'opacity-0 translate-y-8 scale-95'
+      }`}
+      onClick={() => onClick(feature.path)}
+      style={{ transitionDelay: `${index * 50}ms` }}
+    >
+      <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 w-full flex flex-col">
+        {/* Feature Header */}
+        <div 
+          className="p-8 text-center relative overflow-hidden"
+          style={{ 
+            background: `linear-gradient(135deg, ${feature.color} 0%, ${feature.secondaryColor} 100%)` 
+          }}
+        >
+          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="relative z-10">
+            <h3 
+              className="text-2xl font-bold text-white mb-2"
+              style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}
+            >
+              {feature.title}
+            </h3>
+          </div>
+        </div>
+
+        {/* Feature Content */}
+        <div className="p-8 flex flex-col flex-grow">
+          <p 
+            className="text-gray-600 leading-relaxed mb-6 flex-grow"
+            style={{ fontFamily: 'Roboto, sans-serif' }}
+          >
+            {feature.description}
+          </p>
+          
+          <div className="flex items-center justify-between mt-auto">
+            <span 
+              className="text-sm font-semibold"
+              style={{ color: feature.color, fontFamily: 'Roboto, sans-serif' }}
+            >
+              Learn More →
+            </span>
+            <div 
+              className="w-8 h-8 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: `${feature.color}20` }}
+            >
+              <svg 
+                className="w-4 h-4" 
+                style={{ color: feature.color }}
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Features = React.forwardRef((props, ref) => {
   const navigate = useNavigate();
+  const internalRef = React.useRef(null);
+  const sectionRef = ref || internalRef;
+  const { ref: animationRef, isVisible } = useScrollAnimation({ threshold: 0.1, rootMargin: '50px' });
+  
+  // Combine refs
+  React.useEffect(() => {
+    if (typeof sectionRef === 'function') {
+      sectionRef(animationRef.current);
+    } else if (sectionRef && 'current' in sectionRef) {
+      sectionRef.current = animationRef.current;
+    }
+  }, [sectionRef, animationRef]);
 
   const features = [
     {
@@ -60,7 +148,22 @@ const Features = () => {
   };
 
   return (
-    <section className="py-20 relative overflow-hidden" style={{ backgroundColor: '#F9FAFC' }}>
+    <section 
+      ref={(node) => {
+        if (typeof sectionRef === 'function') {
+          sectionRef(node);
+        } else if (sectionRef && 'current' in sectionRef) {
+          sectionRef.current = node;
+        }
+        if (animationRef.current !== node) {
+          animationRef.current = node;
+        }
+      }}
+      className="py-20 relative overflow-hidden"
+      style={{ 
+        backgroundColor: '#F9FAFC'
+      }}
+    >
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-20 w-32 h-32 rounded-full opacity-10 animate-float" style={{ backgroundColor: '#1E65AD' }}></div>
@@ -97,65 +200,12 @@ const Features = () => {
         {/* Features Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {features.map((feature, index) => (
-            <div
+            <FeatureCard 
               key={feature.id}
-              className="group cursor-pointer transform hover:scale-105 transition-all duration-300 flex"
-              onClick={() => handleFeatureClick(feature.path)}
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 w-full flex flex-col">
-                {/* Feature Header */}
-                <div 
-                  className="p-8 text-center relative overflow-hidden"
-                  style={{ 
-                    background: `linear-gradient(135deg, ${feature.color} 0%, ${feature.secondaryColor} 100%)` 
-                  }}
-                >
-                  <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="relative z-10">
-                    <h3 
-                      className="text-2xl font-bold text-white mb-2"
-                      style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}
-                    >
-                      {feature.title}
-                    </h3>
-                  </div>
-                </div>
-
-                {/* Feature Content */}
-                <div className="p-8 flex flex-col flex-grow">
-                  <p 
-                    className="text-gray-600 leading-relaxed mb-6 flex-grow"
-                    style={{ fontFamily: 'Roboto, sans-serif' }}
-                  >
-                    {feature.description}
-                  </p>
-                  
-                  <div className="flex items-center justify-between mt-auto">
-                    <span 
-                      className="text-sm font-semibold"
-                      style={{ color: feature.color, fontFamily: 'Roboto, sans-serif' }}
-                    >
-                      Learn More →
-                    </span>
-                    <div 
-                      className="w-8 h-8 rounded-full flex items-center justify-center"
-                      style={{ backgroundColor: `${feature.color}20` }}
-                    >
-                      <svg 
-                        className="w-4 h-4" 
-                        style={{ color: feature.color }}
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+              feature={feature}
+              index={index}
+              onClick={handleFeatureClick}
+            />
           ))}
         </div>
 
@@ -182,6 +232,8 @@ const Features = () => {
       `}</style>
     </section>
   );
-};
+});
+
+Features.displayName = 'Features';
 
 export default Features;

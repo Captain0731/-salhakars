@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import useScrollAnimation from "../../hooks/useScrollAnimation";
 
 const VideoSection = () => {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const { ref: sectionRef, isVisible } = useScrollAnimation({ threshold: 0.1, rootMargin: '50px' });
 
   const features = [
     {
@@ -41,7 +43,15 @@ const VideoSection = () => {
   };
 
   return (
-    <section className="py-20 relative overflow-hidden" style={{ backgroundColor: '#F9FAFC' }}>
+    <section 
+      ref={sectionRef}
+      className={`py-20 relative overflow-hidden transition-all duration-1000 ${
+        isVisible 
+          ? 'opacity-100 translate-y-0' 
+          : 'opacity-0 translate-y-10'
+      }`}
+      style={{ backgroundColor: '#F9FAFC' }}
+    >
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-20 w-32 h-32 rounded-full opacity-10 animate-float" style={{ backgroundColor: '#1E65AD' }}></div>

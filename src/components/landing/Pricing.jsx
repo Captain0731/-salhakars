@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import useScrollAnimation from "../../hooks/useScrollAnimation";
 
 const Pricing = () => {
   const [isYearly, setIsYearly] = useState(false);
+  const { ref: sectionRef, isVisible } = useScrollAnimation({ threshold: 0.1, rootMargin: '50px' });
 
   const pricingPlans = [
     {
@@ -81,7 +83,15 @@ const Pricing = () => {
   };
 
   return (
-    <section className="py-20 relative overflow-hidden" style={{ backgroundColor: '#F9FAFC' }}>
+    <section 
+      ref={sectionRef}
+      className={`py-20 relative overflow-hidden transition-all duration-1000 ${
+        isVisible 
+          ? 'opacity-100 translate-y-0' 
+          : 'opacity-0 translate-y-10'
+      }`}
+      style={{ backgroundColor: '#F9FAFC' }}
+    >
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-20 w-40 h-40 rounded-full opacity-5 animate-float" style={{ backgroundColor: '#1E65AD' }}></div>

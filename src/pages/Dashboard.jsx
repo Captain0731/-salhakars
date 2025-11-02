@@ -4,7 +4,7 @@ import {
   Download, 
   Calendar as CalendarIcon, 
   Bookmark, 
-  // Note,
+  FileText as Note,
   Menu, 
   X, 
   Search,
@@ -28,6 +28,7 @@ import Navbar from '../components/landing/Navbar';
 import MyDownloads from '../components/dashboard/MyDownloads';
 import Calendar from '../components/dashboard/Calendar';
 import Bookmarks from '../components/dashboard/Bookmarks';
+import Notes from '../components/dashboard/Notes';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
@@ -233,6 +234,8 @@ const Dashboard = () => {
         return <Calendar />;
       case 'bookmarks':
         return <Bookmarks />;
+      case 'notes':
+        return <Notes />;
       default:
         return null;
     }
@@ -243,7 +246,7 @@ const Dashboard = () => {
     { id: 'downloads', label: 'My Downloads', icon: Download },
     { id: 'calendar', label: 'Calendar', icon: CalendarIcon },
     { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark },
-    // { id: 'notes', label: 'Notes', icon: Note },
+    { id: 'notes', label: 'Notes', icon: Note },
   ];
 
   return (
