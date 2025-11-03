@@ -88,6 +88,7 @@ const Navbar = () => {
   const [subDropdownOpen, setSubDropdownOpen] = useState({ main: null, sub: null });
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const navRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
   const subHoverTimeoutRef = useRef(null);
@@ -116,16 +117,42 @@ const Navbar = () => {
     }
   };
 
-  // Handle scroll effect
+  // Handle scroll effect and progress bar
   useEffect(() => {
-    const handleScroll = () => {
+    let rafId = null;
+    
+    const updateScrollProgress = () => {
       const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      
       setIsScrolled(scrollTop > 50);
+      setScrollProgress(Math.min(100, Math.max(0, scrollPercent)));
     };
 
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
+      rafId = requestAnimationFrame(updateScrollProgress);
+    };
+
+    const handleResize = () => {
+      updateScrollProgress();
+    };
+
+    // Initial calculation
+    updateScrollProgress();
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleResize, { passive: true });
+    
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
     };
   }, []);
 
@@ -724,6 +751,35 @@ const Navbar = () => {
             </button>
           )}
 
+        </div>
+      </div>
+      
+      {/* Smooth Scroll Progress Bar */}
+      <div 
+        className="absolute bottom-0 left-0 right-0 z-[10001] h-1 bg-transparent pointer-events-none"
+        style={{ 
+          transform: 'translateY(100%)'
+        }}
+      >
+        <div
+          className="h-full relative overflow-hidden"
+          style={{
+            width: `${scrollProgress}%`,
+            background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 50%, #1E65AD 100%)',
+            backgroundSize: '200% 100%',
+            boxShadow: '0 -2px 10px rgba(30, 101, 173, 0.3)',
+            willChange: 'width',
+            transition: 'width 0.1s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}
+        >
+          {/* Shimmer effect */}
+          <div
+            className="absolute inset-0 shimmer opacity-60"
+            style={{
+              width: '100%',
+              height: '100%'
+            }}
+          />
         </div>
       </div>
     </nav>
