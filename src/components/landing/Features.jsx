@@ -21,10 +21,10 @@ const FeatureCard = ({ feature, index, onClick }) => {
       onClick={() => onClick(feature.path)}
       style={{ transitionDelay: `${index * 50}ms` }}
     >
-      <div className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 w-full flex flex-col">
+      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 w-full flex flex-col">
         {/* Feature Header */}
         <div 
-          className="p-8 text-center relative overflow-hidden"
+          className="p-4 sm:p-6 md:p-8 text-center relative overflow-hidden"
           style={{ 
             background: `linear-gradient(135deg, ${feature.color} 0%, ${feature.secondaryColor} 100%)` 
           }}
@@ -32,7 +32,7 @@ const FeatureCard = ({ feature, index, onClick }) => {
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           <div className="relative z-10">
             <h3 
-              className="text-2xl font-bold text-white mb-2"
+              className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-1 sm:mb-2"
               style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}
             >
               {feature.title}
@@ -41,9 +41,9 @@ const FeatureCard = ({ feature, index, onClick }) => {
         </div>
 
         {/* Feature Content */}
-        <div className="p-8 flex flex-col flex-grow">
+        <div className="p-4 sm:p-6 md:p-8 flex flex-col flex-grow">
           <p 
-            className="text-gray-600 leading-relaxed mb-6 flex-grow"
+            className="text-sm sm:text-base md:text-lg text-gray-600 leading-relaxed mb-4 sm:mb-6 flex-grow"
             style={{ fontFamily: 'Roboto, sans-serif' }}
           >
             {feature.description}
@@ -51,17 +51,17 @@ const FeatureCard = ({ feature, index, onClick }) => {
           
           <div className="flex items-center justify-between mt-auto">
             <span 
-              className="text-sm font-semibold"
+              className="text-xs sm:text-sm font-semibold"
               style={{ color: feature.color, fontFamily: 'Roboto, sans-serif' }}
             >
               Learn More →
             </span>
             <div 
-              className="w-8 h-8 rounded-full flex items-center justify-center"
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0"
               style={{ backgroundColor: `${feature.color}20` }}
             >
               <svg 
-                className="w-4 h-4" 
+                className="w-3.5 h-3.5 sm:w-4 sm:h-4" 
                 style={{ color: feature.color }}
                 fill="none" 
                 stroke="currentColor" 
@@ -159,7 +159,7 @@ const Features = React.forwardRef((props, ref) => {
           animationRef.current = node;
         }
       }}
-      className="py-20 relative overflow-hidden"
+      className="py-12 sm:py-16 md:py-20 relative overflow-hidden"
       style={{ 
         backgroundColor: '#F9FAFC'
       }}
@@ -172,11 +172,11 @@ const Features = React.forwardRef((props, ref) => {
         <div className="absolute bottom-20 right-20 w-28 h-28 rounded-full opacity-10 animate-float animation-delay-3000" style={{ backgroundColor: '#1E65AD' }}></div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
-        <div className="text-center mb-12 sm:mb-16">
+        <div className="text-center mb-8 sm:mb-12 md:mb-16">
           <h2 
-            className="text-4xl sm:text-5xl md:text-6xl font-black mb-4 sm:mb-6 px-4 leading-tight tracking-tight"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-3 sm:mb-4 md:mb-6 px-2 sm:px-4 leading-tight tracking-tight"
             style={{ 
               color: '#1E65AD', 
               fontFamily: 'Helvetica Hebrew Bold, sans-serif',
@@ -188,17 +188,17 @@ const Features = React.forwardRef((props, ref) => {
           </h2>
           
           <p 
-            className="text-lg sm:text-xl md:text-2xl max-w-4xl mx-auto leading-relaxed mb-6 sm:mb-8 px-4"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-4xl mx-auto leading-relaxed mb-4 sm:mb-6 md:mb-8 px-3 sm:px-4"
             style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}
           >
             Comprehensive legal technology solutions designed to empower legal professionals and students
           </p>
           
-          <div className="w-16 sm:w-20 md:w-24 h-1 mx-auto rounded-full" style={{ backgroundColor: '#CF9B63' }}></div>
+          <div className="w-12 sm:w-16 md:w-20 lg:w-24 h-0.5 sm:h-1 mx-auto rounded-full" style={{ backgroundColor: '#CF9B63' }}></div>
         </div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {features.map((feature, index) => (
             <FeatureCard 
               key={feature.id}
