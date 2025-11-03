@@ -8,7 +8,7 @@ const QuickLinks = () => {
     { label: "Law Library", path: "/law-library" },
     { label: "Law Mapping", path: "/law-mapping" },
     { label: "Legal Templates", path: "/legal-template" },
-    { label: "YouTube Summarizer", path: "/youtube-summary" }
+    // { label: "YouTube Summarizer", path: "/youtube-summary" }
   ];
 
   return (

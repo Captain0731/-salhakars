@@ -176,7 +176,7 @@ const pricingData = {
 function PricingPage() {
   const [activeCategory, setActiveCategory] = useState("student");
   const [billingCycle, setBillingCycle] = useState("monthly");
-  const [openFaq, setOpenFaq] = useState(null);
+  const [openFaqs, setOpenFaqs] = useState([]);
 
   const faqData = [
     {
@@ -232,7 +232,39 @@ function PricingPage() {
   ];
 
   const toggleFaq = (id) => {
-    setOpenFaq(openFaq === id ? null : id);
+    // Find the index of the clicked FAQ
+    const clickedIndex = faqData.findIndex(item => item.id === id);
+    
+    // Calculate the partner index (same row, other column)
+    // In a 2-column grid: even index (0,2,4...) pairs with odd index (1,3,5...)
+    let partnerIndex;
+    if (clickedIndex % 2 === 0) {
+      // Even index (left column) - partner is next item (right column)
+      partnerIndex = clickedIndex + 1;
+    } else {
+      // Odd index (right column) - partner is previous item (left column)
+      partnerIndex = clickedIndex - 1;
+    }
+    
+    // Get partner FAQ id if it exists
+    const partnerId = partnerIndex >= 0 && partnerIndex < faqData.length 
+      ? faqData[partnerIndex].id 
+      : null;
+    
+    // Check if the clicked FAQ is already open
+    const isCurrentlyOpen = openFaqs.includes(id);
+    
+    if (isCurrentlyOpen) {
+      // If clicking the same item that's open, close both (clear all)
+      setOpenFaqs([]);
+    } else {
+      // If opening a new pair, close all previously opened FAQs and open the new pair
+      const newOpenFaqs = [id];
+      if (partnerId) {
+        newOpenFaqs.push(partnerId);
+      }
+      setOpenFaqs(newOpenFaqs);
+    }
   };
 
   const handleButtonClick = (buttonText) => {
@@ -695,16 +727,16 @@ function PricingPage() {
                   <div className="flex-shrink-0">
                     <svg
                       className={`w-5 h-5 transition-transform duration-300 ${
-                        openFaq === item.id ? "rotate-180" : ""
+                        openFaqs.includes(item.id) ? "rotate-180" : ""
                       }`}
                       style={{
-                        color: openFaq === item.id ? "#1E65AD" : "#8C969F"
+                        color: openFaqs.includes(item.id) ? "#1E65AD" : "#8C969F"
                       }}
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
-                      {openFaq === item.id ? (
+                      {openFaqs.includes(item.id) ? (
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -725,7 +757,7 @@ function PricingPage() {
                 
                 <div
                   className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                    openFaq === item.id ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                    openFaqs.includes(item.id) ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
                   }`}
                 >
                   <div className="px-4 pb-5 md:pb-6">

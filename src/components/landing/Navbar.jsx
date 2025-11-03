@@ -16,6 +16,14 @@ const navItems = [
         path: "/judgment-access",
       },
       { 
+        label: "Supreme Court Judgments", 
+        path: "/supreme-court-judgments",
+      },
+      { 
+        label: "High Court Judgments", 
+        path: "/high-court-judgments",
+      },
+      { 
         label: "Law Library", 
         path: "/law-library"
       },
@@ -202,22 +210,25 @@ const Navbar = () => {
         
         {/* Brand Logo */}
         <div
-          className="cursor-pointer group"
+          className="cursor-pointer group flex items-center"
           onClick={() => navigate("/")}
         >
           <img
             src="/logo4.png"
             alt="सलहाकार Logo"
-            className={`w-auto group-hover:scale-110 transition-all duration-500 ease-out ${
-              isScrolled ? 'h-10 sm:h-12 md:h-14' : 'h-12 sm:h-14 md:h-16'
+            className={`max-h-12 sm:max-h-16 md:max-h-18 w-auto object-contain group-hover:scale-110 transition-all duration-500 ease-out ${
+              isScrolled ? 'max-h-14 sm:max-h-45 md:max-h-54' : 'max-h-12 sm:max-h-14 md:max-h-16'
             }`}
+            style={{ height: 'auto' }}
             onError={(e) => {
               if (e.target.src.includes('logo4.png')) {
                 e.target.src = '/logo.png';
               } else if (e.target.src.includes('logo.png')) {
                 e.target.src = '/logo 3.PNG';
+              } else if (e.target.src.includes('logo 3.PNG')) {
+                e.target.src = '/laogo2.jpeg';
               } else {
-                e.target.style.display = 'none';
+                e.target.src = '/logo4.png';
               }
             }}
           />

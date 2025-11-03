@@ -37,165 +37,102 @@ const FAQ = () => {
   ];
 
   const toggleItem = (id) => {
-    setOpenItems(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
+    setOpenItems(prev => {
+      // If clicking the same item that's open, close it
+      if (prev[id]) {
+        return {};
+      } else {
+        // If opening a new item, close all others and open this one
+        return { [id]: true };
+      }
+    });
   };
 
   return (
-    <section className="py-24 relative overflow-hidden" style={{ backgroundColor: '#F8FAFC' }}>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <section className="py-10 md:py-20 bg-[#F9FAFC]">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-14 xl:px-18">
+        <h2
+          className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-12"
+          style={{
+            color: "#1E65AD",
+            fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+            fontWeight: 700,
+            letterSpacing: "-0.02em"
+          }}
+        >
+          FAQ
+        </h2>
         
-        {/* Header Section */}
-        <div className="text-center mb-20">
-          <div className="inline-flex items-center px-6 py-3 rounded-full mb-8" style={{ backgroundColor: 'rgba(30, 101, 173, 0.1)' }}>
-            <span className="text-2xl mr-3">❓</span>
-            <span className="font-semibold text-lg" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
-              Frequently Asked Questions
-            </span>
-          </div>
-          
-          <h2 
-            className="text-5xl sm:text-6xl font-bold mb-8"
-            style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}
-          >
-            Questions?
-          </h2>
-          
-          <p 
-            className="text-2xl max-w-4xl mx-auto leading-relaxed"
-            style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}
-          >
-            We're here to help. Find answers to common questions about सलहाकार and get the support you need.
-          </p>
-        </div>
-
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-          
-          {/* Left Column - FAQ Information */}
-          <div className="space-y-8">
-            <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8">
-              <div className="text-center mb-8">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-3xl">💡</span>
-                </div>
-                <h3 
-                  className="text-3xl font-bold mb-4"
-                  style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}
-                >
-                  About Our FAQ
-                </h3>
-                <p 
-                  className="text-lg leading-relaxed"
-                  style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}
-                >
-                  Our comprehensive FAQ section covers the most common questions about सलहाकार. If you can't find what you're looking for, our support team is always ready to help.
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8">
-              <h4 
-                className="text-2xl font-bold mb-6"
-                style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}
+        <div className="space-y-0 grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-4">
+          {faqData.map((item, index) => (
+            <div
+              key={item.id}
+            >
+              <button
+                onClick={() => toggleItem(item.id)}
+                className="w-full py-5 md:py-6 px-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200 group"
               >
-                Quick Stats
-              </h4>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="text-center">
-                  <div className="text-4xl font-bold mb-2" style={{ color: '#CF9B63' }}>6+</div>
-                  <div className="text-sm" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}>Common Questions</div>
+                <span
+                  className="text-base md:text-lg font-semibold flex-1 pr-4"
+                  style={{
+                    color: "#1E65AD",
+                    fontFamily: "'Roboto', sans-serif",
+                    fontWeight: 600
+                  }}
+                >
+                  {item.question}
+                </span>
+                <div className="flex-shrink-0">
+                  <svg
+                    className={`w-5 h-5 transition-transform duration-300 ${
+                      openItems[item.id] ? "rotate-180" : ""
+                    }`}
+                    style={{
+                      color: openItems[item.id] ? "#1E65AD" : "#8C969F"
+                    }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    {openItems[item.id] ? (
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M20 12H4"
+                      />
+                    ) : (
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 4v16m8-8H4"
+                      />
+                    )}
+                  </svg>
                 </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold mb-2" style={{ color: '#CF9B63' }}>24/7</div>
-                  <div className="text-sm" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}>Support Available</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold mb-2" style={{ color: '#CF9B63' }}>100%</div>
-                  <div className="text-sm" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}>Secure Platform</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold mb-2" style={{ color: '#CF9B63' }}>5★</div>
-                  <div className="text-sm" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}>User Rating</div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Right Column - FAQ List */}
-          <div className="space-y-6">
-            {faqData.map((item, index) => (
+              </button>
+              
               <div
-                key={item.id}
-                className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  openItems[item.id] ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                }`}
               >
-                {/* Question Header */}
-                <button
-                  onClick={() => toggleItem(item.id)}
-                  className="w-full p-6 text-left focus:outline-none focus:ring-4 focus:ring-opacity-20 transition-all duration-300 group-hover:bg-gray-50"
-                  style={{ focusRingColor: 'rgba(30, 101, 173, 0.3)' }}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 pr-6">
-                      <h3 
-                        className="text-lg font-bold leading-relaxed"
-                        style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}
-                      >
-                        {item.question}
-                      </h3>
-                    </div>
-                    
-                    <div className="flex-shrink-0">
-                      <div 
-                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
-                          openItems[item.id] 
-                            ? 'bg-blue-100 transform rotate-180' 
-                            : 'bg-gray-100 group-hover:bg-blue-50'
-                        }`}
-                      >
-                        <svg
-                          className={`w-5 h-5 transition-all duration-300 ${
-                            openItems[item.id] ? 'text-blue-600' : 'text-gray-600'
-                          }`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </button>
-
-                {/* Answer */}
-                <div
-                  className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                    openItems[item.id] ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                  }`}
-                >
-                  <div className="px-6 pb-6">
-                    <div 
-                      className="w-full h-px mb-4"
-                      style={{ backgroundColor: '#E5E7EB' }}
-                    ></div>
-                    
-                    <p 
-                      className="text-gray-700 leading-relaxed"
-                      style={{ fontFamily: 'Roboto, sans-serif' }}
-                    >
-                      {item.answer}
-                    </p>
-                  </div>
+                <div className="px-4 pb-5 md:pb-6">
+                  <p
+                    className="text-sm md:text-base leading-relaxed"
+                    style={{
+                      color: "#8C969F",
+                      fontFamily: "'Roboto', sans-serif",
+                      fontWeight: 400
+                    }}
+                  >
+                    {item.answer}
+                  </p>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

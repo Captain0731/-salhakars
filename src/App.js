@@ -9,6 +9,7 @@ import SupremeCourtJudgments from "./pages/SupremeCourtJudgments";
 import HighCourtJudgments from "./pages/HighCourtJudgments";
 import LegalJudgments from "./pages/LegalJudgments";
 import ViewPDF from "./pages/ViewPDF";
+import ViewJudgmentHTML from "./pages/ViewJudgmentHTML";
 import BrowseActs from "./pages/BrowseActs";
 import CentralActs from "./pages/CentralActs";
 import StateActs from "./pages/StateActs";
@@ -73,6 +74,8 @@ function AppLayout() {
         <Route path="/supreme-court-judgments" element={<SupremeCourtJudgments />} />
         <Route path="/high-court-judgments" element={<HighCourtJudgments />} />
         <Route path="/view-pdf" element={<ViewPDF />} />
+        <Route path="/view-judgment/:id" element={<ViewJudgmentHTML />} />
+        <Route path="/view-judgment" element={<ViewJudgmentHTML />} />
         <Route path="/law-library" element={<LawLibrary />} />
         <Route path="/browse-acts" element={<BrowseActs />} />
         <Route path="/central-acts" element={<CentralActs />} />

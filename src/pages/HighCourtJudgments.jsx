@@ -331,7 +331,13 @@ export default function HighCourtJudgments() {
   });
 
   const viewJudgment = (judgment) => {
-    navigate('/view-pdf', { state: { judgment } });
+    // Navigate to HTML view page with judgment ID
+    if (judgment.id) {
+      navigate(`/view-judgment/${judgment.id}`, { state: { judgment } });
+    } else {
+      // Fallback to PDF view if no ID available
+      navigate('/view-pdf', { state: { judgment } });
+    }
   };
 
 

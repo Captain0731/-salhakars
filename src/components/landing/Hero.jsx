@@ -23,20 +23,10 @@ const Hero = forwardRef((props, ref) => {
         {/* Heading */}
         <div className="flex flex-col items-center justify-center mb-8 sm:mb-12">
           
-          <h1 
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-4 sm:mb-6 tracking-tight px-4 leading-tight"
-            style={{ 
-              color: '#000', 
-              fontFamily: 'Helvetica Hebrew Bold, sans-serif',
-              textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-              letterSpacing: '-0.02em'
-            }}
-          >
-            सलहाकार
-          </h1>
+          <img src="/logo31.png" alt="सलहाकार Logo" className="w-1/2 h-21 object-contain max-h-24 sm:max-h-32 md:max-h-30 lg:max-h-38 xl:max-h-36" />
 
           <p 
-            className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-4xl px-4 leading-relaxed text-center"
+            className=" sm:text-lg md:text-xl lg:text-2xl max-w-4xl px-4 leading-relaxed text-center text-3xl"
             style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}
           >
             India's first{" "}

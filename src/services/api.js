@@ -1,5 +1,5 @@
 // API Service for Legal Platform - Complete Integration
-const API_BASE_URL = 'https://unquestioned-gunnar-medially.ngrok-free.dev';
+const API_BASE_URL = 'https://operantly-unchattering-ernie.ngrok-free.dev/';
 
 // Fallback URLs in case the primary one fails
 const FALLBACK_URLS = [
@@ -1379,6 +1379,26 @@ class ApiService {
       headers: this.getAuthHeaders()
     });
     return await this.handleResponse(response);
+  }
+
+  async getJudgementByIdHTML(judgementId) {
+    const token = localStorage.getItem('access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
+    const headers = {
+      'Accept': 'text/html',
+      'ngrok-skip-browser-warning': 'true',
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    };
+    
+    const response = await fetch(`${this.baseURL}/api/judgements/${judgementId}?format=html`, {
+      method: 'GET',
+      headers: headers
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch judgment HTML: ${response.statusText}`);
+    }
+    
+    return await response.text(); // Return HTML as text
   }
 
   // Bookmark an act (central or state)
