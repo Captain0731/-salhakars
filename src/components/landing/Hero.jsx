@@ -26,7 +26,7 @@ const Hero = forwardRef((props, ref) => {
           <img 
             src="/logo31.png" 
             alt="सलहाकार Logo" 
-            className="w-48 sm:w-56 md:w-64 lg:w-72 xl:w-80 h-auto object-contain mb-4 sm:mb-6" 
+            className="w-64 sm:w-80 md:w-96 lg:w-[28rem] xl:w-[32rem] 2xl:w-[36rem] h-auto object-contain mb-4 sm:mb-6" 
           />
 
           <p 

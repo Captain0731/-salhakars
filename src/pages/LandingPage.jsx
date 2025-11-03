@@ -4,7 +4,6 @@ import Hero from "../components/landing/Hero";
 import Features from "../components/landing/Features";
 import VideoSection from "../components/landing/VideoSection";
 import Testimonials from "../components/landing/Testimonials";
-import Pricing from "../components/landing/Pricing";
 import BlogSection from "../components/landing/BlogSection";
 import FAQ from "../components/landing/FAQ";
 import Footer from "../components/landing/Footer";
@@ -19,9 +18,6 @@ function LandingPage() {
       </div>
       <VideoSection />
       <Testimonials />
-      <div id="pricing">
-        <Pricing />
-      </div>
       <div id="blogs">
         <BlogSection />
       </div>

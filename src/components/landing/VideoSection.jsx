@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import useScrollAnimation from "../../hooks/useScrollAnimation";
 
 const VideoSection = () => {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const videoRef = useRef(null);
   const { ref: sectionRef, isVisible } = useScrollAnimation({ threshold: 0.1, rootMargin: '50px' });
 
   const features = [
@@ -40,6 +41,11 @@ const VideoSection = () => {
 
   const handlePlayVideo = () => {
     setIsVideoPlaying(true);
+    if (videoRef.current) {
+      videoRef.current.play().catch(error => {
+        console.error('Error playing video:', error);
+      });
+    }
   };
 
   return (
@@ -159,9 +165,9 @@ const VideoSection = () => {
           <div className="relative">
             <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
               {/* Video Container */}
-              <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200">
+              <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
                 {!isVideoPlaying ? (
-                  <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 z-10">
                     <div className="text-center">
                       {/* Play Button */}
                       <button
@@ -197,26 +203,19 @@ const VideoSection = () => {
                       </p>
                     </div>
                   </div>
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <div 
-                        className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
-                        style={{ backgroundColor: '#CF9B63' }}
-                      >
-                        <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-                        </svg>
-                      </div>
-                      <p 
-                        className="text-lg font-semibold"
-                        style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}
-                      >
-                        Video Playing...
-                      </p>
-                    </div>
-                  </div>
-                )}
+                ) : null}
+                <video
+                  ref={videoRef}
+                  className={`w-full h-full object-cover ${!isVideoPlaying ? 'opacity-0 absolute' : 'opacity-100 relative'} transition-opacity duration-300`}
+                  controls
+                  onPlay={() => setIsVideoPlaying(true)}
+                  onPause={() => setIsVideoPlaying(false)}
+                  onEnded={() => setIsVideoPlaying(false)}
+                  poster=""
+                >
+                  <source src="/sl.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
               </div>
 
               {/* Video Info */}

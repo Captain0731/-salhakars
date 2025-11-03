@@ -477,10 +477,10 @@ function PricingPage() {
           {/* Pricing Cards Section */}
           {(() => {
             const filteredPlans = pricingData[activeCategory].filter((plan) => {
-              // Hide free plan when yearly billing is selected
+              // When yearly billing is selected, only show Pro and Ultimate plans
               if (billingCycle === "yearly") {
-                const isFree = !plan.price || plan.price === "₹/mo" || plan.price === "₹0/mo" || plan.price.toLowerCase().includes("free");
-                return !isFree;
+                const planTitle = plan.title.toLowerCase();
+                return planTitle === "pro" || planTitle === "ultimate";
               }
               return true;
             });
