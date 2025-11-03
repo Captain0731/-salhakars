@@ -101,28 +101,41 @@ const LanguageSelector = () => {
         <button
           onClick={() => setIsOpen(!isOpen)}
           onKeyDown={handleKeyDown}
-          className="flex items-center justify-between gap-2 px-4 py-2.5 rounded-lg border-2 transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="flex items-center justify-between gap-1.5 px-2.5 py-1.5 rounded-lg border-2 transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           style={{ 
-            color: isOpen ? '#1E65AD' : '#8C969F',
+            color: '#FFFFFF',
             fontFamily: 'Roboto, sans-serif',
-            backgroundColor: isOpen ? '#F0F7FF' : '#FFFFFF',
-            borderColor: isOpen ? '#1E65AD' : '#E5E7EB',
-            minHeight: '44px',
-            minWidth: '80px'
+            background: isOpen 
+              ? 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)' 
+              : 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)',
+            borderColor: isOpen ? '#CF9B63' : '#1E65AD',
+            minHeight: '50px',
+            minWidth: '70px',
+            boxShadow: isOpen ? '0 4px 15px rgba(30, 101, 173, 0.4)' : '0 2px 8px rgba(30, 101, 173, 0.3)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(135deg, #CF9B63 0%, #1E65AD 100%)';
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(207, 155, 99, 0.5)';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)';
+            e.currentTarget.style.boxShadow = isOpen ? '0 4px 15px rgba(30, 101, 173, 0.4)' : '0 2px 8px rgba(30, 101, 173, 0.3)';
+            e.currentTarget.style.transform = 'translateY(0)';
           }}
           aria-label={`Current language: ${currentLanguage.name}. Click to change language.`}
           aria-expanded={isOpen}
           aria-haspopup="listbox"
         >
-          <div className="flex items-center gap-2">
-            <span className="text-xl" aria-hidden="true">
+          <div className="flex items-center gap-1.5">
+            <span className="text-base" aria-hidden="true">
               {currentLanguage.flag}
             </span>
-            <span className="text-sm font-semibold">{currentLanguage.display}</span>
+            <span className="text-xs font-semibold">{currentLanguage.display}</span>
           </div>
           <svg 
-            className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-            style={{ color: isOpen ? '#1E65AD' : '#8C969F' }}
+            className={`w-3 h-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+            style={{ color: '#FFFFFF' }}
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24"

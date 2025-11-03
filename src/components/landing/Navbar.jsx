@@ -206,9 +206,9 @@ const Navbar = () => {
         ? 'bg-white/20 backdrop-blur-lg shadow-xl py-2' 
         : 'bg-white/90 backdrop-blur-md shadow-lg py-3 sm:py-4 md:py-4'
     }`} style={{ borderColor: '#E5E7EB' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center ">
         
-        {/* Brand Logo */}
+        {/* Brand Logo - Left Corner */}
         <div
           className="cursor-pointer group flex items-center"
           onClick={() => navigate("/")}
@@ -255,7 +255,7 @@ const Navbar = () => {
 
         {/* Nav Links */}
         <ul
-          className={`flex-col md:flex-row md:flex gap-1 sm:gap-2 items-center absolute md:static left-0 w-full md:w-auto backdrop-blur-lg md:bg-transparent p-6 sm:p-8 md:p-0 transition-all duration-500 ease-out shadow-2xl md:shadow-none rounded-2xl md:rounded-none border-t md:border-t-0 z-40 ${
+          className={`flex-col md:flex-row md:flex gap-1 sm:gap-2 items-center absolute md:static left-0 w-full md:w-auto backdrop-blur-lg md:bg-transparent p-6 sm:p-8 md:p-0 transition-all duration-500 ease-out shadow-2xl md:shadow-none rounded-2xl md:rounded-none border-t md:border-t-0  ${
             isScrolled ? 'bg-white/70 backdrop-blur-lg top-16 sm:top-18' : 'bg-white/90 backdrop-blur-md top-20 sm:top-24'
           } ${menuOpen ? "flex opacity-100 translate-y-0" : "hidden md:flex opacity-0 md:opacity-100 -translate-y-2 md:translate-y-0"}`}
           style={{ borderTopColor: '#E5E7EB', zIndex: 9999 }}
@@ -635,21 +635,24 @@ const Navbar = () => {
             ) : (
               <button
                 onClick={() => navigate("/login")}
-                className="text-white px-6 sm:px-8 py-3 sm:py-3 rounded-full font-semibold hover:shadow-xl hover:scale-110 transition-all duration-500 ease-out transform w-full text-sm sm:text-base touch-manipulation relative overflow-hidden group"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border-2 font-semibold hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full text-sm touch-manipulation"
                 style={{ 
-                  backgroundColor: '#1E65AD', 
+                  color: '#FFFFFF',
                   fontFamily: 'Roboto, sans-serif',
-                  boxShadow: '0 4px 15px rgba(30, 101, 173, 0.3)',
-                  minHeight: '44px'
+                  background: 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)',
+                  borderColor: '#1E65AD',
+                  minHeight: '50px',
+                  minWidth: '100px',
+                  boxShadow: '0 2px 8px rgba(30, 101, 173, 0.3)'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#CF9B63';
-                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(207, 155, 99, 0.4)';
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #CF9B63 0%, #1E65AD 100%)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(207, 155, 99, 0.5)';
                   e.currentTarget.style.transform = 'translateY(-2px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#1E65AD';
-                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(30, 101, 173, 0.3)';
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(30, 101, 173, 0.3)';
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
@@ -740,21 +743,24 @@ const Navbar = () => {
           ) : (
             <button
               onClick={() => navigate("/login")}
-              className="text-white px-6 sm:px-8 py-3 sm:py-3 rounded-full font-semibold hover:shadow-xl hover:scale-110 transition-all duration-500 ease-out transform text-sm sm:text-base touch-manipulation relative overflow-hidden group"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border-2 font-semibold hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm touch-manipulation"
               style={{ 
-                backgroundColor: '#1E65AD', 
+                color: '#FFFFFF',
                 fontFamily: 'Roboto, sans-serif',
-                boxShadow: '0 4px 15px rgba(30, 101, 173, 0.3)',
-                minHeight: '44px'
+                background: 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)',
+                borderColor: '#1E65AD',
+                minHeight: '50px',
+                minWidth: '100px',
+                boxShadow: '0 2px 8px rgba(30, 101, 173, 0.3)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#CF9B63';
-                e.currentTarget.style.boxShadow = '0 8px 25px rgba(207, 155, 99, 0.4)';
+                e.currentTarget.style.background = 'linear-gradient(135deg, #CF9B63 0%, #1E65AD 100%)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(207, 155, 99, 0.5)';
                 e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#1E65AD';
-                e.currentTarget.style.boxShadow = '0 4px 15px rgba(30, 101, 173, 0.3)';
+                e.currentTarget.style.background = 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(30, 101, 173, 0.3)';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
