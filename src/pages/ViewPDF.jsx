@@ -4,6 +4,7 @@ import Navbar from "../components/landing/Navbar";
 import PDFTranslator from "../components/PDFTranslator";
 import BookmarkButton from "../components/BookmarkButton";
 import { useAuth } from "../contexts/AuthContext";
+import { Search, FileText, StickyNote } from "lucide-react";
 
 export default function ViewPDF() {
   const navigate = useNavigate();
@@ -20,6 +21,15 @@ export default function ViewPDF() {
   const [zoom, setZoom] = useState(100);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showNotesPopup, setShowNotesPopup] = useState(false);
+  const [notesContent, setNotesContent] = useState("");
+  const [popupPosition, setPopupPosition] = useState({ x: 100, y: 100 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [popupSize, setPopupSize] = useState({ width: 500, height: 400 });
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
   useEffect(() => {
     // Get act or judgment data from location state
@@ -27,15 +37,34 @@ export default function ViewPDF() {
     const judgmentData = location.state?.judgment;
    
     if (judgmentData) {
+      console.log('📄 ViewPDF: Received judgment data:', judgmentData);
       setJudgmentInfo(judgmentData);
-      // Use pdf_link from judgment data, fallback to empty string if not available
-      const originalPdfUrl = judgmentData.pdf_link || "";
+      
+      // Handle both pdf_url (from API) and pdf_link (for backward compatibility)
+      // Priority: pdf_link > pdf_url > empty string
+      const originalPdfUrl = judgmentData.pdf_link || judgmentData.pdf_url || "";
+      
+      console.log('📄 ViewPDF: PDF URL resolved:', originalPdfUrl);
+      
+      if (!originalPdfUrl || originalPdfUrl.trim() === "") {
+        console.warn('⚠️ ViewPDF: No PDF URL found in judgment data');
+        setError('PDF URL not available for this judgment');
+      }
+      
       setPdfUrl(originalPdfUrl);
       setTranslatedPdfUrl(originalPdfUrl); // Initialize with original URL
       setTotalPages(25); // Default page count, could be enhanced with API data
       setLoading(false);
+    } else if (actData) {
+      // Handle act data if needed
+      setJudgmentInfo(actData);
+      const actPdfUrl = actData.pdf_link || actData.pdf_url || "";
+      setPdfUrl(actPdfUrl);
+      setTranslatedPdfUrl(actPdfUrl);
+      setLoading(false);
     } else {
       // No data provided, redirect back to appropriate page
+      console.warn('⚠️ ViewPDF: No judgment or act data provided, redirecting...');
       const referrer = document.referrer;
       if (referrer.includes('/state-acts')) {
         navigate('/state-acts');
@@ -87,6 +116,30 @@ export default function ViewPDF() {
       }
     };
   }, [translationTimeout]);
+
+  // Handle window resize to keep popup within bounds
+  useEffect(() => {
+    const handleResize = () => {
+      if (showNotesPopup) {
+        const maxX = window.innerWidth - popupSize.width;
+        const maxY = window.innerHeight - popupSize.height;
+        
+        // Adjust popup size if it exceeds viewport
+        setPopupSize(prev => ({
+          width: Math.min(prev.width, window.innerWidth * 0.9),
+          height: Math.min(prev.height, window.innerHeight * 0.9)
+        }));
+        
+        setPopupPosition(prev => ({
+          x: Math.max(0, Math.min(prev.x, maxX)),
+          y: Math.max(0, Math.min(prev.y, maxY))
+        }));
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [showNotesPopup, popupSize]);
 
 
   if (loading) {
@@ -329,7 +382,74 @@ export default function ViewPDF() {
 
             {/* PDF Viewer - Right Side */}
             <div className="lg:col-span-2 order-2 lg:order-2">
-              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 overflow-hidden h-[calc(100vh-350px)] sm:h-[500px] md:h-[600px] lg:h-full min-h-[450px] sm:min-h-[500px]">
+              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 overflow-hidden h-[calc(100vh-350px)] sm:h-[500px] md:h-[600px] lg:h-full min-h-[450px] sm:min-h-[500px] flex flex-col">
+                {/* PDF Toolbar - Search, Summary, Notes */}
+                <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+                  {/* Search Bar */}
+                  <div className="relative flex-1 min-w-0">
+                    <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search in PDF..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-1.5 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-xs sm:text-sm"
+                      style={{ fontFamily: 'Roboto, sans-serif' }}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && searchQuery.trim()) {
+                          // Trigger PDF search functionality
+                          console.log('Searching for:', searchQuery);
+                          // You can implement PDF search logic here
+                        }
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Summary Button */}
+                  <button
+                    onClick={() => {
+                      // Navigate to summary or show summary modal
+                      console.log('Summary clicked for:', judgmentInfo?.id || judgmentInfo?.title);
+                      // You can implement summary functionality here
+                    }}
+                    className="flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium text-xs sm:text-sm shadow-sm hover:shadow-md whitespace-nowrap flex-shrink-0"
+                    style={{ fontFamily: 'Roboto, sans-serif' }}
+                    title="View Summary"
+                  >
+                    <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Summary</span>
+                  </button>
+                  
+                  {/* Notes Button - Only show if authenticated */}
+                  {isAuthenticated && (
+                    <button
+                      onClick={() => {
+                        // Initialize notes content with judgment/act data
+                        const initialContent = `# ${judgmentInfo?.title || judgmentInfo?.short_title || 'Untitled Note'}\n\n${judgmentInfo?.summary || 'No summary available.'}\n\n## Details\n\n${location.state?.act ? 'Ministry' : 'Court'}: ${location.state?.act ? (judgmentInfo?.ministry || 'N/A') : (judgmentInfo?.court_name || 'N/A')}\nDate: ${judgmentInfo?.decision_date || judgmentInfo?.year || 'N/A'}`;
+                        setNotesContent(initialContent);
+                        setShowNotesPopup(true);
+                      }}
+                      className="flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 text-white rounded-lg transition-all duration-200 font-medium text-xs sm:text-sm shadow-sm hover:shadow-md whitespace-nowrap flex-shrink-0"
+                      style={{ 
+                        fontFamily: 'Roboto, sans-serif',
+                        background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.background = 'linear-gradient(90deg, #1a5a9a 0%, #b88a56 100%)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.background = 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)';
+                      }}
+                      title="Add Notes"
+                    >
+                      <StickyNote className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Notes</span>
+                    </button>
+                  )}
+                </div>
+                
+                {/* PDF Content */}
+                <div className="flex-1 overflow-hidden relative">
                 {pdfUrl && pdfUrl.trim() !== "" ? (
                   <div className="relative h-full w-full" style={{ minHeight: '400px' }}>
                     {/* PDF Embed - Try iframe first, fallback to button */}
@@ -446,12 +566,262 @@ export default function ViewPDF() {
                     </div>
                   </div>
                 )}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
       </div>
+
+      {/* Draggable Notes Popup */}
+      {showNotesPopup && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-30 z-40"
+            onClick={() => setShowNotesPopup(false)}
+          />
+          
+          {/* Draggable Popup */}
+          <div
+            className="fixed bg-white rounded-lg shadow-2xl z-50 flex flex-col"
+            style={{
+              left: `${popupPosition.x}px`,
+              top: `${popupPosition.y}px`,
+              width: `${popupSize.width}px`,
+              height: `${popupSize.height}px`,
+              minWidth: '400px',
+              minHeight: '300px',
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              fontFamily: 'Roboto, sans-serif',
+              userSelect: isDragging || isResizing ? 'none' : 'auto'
+            }}
+            onMouseDown={(e) => {
+              // Only start dragging if clicking on the header
+              if (e.target.closest('.notes-popup-header')) {
+                setIsDragging(true);
+                const rect = e.currentTarget.getBoundingClientRect();
+                setDragOffset({
+                  x: e.clientX - rect.left,
+                  y: e.clientY - rect.top
+                });
+              }
+            }}
+            onMouseMove={(e) => {
+              if (isDragging) {
+                const newX = e.clientX - dragOffset.x;
+                const newY = e.clientY - dragOffset.y;
+                
+                // Constrain to viewport
+                const maxX = window.innerWidth - popupSize.width;
+                const maxY = window.innerHeight - popupSize.height;
+                
+                setPopupPosition({
+                  x: Math.max(0, Math.min(newX, maxX)),
+                  y: Math.max(0, Math.min(newY, maxY))
+                });
+              } else if (isResizing) {
+                const deltaX = e.clientX - resizeStart.x;
+                const deltaY = e.clientY - resizeStart.y;
+                
+                const newWidth = Math.max(400, Math.min(window.innerWidth * 0.9, resizeStart.width + deltaX));
+                const newHeight = Math.max(300, Math.min(window.innerHeight * 0.9, resizeStart.height + deltaY));
+                
+                setPopupSize({
+                  width: newWidth,
+                  height: newHeight
+                });
+                
+                // Adjust position if popup goes out of bounds
+                const maxX = window.innerWidth - newWidth;
+                const maxY = window.innerHeight - newHeight;
+                setPopupPosition(prev => ({
+                  x: Math.min(prev.x, maxX),
+                  y: Math.min(prev.y, maxY)
+                }));
+              }
+            }}
+            onMouseUp={() => {
+              setIsDragging(false);
+              setIsResizing(false);
+            }}
+            onMouseLeave={() => {
+              setIsDragging(false);
+              setIsResizing(false);
+            }}
+          >
+            {/* Header - Draggable Area */}
+            <div 
+              className="notes-popup-header flex items-center justify-between p-4 border-b border-gray-200"
+              style={{ 
+                borderTopLeftRadius: '0.5rem', 
+                borderTopRightRadius: '0.5rem',
+                cursor: isDragging ? 'grabbing' : 'move',
+                userSelect: 'none',
+                background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)'
+              }}
+              onMouseEnter={(e) => {
+                if (!isDragging) {
+                  e.currentTarget.style.cursor = 'move';
+                }
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <StickyNote className="h-5 w-5 text-white" />
+                <h3 className="text-lg font-bold text-white" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                  Notes
+                </h3>
+              </div>
+              <div className="flex items-center gap-2">
+                {/* Size Control Buttons */}
+                <div className="flex items-center gap-1 border-r border-white border-opacity-30 pr-2 mr-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPopupSize(prev => ({
+                        width: Math.max(400, prev.width - 50),
+                        height: Math.max(300, prev.height - 50)
+                      }));
+                    }}
+                    className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20"
+                    style={{ 
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      borderRadius: '0.25rem',
+                      cursor: 'pointer'
+                    }}
+                    title="Make Smaller"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPopupSize(prev => ({
+                        width: Math.min(window.innerWidth * 0.9, prev.width + 50),
+                        height: Math.min(window.innerHeight * 0.9, prev.height + 50)
+                      }));
+                    }}
+                    className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20"
+                    style={{ 
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      borderRadius: '0.25rem',
+                      cursor: 'pointer'
+                    }}
+                    title="Make Bigger"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </button>
+                </div>
+                
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowNotesPopup(false);
+                  }}
+                  className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20 flex-shrink-0"
+                  style={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: '0.25rem',
+                    cursor: 'pointer'
+                  }}
+                  title="Close"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            {/* Resize Handle - Bottom Right Corner */}
+            <div
+              className="absolute bottom-0 right-0 w-6 h-6"
+              style={{
+                background: 'linear-gradient(135deg, transparent 0%, transparent 50%, rgba(30, 101, 173, 0.3) 50%, rgba(30, 101, 173, 0.3) 100%)',
+                borderBottomRightRadius: '0.5rem',
+                cursor: isResizing ? 'nwse-resize' : 'nwse-resize'
+              }}
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                setIsResizing(true);
+                setResizeStart({
+                  x: e.clientX,
+                  y: e.clientY,
+                  width: popupSize.width,
+                  height: popupSize.height
+                });
+              }}
+              onMouseEnter={(e) => {
+                if (!isResizing) {
+                  e.currentTarget.style.cursor = 'nwse-resize';
+                }
+              }}
+              title="Drag to resize"
+            />
+
+            {/* Content Area */}
+            <div className="flex-1 overflow-hidden flex flex-col" style={{ cursor: 'text' }}>
+              <textarea
+                value={notesContent}
+                onChange={(e) => setNotesContent(e.target.value)}
+                placeholder="Write your notes here..."
+                className="flex-1 w-full p-4 border-0 resize-none focus:outline-none focus:ring-0"
+                style={{ 
+                  fontFamily: 'Roboto, sans-serif',
+                  minHeight: '300px',
+                  fontSize: '14px',
+                  lineHeight: '1.6',
+                  color: '#1E65AD',
+                  cursor: 'text'
+                }}
+              />
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200 bg-gray-50">
+              <button
+                onClick={() => {
+                  setShowNotesPopup(false);
+                  setNotesContent("");
+                }}
+                className="px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium text-sm"
+                style={{ fontFamily: 'Roboto, sans-serif', cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  // Save notes logic here
+                  console.log('Saving notes:', notesContent);
+                  // You can implement save functionality here
+                  // For now, just close the popup
+                  setShowNotesPopup(false);
+                }}
+                className="px-4 py-2 text-white rounded-lg transition-all font-medium text-sm shadow-sm hover:shadow-md"
+                style={{ 
+                  fontFamily: 'Roboto, sans-serif',
+                  background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)',
+                  cursor: 'pointer'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = 'linear-gradient(90deg, #1a5a9a 0%, #b88a56 100%)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)';
+                }}
+              >
+                Save Notes
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
     </div>
   );

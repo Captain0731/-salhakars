@@ -29,11 +29,13 @@ import {
   Download as DownloadIcon
 } from 'lucide-react';
 import apiService from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 import BookmarkAnalytics from './BookmarkAnalytics';
 import BookmarkImportExport from './BookmarkImportExport';
 
 const Bookmarks = () => {
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
   const [bookmarks, setBookmarks] = useState([]);
   const [folders, setFolders] = useState([]);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
@@ -60,6 +62,66 @@ const Bookmarks = () => {
     offset: 0,
     hasMore: false
   });
+
+  // Helper function to extract title based on bookmark type
+  const getBookmarkTitle = (bookmark) => {
+    const item = bookmark.item || bookmark;
+    const bookmarkType = bookmark.type;
+
+    // For judgments, use title field
+    if (bookmarkType === 'judgement') {
+      return item.title || item.case_title || 'Untitled';
+    }
+
+    // For acts (central and state), use short_title or long_title
+    if (bookmarkType === 'central_act' || bookmarkType === 'state_act') {
+      return item.short_title || item.long_title || item.title || 'Untitled';
+    }
+
+    // For mappings, use subject or construct from sections
+    if (bookmarkType === 'bns_ipc_mapping') {
+      if (item.subject) return item.subject;
+      if (item.title) return item.title;
+      // Construct title from sections
+      const ipcSection = item.ipc_section || item.source_section;
+      const bnsSection = item.bns_section || item.target_section;
+      if (ipcSection && bnsSection) {
+        return `IPC ${ipcSection} → BNS ${bnsSection}`;
+      }
+      if (ipcSection) return `IPC ${ipcSection}`;
+      if (bnsSection) return `BNS ${bnsSection}`;
+      return 'Untitled';
+    }
+
+    if (bookmarkType === 'bsa_iea_mapping') {
+      if (item.subject) return item.subject;
+      if (item.title) return item.title;
+      const ieaSection = item.iea_section || item.source_section;
+      const bsaSection = item.bsa_section || item.target_section;
+      if (ieaSection && bsaSection) {
+        return `IEA ${ieaSection} → BSA ${bsaSection}`;
+      }
+      if (ieaSection) return `IEA ${ieaSection}`;
+      if (bsaSection) return `BSA ${bsaSection}`;
+      return 'Untitled';
+    }
+
+    if (bookmarkType === 'bnss_crpc_mapping') {
+      if (item.subject) return item.subject;
+      if (item.title) return item.title;
+      const crpcSection = item.crpc_section || item.source_section;
+      const bnssSection = item.bnss_section || item.target_section;
+      if (crpcSection && bnssSection) {
+        return `CrPC ${crpcSection} → BNSS ${bnssSection}`;
+      }
+      if (crpcSection) return `CrPC ${crpcSection}`;
+      if (bnssSection) return `BNSS ${bnssSection}`;
+      return 'Untitled';
+    }
+
+    // Fallback for unknown types
+    return item.title || item.subject || item.short_title || item.long_title || 'Untitled';
+  };
   
   // Advanced filtering states
   const [advancedFilters, setAdvancedFilters] = useState({
@@ -80,7 +142,21 @@ const Bookmarks = () => {
   const handleViewBookmark = async (bookmark) => {
     const item = bookmark.item || bookmark;
     const bookmarkType = bookmark.type;
-    const itemId = item.id;
+    
+    // Extract item ID - handle various possible structures
+    let itemId = item.id || item.judgement_id || item.act_id || item.mapping_id || bookmark.item_id;
+    
+    // If itemId is still not found, try to extract from bookmark structure
+    if (!itemId && bookmark.item_id) {
+      itemId = bookmark.item_id;
+    }
+    
+    // If still no ID, log warning and try to proceed with what we have
+    if (!itemId) {
+      console.warn('⚠️ No item ID found in bookmark:', bookmark);
+      // Try to use the bookmark ID itself as a fallback
+      itemId = bookmark.id;
+    }
 
     try {
       setLoading(true);
@@ -88,17 +164,83 @@ const Bookmarks = () => {
 
       switch (bookmarkType) {
         case 'judgement':
-          // Fetch full judgment details and navigate to view page
+          // Navigate to judgment view - fetch full details and ensure proper structure
           try {
-            const judgmentData = await apiService.getJudgementById(itemId);
-            navigate('/view-pdf', { state: { judgment: judgmentData } });
+            console.log('🔍 Fetching judgment details for ID:', itemId);
+            console.log('🔍 Current item data:', item);
+            
+            // Fetch full judgment details from API
+            const response = await apiService.getJudgementById(itemId);
+            console.log('📥 API Response:', response);
+            
+            // Handle various response structures:
+            // 1. Direct judgment object: { id, title, pdf_url, ... }
+            // 2. Wrapped in data: { data: { id, title, pdf_url, ... } }
+            // 3. Wrapped in judgment: { judgment: { id, title, pdf_url, ... } }
+            // 4. Array: [{ id, title, pdf_url, ... }]
+            let judgmentData = null;
+            
+            if (response) {
+              if (Array.isArray(response)) {
+                judgmentData = response[0]; // Take first item if array
+              } else if (response.data) {
+                judgmentData = response.data;
+              } else if (response.judgment) {
+                judgmentData = response.judgment;
+              } else if (response.id || response.title || response.pdf_url || response.pdf_link) {
+                judgmentData = response; // Direct judgment object
+              }
+            }
+            
+            // If still no data, use item as fallback
+            if (!judgmentData) {
+              console.warn('⚠️ No judgment data from API, using item data');
+              judgmentData = item;
+            }
+            
+            console.log('✅ Extracted judgment data:', judgmentData);
+            
+            // Merge with item data to ensure all fields are present
+            // Priority: API data > item data > empty defaults
+            const completeJudgment = {
+              // Start with item data (has bookmark context)
+              ...item,
+              // Override with fresh API data (has complete details)
+              ...judgmentData,
+              // Ensure critical fields are set with fallbacks
+              id: judgmentData.id || item.id || itemId,
+              title: judgmentData.title || judgmentData.case_title || item.title || item.case_title || 'Untitled Judgment',
+              // Ensure pdf_link/pdf_url is set (ViewPDF expects pdf_link, but API may use pdf_url)
+              pdf_link: judgmentData.pdf_link || judgmentData.pdf_url || item.pdf_link || item.pdf_url || "",
+              pdf_url: judgmentData.pdf_url || judgmentData.pdf_link || item.pdf_url || item.pdf_link || "",
+              // Preserve other important fields
+              case_title: judgmentData.case_title || item.case_title || judgmentData.title || item.title,
+              court: judgmentData.court || item.court || '',
+              decision_date: judgmentData.decision_date || item.decision_date || '',
+              judges: judgmentData.judges || item.judges || [],
+              summary: judgmentData.summary || item.summary || '',
+              citation: judgmentData.citation || item.citation || ''
+            };
+            
+            console.log('✅ Complete judgment data to navigate:', completeJudgment);
+            
+            // Navigate to PDF view with complete judgment data
+            navigate('/view-pdf', { state: { judgment: completeJudgment } });
           } catch (err) {
-            console.error('Error fetching judgment:', err);
+            console.error('❌ Error fetching judgment:', err);
             // Fallback: use item data if available
-            if (item.title || item.pdf_url) {
-              navigate('/view-pdf', { state: { judgment: item } });
+            if (item.title || item.case_title || item.pdf_link || item.pdf_url) {
+              console.log('⚠️ Using fallback item data');
+              // Ensure pdf_link is set for ViewPDF
+              const fallbackJudgment = {
+                ...item,
+                pdf_link: item.pdf_link || item.pdf_url || "",
+                pdf_url: item.pdf_url || item.pdf_link || ""
+              };
+              navigate('/view-pdf', { state: { judgment: fallbackJudgment } });
             } else {
-              throw new Error('Failed to load judgment details');
+              setError(`Failed to load judgment: ${err.message || 'Unknown error'}`);
+              throw err;
             }
           }
           break;
@@ -122,15 +264,22 @@ const Bookmarks = () => {
         case 'state_act':
           // Fetch full state act details and navigate to act details page
           try {
+            console.log('🔍 Navigating to state act:', itemId, 'Item data:', item);
             const actData = await apiService.getStateActById(itemId);
-            navigate('/act-details', { state: { act: actData } });
+            console.log('✅ State act fetched successfully:', actData);
+            // Ensure the act has location field to identify it as state act
+            const actWithLocation = { ...actData, location: actData.location || item.location || 'state' };
+            navigate('/act-details', { state: { act: actWithLocation } });
           } catch (err) {
-            console.error('Error fetching state act:', err);
+            console.error('❌ Error fetching state act:', err);
+            console.error('❌ Error details:', err.message, err.stack);
             // Fallback: use item data if available
-            if (item.short_title || item.long_title) {
-              navigate('/act-details', { state: { act: item } });
+            if (item.short_title || item.long_title || item.title) {
+              console.log('⚠️ Using fallback item data for state act');
+              const fallbackAct = { ...item, location: item.location || 'state' };
+              navigate('/act-details', { state: { act: fallbackAct } });
             } else {
-              throw new Error('Failed to load state act details');
+              throw new Error(`Failed to load state act details: ${err.message}`);
             }
           }
           break;
@@ -201,16 +350,32 @@ const Bookmarks = () => {
     }
   };
 
-  // Load bookmarks and folders from API
+  // Clear bookmarks when user changes or logs out
   useEffect(() => {
+    if (!isAuthenticated || !user) {
+      setBookmarks([]);
+      setFolders([]);
+      setError(null);
+      return;
+    }
+  }, [isAuthenticated, user]);
+
+  // Load bookmarks and folders from API when user is authenticated
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      return;
+    }
     loadBookmarks();
     loadFolders();
-  }, []);
+  }, [isAuthenticated, user?.id]); // Add user.id dependency to reload when user changes
 
-  // Reload bookmarks when filters change
+  // Reload bookmarks when filters change (only if authenticated)
   useEffect(() => {
+    if (!isAuthenticated || !user) {
+      return;
+    }
     loadBookmarks();
-  }, [filterType, searchQuery, advancedFilters, currentFolder]);
+  }, [filterType, searchQuery, advancedFilters, currentFolder, user?.id]); // Add user.id to dependencies
 
   // Handle filter changes
   const handleFilterChange = (filterKey, value) => {
@@ -288,6 +453,26 @@ const Bookmarks = () => {
 
       const response = await apiService.getUserBookmarks(filterParams);
       
+      // Debug: Log response to understand structure
+      console.log('📋 Bookmark API Response:', response);
+      console.log('📋 Bookmarks received:', response.bookmarks?.length || 0);
+      if (response.bookmarks) {
+        const typeCounts = {};
+        response.bookmarks.forEach(b => {
+          typeCounts[b.type] = (typeCounts[b.type] || 0) + 1;
+        });
+        console.log('📋 Bookmark types distribution:', typeCounts);
+        
+        // Debug state acts specifically
+        const stateActs = response.bookmarks.filter(b => b.type === 'state_act');
+        if (stateActs.length > 0) {
+          console.log('📋 State Acts found:', stateActs.length);
+          console.log('📋 Sample State Act:', stateActs[0]);
+        } else {
+          console.log('⚠️ No state acts found in response');
+        }
+      }
+      
       if (offset === 0) {
         setBookmarks(response.bookmarks || []);
       } else {
@@ -327,7 +512,7 @@ const Bookmarks = () => {
     
     switch (sortBy) {
       case 'name':
-        return (itemA.title || '').localeCompare(itemB.title || '');
+        return getBookmarkTitle(a).localeCompare(getBookmarkTitle(b));
       case 'date':
         return new Date(b.created_at || b.dateAdded) - new Date(a.created_at || a.dateAdded);
       case 'type':
@@ -523,20 +708,23 @@ const Bookmarks = () => {
     <div className="space-y-6">
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
-          <div className="flex items-center">
-            <AlertCircle className="h-5 w-5 text-red-600 mr-3 flex-shrink-0" />
-            <div>
-              <h3 className="text-sm font-medium text-red-800" style={{ fontFamily: 'Roboto, sans-serif' }}>Error</h3>
-              <p className="text-sm text-red-700 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>{error}</p>
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 shadow-sm">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start flex-1 min-w-0">
+              <AlertCircle className="h-5 w-5 text-red-600 mr-3 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-medium text-red-800 mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Error</h3>
+                <p className="text-sm text-red-700 break-words whitespace-normal" style={{ fontFamily: 'Roboto, sans-serif', wordBreak: 'break-word' }}>{error}</p>
+              </div>
             </div>
+            <button
+              onClick={() => setError(null)}
+              className="text-red-600 hover:text-red-800 p-1 hover:bg-red-100 rounded transition-colors flex-shrink-0"
+              aria-label="Close error"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
-          <button
-            onClick={() => setError(null)}
-            className="ml-4 text-red-600 hover:text-red-800 p-1 hover:bg-red-100 rounded transition-colors"
-          >
-            <X className="h-4 w-4" />
-          </button>
         </div>
       )}
 
@@ -1100,7 +1288,7 @@ const Bookmarks = () => {
                       {/* Bookmark Info */}
                       <div className="text-center">
                         <h3 className="font-semibold text-gray-900 text-sm mb-2 line-clamp-2 min-h-[2.5rem]" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                          {(bookmark.item || bookmark).title || 'Untitled'}
+                          {getBookmarkTitle(bookmark)}
                         </h3>
                         
                         {/* Type Badge */}
@@ -1110,7 +1298,13 @@ const Bookmarks = () => {
                             bookmark.type === 'central_act' || bookmark.type === 'state_act' ? 'bg-green-100 text-green-800' :
                             'bg-purple-100 text-purple-800'
                           }`} style={{ fontFamily: 'Roboto, sans-serif' }}>
-                            {bookmark.type.replace('_', ' ').replace('mapping', '').trim()}
+                            {bookmark.type === 'judgement' ? 'Judgement' :
+                             bookmark.type === 'central_act' ? 'Central Act' :
+                             bookmark.type === 'state_act' ? 'State Act' :
+                             bookmark.type === 'bns_ipc_mapping' ? 'BNS IPC' :
+                             bookmark.type === 'bsa_iea_mapping' ? 'BSA IEA' :
+                             bookmark.type === 'bnss_crpc_mapping' ? 'BNSS CrPC' :
+                             bookmark.type.replace('_', ' ').replace('mapping', '').trim()}
                           </span>
                         </div>
                         
@@ -1217,7 +1411,7 @@ const Bookmarks = () => {
                             {getFileIcon(bookmark.type)}
                             <div className="ml-3">
                               <div className="text-sm font-medium text-gray-900">
-                                {(bookmark.item || bookmark).title || 'Untitled'}
+                                {getBookmarkTitle(bookmark)}
                               </div>
                               <div className="text-sm text-gray-500">
                                 {(bookmark.item || bookmark).description || ''}

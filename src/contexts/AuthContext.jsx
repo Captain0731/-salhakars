@@ -85,10 +85,14 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
     setSessions([]);
+    // Clear all possible token storage keys
     localStorage.removeItem('user');
+    localStorage.removeItem('userData');
     localStorage.removeItem('token');
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('access_token');
     localStorage.removeItem('refreshToken');
+    localStorage.removeItem('refresh_token');
     setLoading(false);
   };
 

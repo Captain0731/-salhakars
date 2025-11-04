@@ -99,11 +99,24 @@ class ApiService {
 
   // Helper method to get auth headers
   getAuthHeaders() {
-    const token = localStorage.getItem('access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
+    // Check all possible token storage keys
+    const token = localStorage.getItem('access_token') || 
+                  localStorage.getItem('accessToken') || 
+                  localStorage.getItem('token') ||
+                  this.accessToken;
+    
+    // Clear and return null if token is invalid/empty
+    if (!token || token === 'null' || token === 'undefined') {
+      return {
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true'
+      };
+    }
+    
     return {
       'Content-Type': 'application/json',
       'ngrok-skip-browser-warning': 'true',
-      ...(token && { 'Authorization': `Bearer ${token}` })
+      'Authorization': `Bearer ${token}`
     };
   }
 
@@ -167,7 +180,17 @@ class ApiService {
         }
       } catch (parseError) {
         // If response is not JSON (e.g., HTML error page)
-        errorMessage = `HTTP ${response.status}: ${response.statusText || 'Unknown error'}`;
+        if (response.status === 404) {
+          errorMessage = `Resource not found (404)`;
+        } else if (response.status === 500) {
+          errorMessage = `Server error (500)`;
+        } else if (response.status === 403) {
+          errorMessage = `Access forbidden (403)`;
+        } else if (response.status === 401) {
+          errorMessage = `Authentication required (401)`;
+        } else {
+          errorMessage = `HTTP ${response.status}: ${response.statusText || 'Unknown error'}`;
+        }
       }
       
       throw new Error(errorMessage);
@@ -1347,10 +1370,24 @@ class ApiService {
   // Get user bookmarks
   async getUserBookmarks(params = {}) {
     const queryString = new URLSearchParams(params).toString();
+    const headers = this.getAuthHeaders();
+    
+    // Log token info for debugging (without exposing actual token)
+    const token = localStorage.getItem('access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
+    console.log('🔐 Fetching bookmarks with token:', token ? `Bearer ${token.substring(0, 10)}...` : 'No token');
+    
     const response = await fetch(`${this.baseURL}/api/bookmarks?${queryString}`, {
       method: 'GET',
-      headers: this.getAuthHeaders()
+      headers: headers
     });
+    
+    if (!response.ok && response.status === 401) {
+      console.error('❌ Authentication failed - token may be invalid or expired');
+      // Clear invalid tokens
+      this.clearAllTokens();
+      throw new Error('Authentication failed. Please login again.');
+    }
+    
     return await this.handleResponse(response);
   }
 
@@ -1374,11 +1411,58 @@ class ApiService {
 
   // Get full judgment details by ID (for viewing bookmarked judgments)
   async getJudgementById(judgementId) {
-    const response = await fetch(`${this.baseURL}/api/judgements/${judgementId}`, {
-      method: 'GET',
-      headers: this.getAuthHeaders()
-    });
-    return await this.handleResponse(response);
+    try {
+      const response = await fetch(`${this.baseURL}/api/judgements/${judgementId}`, {
+        method: 'GET',
+        headers: this.getAuthHeaders()
+      });
+      
+      if (!response.ok) {
+        // If direct fetch fails, try with fallback search
+        if (response.status === 404) {
+          console.warn(`Judgment ${judgementId} not found via direct endpoint, trying search fallback...`);
+          // Fallback: fetch judgments list and search by ID
+          try {
+            const searchResponse = await this.getJudgements({ limit: 100 });
+            if (searchResponse.data && searchResponse.data.length > 0) {
+              const foundJudgment = searchResponse.data.find(j => 
+                j.id === parseInt(judgementId) || 
+                j.id === judgementId ||
+                j.id === String(judgementId)
+              );
+              if (foundJudgment) {
+                console.log('✅ Found judgment via fallback search');
+                return foundJudgment;
+              }
+            }
+            // Try with larger limit if first attempt didn't find it
+            const largeSearchResponse = await this.getJudgements({ limit: 1000, offset: 0 });
+            if (largeSearchResponse.data && largeSearchResponse.data.length > 0) {
+              const foundJudgment = largeSearchResponse.data.find(j => 
+                j.id === parseInt(judgementId) || 
+                j.id === judgementId ||
+                j.id === String(judgementId)
+              );
+              if (foundJudgment) {
+                console.log('✅ Found judgment via large fallback search');
+                return foundJudgment;
+              }
+            }
+          } catch (fallbackErr) {
+            console.error('Fallback search also failed:', fallbackErr);
+          }
+          throw new Error(`Judgment with ID ${judgementId} not found`);
+        }
+        throw new Error(`Failed to fetch judgment: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      // Handle both direct object and wrapped responses
+      return data.data || data.judgment || data;
+    } catch (err) {
+      console.error('Error fetching judgment by ID:', err);
+      throw err;
+    }
   }
 
   // Get central act by ID
@@ -1588,19 +1672,85 @@ class ApiService {
 
   // Bookmark an act (central or state)
   async bookmarkAct(actType, actId) {
-    const response = await fetch(`${this.baseURL}/api/bookmarks/acts/${actType}/${actId}`, {
+    // Ensure actId is numeric - backend requires numeric ID
+    const numericId = parseInt(actId);
+    if (isNaN(numericId)) {
+      throw new Error(`Invalid act ID: ${actId}. Must be a number.`);
+    }
+    
+    // Backend requires exactly "central" or "state" (not "central_act" or "state_act")
+    const validActType = actType === 'central_act' ? 'central' : actType === 'state_act' ? 'state' : actType;
+    
+    if (validActType !== 'central' && validActType !== 'state') {
+      throw new Error(`Invalid act type: ${actType}. Must be "central" or "state".`);
+    }
+    
+    const url = `${this.baseURL}/api/bookmarks/acts/${validActType}/${numericId}`;
+    const headers = this.getAuthHeaders();
+    
+    console.log('🔖 Bookmarking act:', { actType, validActType, actId, numericId, url });
+    console.log('🔖 Headers:', { ...headers, Authorization: headers.Authorization ? 'Bearer ***' : 'None' });
+    
+    const response = await fetch(url, {
       method: 'POST',
-      headers: this.getAuthHeaders()
+      headers: headers
     });
+    
+    console.log('🔖 Response status:', response.status, response.statusText);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('🔖 Bookmark act error:', response.status, errorText);
+      try {
+        const errorJson = JSON.parse(errorText);
+        console.error('🔖 Error details:', errorJson);
+      } catch (e) {
+        console.error('🔖 Error response is not JSON:', errorText);
+      }
+    }
+    
     return await this.handleResponse(response);
   }
 
   // Remove act bookmark
   async removeActBookmark(actType, actId) {
-    const response = await fetch(`${this.baseURL}/api/bookmarks/acts/${actType}/${actId}`, {
+    // Ensure actId is numeric - backend requires numeric ID
+    const numericId = parseInt(actId);
+    if (isNaN(numericId)) {
+      throw new Error(`Invalid act ID: ${actId}. Must be a number.`);
+    }
+    
+    // Backend requires exactly "central" or "state" (not "central_act" or "state_act")
+    const validActType = actType === 'central_act' ? 'central' : actType === 'state_act' ? 'state' : actType;
+    
+    if (validActType !== 'central' && validActType !== 'state') {
+      throw new Error(`Invalid act type: ${actType}. Must be "central" or "state".`);
+    }
+    
+    const url = `${this.baseURL}/api/bookmarks/acts/${validActType}/${numericId}`;
+    const headers = this.getAuthHeaders();
+    
+    console.log('🗑️ Removing act bookmark:', { actType, validActType, actId, numericId, url });
+    console.log('🗑️ Headers:', { ...headers, Authorization: headers.Authorization ? 'Bearer ***' : 'None' });
+    
+    const response = await fetch(url, {
       method: 'DELETE',
-      headers: this.getAuthHeaders()
+      headers: headers
     });
+    
+    console.log('🗑️ Response status:', response.status, response.statusText);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('🗑️ Remove act bookmark error:', response.status, errorText);
+      try {
+        const errorJson = JSON.parse(errorText);
+        console.error('🗑️ Error details:', errorJson);
+      } catch (e) {
+        console.error('🗑️ Error response is not JSON:', errorText);
+      }
+    }
+    
     return await this.handleResponse(response);
   }
 

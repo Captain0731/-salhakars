@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Home, 
   Download, 
@@ -29,15 +29,105 @@ import MyDownloads from '../components/dashboard/MyDownloads';
 import Calendar from '../components/dashboard/Calendar';
 import Bookmarks from '../components/dashboard/Bookmarks';
 import Notes from '../components/dashboard/Notes';
+import apiService from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const Dashboard = () => {
+  const { isAuthenticated, user } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [bookmarks, setBookmarks] = useState([]);
+  const [bookmarksLoading, setBookmarksLoading] = useState(false);
 
   const handleSearch = (e) => {
     e.preventDefault();
     console.log('Searching for:', searchQuery);
+  };
+
+  // Clear bookmarks when user changes or logs out
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      setBookmarks([]);
+      setBookmarksLoading(false);
+      return;
+    }
+  }, [isAuthenticated, user]);
+
+  // Load bookmarks for dashboard
+  useEffect(() => {
+    const loadBookmarks = async () => {
+      if (!isAuthenticated || !user) {
+        setBookmarks([]);
+        return;
+      }
+      
+      setBookmarksLoading(true);
+      try {
+        const response = await apiService.getUserBookmarks({ limit: 10 });
+        if (response.bookmarks) {
+          setBookmarks(response.bookmarks);
+        } else {
+          setBookmarks([]);
+        }
+      } catch (err) {
+        console.error('Error loading bookmarks for dashboard:', err);
+        setBookmarks([]);
+      } finally {
+        setBookmarksLoading(false);
+      }
+    };
+
+    if (activeTab === 'home' && isAuthenticated && user) {
+      loadBookmarks();
+    } else {
+      setBookmarks([]);
+    }
+  }, [isAuthenticated, activeTab, user?.id]); // Add user.id dependency to reload when user changes
+
+  // Helper to get bookmark title
+  const getBookmarkTitle = (bookmark) => {
+    const item = bookmark.item || bookmark;
+    if (bookmark.type === 'judgement') {
+      return item.title || item.case_title || 'Untitled Judgment';
+    } else if (bookmark.type === 'central_act' || bookmark.type === 'state_act') {
+      return item.short_title || item.long_title || 'Untitled Act';
+    } else if (bookmark.type === 'bns_ipc_mapping' || bookmark.type === 'bsa_iea_mapping') {
+      return item.subject || item.title || 'Untitled Mapping';
+    }
+    return 'Untitled';
+  };
+
+  // Helper to get bookmark description
+  const getBookmarkDescription = (bookmark) => {
+    const item = bookmark.item || bookmark;
+    if (bookmark.type === 'judgement') {
+      return item.court_name || item.judge || 'Judgment';
+    } else if (bookmark.type === 'central_act' || bookmark.type === 'state_act') {
+      return item.ministry || item.year || 'Act';
+    } else if (bookmark.type === 'bns_ipc_mapping') {
+      return `IPC ${item.ipc_section || ''} → BNS ${item.bns_section || ''}`.trim() || 'Mapping';
+    } else if (bookmark.type === 'bsa_iea_mapping') {
+      return `IEA ${item.iea_section || ''} → BSA ${item.bsa_section || ''}`.trim() || 'Mapping';
+    }
+    return '';
+  };
+
+  // Format relative time
+  const formatRelativeTime = (dateString) => {
+    if (!dateString) return 'Recently';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    return date.toLocaleDateString();
   };
 
   const renderContent = () => {
@@ -98,8 +188,12 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>Bookmarks</p>
-                    <p className="text-3xl font-bold mb-1" style={{ color: '#CF9B63', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>12</p>
-                    <p className="text-sm text-green-600 font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>+2 this week</p>
+                    <p className="text-3xl font-bold mb-1" style={{ color: '#CF9B63', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                      {bookmarksLoading ? '...' : bookmarks.length}
+                    </p>
+                    <p className="text-sm text-green-600 font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      {bookmarks.length > 0 ? 'Active bookmarks' : 'No bookmarks yet'}
+                    </p>
                   </div>
                   <div className="p-3 rounded-xl shadow-sm" style={{ backgroundColor: '#CF9B63' }}>
                     <Bookmark className="h-6 w-6 text-white" />
@@ -147,38 +241,36 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <div className="p-5 space-y-4">
-                  <div className="flex items-start space-x-4">
-                    <div className="p-2.5 rounded-lg flex-shrink-0" style={{ backgroundColor: '#1E65AD' }}>
-                      <Download className="h-5 w-5 text-white" />
+                  {bookmarksLoading ? (
+                    <div className="text-center py-4">
+                      <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                      <p className="text-sm text-gray-500 mt-2" style={{ fontFamily: 'Roboto, sans-serif' }}>Loading bookmarks...</p>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Downloaded Supreme Court Judgment</p>
-                      <p className="text-sm text-gray-500 mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Contract Law Case 2023 - Civil Appeal No. 1234</p>
-                      <p className="text-xs text-gray-400" style={{ fontFamily: 'Roboto, sans-serif' }}>2 hours ago</p>
+                  ) : bookmarks.length === 0 ? (
+                    <div className="text-center py-4">
+                      <Bookmark className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>No recent bookmarks</p>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-start space-x-4">
-                    <div className="p-2.5 rounded-lg flex-shrink-0" style={{ backgroundColor: '#CF9B63' }}>
-                      <Bookmark className="h-5 w-5 text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Bookmarked IPC Act 2023</p>
-                      <p className="text-sm text-gray-500 mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Indian Penal Code - Bharatiya Nyaya Sanhita</p>
-                      <p className="text-xs text-gray-400" style={{ fontFamily: 'Roboto, sans-serif' }}>1 day ago</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start space-x-4">
-                    <div className="p-2.5 rounded-lg flex-shrink-0" style={{ backgroundColor: '#8C969F' }}>
-                      <CalendarIcon className="h-5 w-5 text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Added Court Hearing Event</p>
-                      <p className="text-sm text-gray-500 mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Supreme Court - Contract Dispute Hearing</p>
-                      <p className="text-xs text-gray-400" style={{ fontFamily: 'Roboto, sans-serif' }}>3 days ago</p>
-                    </div>
-                  </div>
+                  ) : (
+                    bookmarks.slice(0, 3).map((bookmark) => (
+                      <div key={bookmark.id} className="flex items-start space-x-4">
+                        <div className="p-2.5 rounded-lg flex-shrink-0" style={{ backgroundColor: '#CF9B63' }}>
+                          <Bookmark className="h-5 w-5 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                            {getBookmarkTitle(bookmark)}
+                          </p>
+                          <p className="text-sm text-gray-500 mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                            {getBookmarkDescription(bookmark)}
+                          </p>
+                          <p className="text-xs text-gray-400" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                            {formatRelativeTime(bookmark.created_at)}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
 
