@@ -9,33 +9,33 @@ const VideoSection = () => {
   const features = [
     {
       icon: "⚡",
-      title: "Lightning Fast",
-      description: "Optimized for speed and performance"
+      title: "Instant research",
+      description: "Judgments and acts in just one to three clicks."
     },
     {
       icon: "🔒",
-      title: "Secure & Reliable",
-      description: "Enterprise-grade security features"
+      title: "Multilingual Access",
+      description: "Instantly view research in any Indian language."
     },
     {
       icon: "📱",
-      title: "Mobile Responsive",
-      description: "Works perfectly on all devices"
+      title: "Voice assistance",
+      description: "Speak your query; get instant, accurate results."
     },
     {
       icon: "🎯",
-      title: "AI-Powered",
-      description: "Advanced AI for legal research"
+      title: "Concise Summaries",
+      description: "Get the gist in two to three lines instantly."
     },
     {
       icon: "📊",
-      title: "Analytics Dashboard",
-      description: "Comprehensive insights and reports"
+      title: "Universal Search",
+      description: "Find cases with keywords or simple questions - no details needed."
     },
     {
       icon: "🔄",
-      title: "Always Updated",
-      description: "Latest legal frameworks and laws"
+      title: "Kiki AI",
+      description: "Smart assistant answers, automates, and guides your legal research."
     }
   ];
 
@@ -75,15 +75,14 @@ const VideoSection = () => {
                 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 leading-tight px-4 lg:px-0"
                 style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}
               >
-                Crafted for Legal Professionals, Students and Law Firms
+                Why Choose Salhakar
               </h2>
               
               <p 
                 className="text-lg sm:text-xl leading-relaxed mb-6 sm:mb-8 px-4 lg:px-0"
                 style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}
               >
-                The main focus is to provide comprehensive legal technology solutions with interactive features, 
-                AI-powered research tools, and seamless user experience for all legal professionals.
+                Salhakar aims to make legal research in India simple, convenient, and reliable, leveraging advanced AI to give every user a smarter edge.
               </p>
             </div>
 
@@ -199,7 +198,7 @@ const VideoSection = () => {
                         className="mt-4 text-lg font-semibold"
                         style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}
                       >
-                        Watch Demo Video
+                        Watch Video
                       </p>
                     </div>
                   </div>
@@ -263,17 +262,17 @@ const VideoSection = () => {
             </div>
 
             {/* Floating Elements */}
-            <div className="absolute -top-4 -right-4 w-16 h-16 rounded-2xl flex items-center justify-center transform rotate-12 shadow-lg" style={{ backgroundColor: '#CF9B63' }}>
+            {/* <div className="absolute -top-4 -right-4 w-16 h-16 rounded-2xl flex items-center justify-center transform rotate-12 shadow-lg" style={{ backgroundColor: '#CF9B63' }}>
               <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
               </svg>
-            </div>
+            </div> */}
 
-            <div className="absolute -bottom-4 -left-4 w-12 h-12 rounded-xl flex items-center justify-center transform -rotate-12 shadow-lg" style={{ backgroundColor: '#8C969F' }}>
+            {/* <div className="absolute -bottom-4 -left-4 w-12 h-12 rounded-xl flex items-center justify-center transform -rotate-12 shadow-lg" style={{ backgroundColor: '#8C969F' }}>
               <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2.5-9H19V1h-2v1H7V1H5v1H4.5C3.67 2 3 2.67 3 3.5v15C3 19.33 3.67 20 4.5 20h15c.83 0 1.5-.67 1.5-1.5v-15C21 2.67 20.33 2 19.5 2z"/>
               </svg>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

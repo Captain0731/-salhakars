@@ -6,7 +6,7 @@ const Hero = forwardRef((props, ref) => {
   return (
     <section
       ref={ref}
-      className="relative min-h-[85vh] sm:min-h-screen flex flex-col items-center justify-center text-center overflow-hidden px-2 sm:px-4 md:px-6 lg:px-8"
+      className="relative min-h-[70vh] sm:min-h-screen flex flex-col items-center justify-center text-center overflow-hidden px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-12"
       style={{ 
         background: 'radial-gradient(ellipse at center, #B8D4E8 0%, #D8E8F0 30%, #FCFFFF 50%, #F5F5F0 100%)'
       }}
@@ -19,18 +19,19 @@ const Hero = forwardRef((props, ref) => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 max-w-6xl mx-auto w-full py-8 sm:py-12 md:py-16">
+      <div className="relative z-10 max-w-6xl mx-auto w-full py-4 sm:py-8 md:py-12 lg:py-16">
         {/* Heading */}
-        <div className="flex flex-col items-center justify-center mb-6 sm:mb-8 md:mb-12 px-2 sm:px-4">
+        <div className="flex flex-col items-center justify-center mb-4 sm:mb-6 md:mb-8 lg:mb-12 px-2 sm:px-4">
           
           <img 
             src="/logo31.png" 
             alt="सलहाकार Logo" 
-            className="w-48 sm:w-56 md:w-64 lg:w-72 xl:w-80 h-auto object-contain mb-4 sm:mb-6" 
+            className="w-40 sm:w-48 md:w-56 lg:w-64 xl:w-72 h-auto object-contain mb-3 sm:mb-4 md:mb-6" 
+            style={{ maxWidth: '90%' }}
           />
 
           <p 
-            className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-4xl px-2 sm:px-4 leading-relaxed text-center"
+            className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl max-w-4xl px-3 sm:px-4 leading-relaxed text-center"
             style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}
           >
             India's first{" "}
@@ -43,11 +44,11 @@ const Hero = forwardRef((props, ref) => {
             multilingual legal tech platform
           </p>
           
-          <div className="w-12 sm:w-16 md:w-20 lg:w-24 h-0.5 sm:h-1 mx-auto mt-3 sm:mt-4 md:mt-6 rounded-full" style={{ backgroundColor: '#CF9B63' }}></div>
+          <div className="w-10 sm:w-12 md:w-16 lg:w-20 xl:w-24 h-0.5 sm:h-1 mx-auto mt-2 sm:mt-3 md:mt-4 lg:mt-6 rounded-full" style={{ backgroundColor: '#CF9B63' }}></div>
         </div>
 
         {/* Search + Quick Links */}
-        <div className="mt-4 sm:mt-6 md:mt-8 w-full max-w-4xl mx-auto px-2 sm:px-4">
+        <div className="mt-3 sm:mt-4 md:mt-6 lg:mt-8 w-full max-w-4xl mx-auto px-2 sm:px-3 md:px-4">
           <SearchBar />
           <QuickLinks />
         </div>

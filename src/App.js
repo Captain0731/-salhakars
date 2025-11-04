@@ -49,12 +49,15 @@ import MinimalistSupremeCourt from "./pages/designs/minimalist/SupremeCourtJudgm
 
 // Design Variants - Glassmorphism
 import GlassmorphismShowcase from "./pages/designs/glassmorphism/index";
+import Chatbot from "./components/Chatbot";
 
 function AppLayout() {
   return (
     <div style={{ minHeight: "100vh", overflowY: "auto" }}>
       {/* Google Translate Component - Global mount point */}
       <GoogleTranslate />
+      {/* Chatbot Icon - Fixed position on all pages */}
+      <Chatbot />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
@@ -116,6 +119,11 @@ function AppLayout() {
         
         {/* Design Variant Routes - Glassmorphism */}
         <Route path="/designs/glassmorphism" element={<GlassmorphismShowcase />} />
+
+
+        {/* {chatbot routes} */}
+        <Route path="/chatbot" element={<LegalChatbot />} />
+        
       </Routes>
     </div>
   );

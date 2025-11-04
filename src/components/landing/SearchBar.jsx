@@ -50,22 +50,22 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="w-full px-2 sm:px-4 lg:px-8 flex justify-center">
+    <div className="w-full px-1 sm:px-2 md:px-4 lg:px-8 flex justify-center">
       <form onSubmit={handleSearch} className="flex bg-white rounded-full p-1 sm:p-1.5 md:p-2 shadow-lg items-center gap-1 sm:gap-2 w-full max-w-5xl">
         <input
           type="text"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           placeholder={displayedText || "Search..."}
-          className="flex-1 rounded-full outline-none px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 text-gray-700 text-sm sm:text-base md:text-lg placeholder:text-xs sm:placeholder:text-sm md:placeholder:text-base"
+          className="flex-1 rounded-full outline-none px-2.5 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 text-gray-700 text-xs sm:text-sm md:text-base lg:text-lg placeholder:text-xs sm:placeholder:text-sm md:placeholder:text-base"
         />
         <button 
           type="submit"
-          className="w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 bg-gray-950 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-transform flex-shrink-0 touch-manipulation"
-          style={{ minWidth: '36px', minHeight: '36px' }}
+          className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 lg:w-12 lg:h-12 xl:w-14 xl:h-14 bg-gray-950 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-transform flex-shrink-0 touch-manipulation"
+          style={{ minWidth: '32px', minHeight: '32px' }}
         >
           <svg
-            className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7"
+            className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7"
             fill="currentColor"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"

@@ -13,24 +13,21 @@ const Chatbot = () => {
       className="fixed bottom-6 right-6 z-50 transition-transform duration-300 hover:scale-110 cursor-pointer"
       onClick={handleChatbotClick}
       style={{
-        width: '100px',
-        height: '100px',
+        width: '80px',
+        height: '80px',
         backgroundColor: 'transparent',
-        background: 'transparent',
       }}
     >
       <img
         src="/chatbot.png"
         alt="Chatbot"
         style={{
-          width: '70%',
-          height: '70%',
+          width: '100%',
+          height: '100%',
           objectFit: 'contain',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+          boxShadow: '0 4px 20px rgba(30, 101, 173, 0.4)',
+          borderRadius: '50%',
           pointerEvents: 'none',
-          backgroundColor: 'transparent',
-          background: 'transparent',
-          mixBlendMode: 'multiply',
         }}
         onError={(e) => {
           e.target.style.display = 'none';

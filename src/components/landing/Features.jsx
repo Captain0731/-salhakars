@@ -40,50 +40,50 @@ const FeatureCard = ({ feature, index, onClick }) => {
     >
       <div 
         className="relative w-full flex flex-col overflow-hidden"
-        style={{
-          transformStyle: 'preserve-3d',
-          transform: isHovered ? 'rotateY(5deg) rotateX(-5deg)' : 'rotateY(0deg) rotateX(0deg)',
-          transition: 'transform 0.5s cubic-bezier(0.23, 1, 0.32, 1)'
-        }}
+        // style={{
+        //   transformStyle: 'preserve-3d',
+        //   transform: isHovered ? 'rotateY(5deg) rotateX(-5deg)' : 'rotateY(0deg) rotateX(0deg)',
+        //   transition: 'transform 0.5s cubic-bezier(0.23, 1, 0.32, 1)'
+        // }}
       >
         {/* Glassmorphism Card with Gradient Background */}
         <div 
-          className="relative rounded-3xl sm:rounded-[2rem] flex flex-col flex-grow backdrop-blur-xl border border-white/20 shadow-2xl overflow-hidden"
-          style={{
-            background: isHovered 
-              ? `linear-gradient(145deg, ${feature.color}15 0%, ${feature.secondaryColor}25 50%, ${feature.color}15 100%)`
-              : `linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%)`,
-            boxShadow: isHovered 
-              ? `0 20px 60px -15px ${feature.color}40, 0 0 30px ${feature.color}20, inset 0 1px 0 rgba(255, 255, 255, 0.6)`
-              : '0 10px 40px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)',
-            transition: 'all 0.5s cubic-bezier(0.23, 1, 0.32, 1)'
-          }}
+          className="relative rounded-3xl sm:rounded-[2rem] flex flex-col flex-grow backdrop-blur-xl border border-white/200  overflow-hidden"
+          // style={{
+          //   background: isHovered 
+          //     ? `linear-gradient(145deg, ${feature.color}15 0%, ${feature.secondaryColor}25 50%, ${feature.color}15 100%)`
+          //     : `linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%)`,
+          //   boxShadow: isHovered 
+          //     ? `0 20px 60px -15px ${feature.color}40, 0 0 30px ${feature.color}20, inset 0 1px 0 rgba(255, 255, 255, 0.6)`
+          //     : '0 10px 40px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+          //   transition: 'all 0.5s cubic-bezier(0.23, 1, 0.32, 1)'
+          // }}
         >
           {/* Animated Gradient Overlay */}
           <div 
-            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-            style={{
-              background: `linear-gradient(135deg, ${feature.color}08 0%, ${feature.secondaryColor}12 50%, ${feature.color}08 100%)`,
-              backgroundSize: '200% 200%',
-              animation: isHovered ? 'gradientShift 3s ease infinite' : 'none'
-            }}
+            // className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            // style={{
+            //   background: `linear-gradient(135deg, ${feature.color}08 0%, ${feature.secondaryColor}12 50%, ${feature.color}08 100%)`,
+            //   backgroundSize: '200% 200%',
+            //   animation: isHovered ? 'gradientShift 3s ease infinite' : 'none'
+            // }}
           />
 
           {/* Floating Icon Badge */}
-          <div 
-            className="absolute -top-4 -right-4 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center text-2xl sm:text-3xl transition-all duration-500 z-10"
-            style={{
-              background: `linear-gradient(135deg, ${feature.color} 0%, ${feature.secondaryColor} 100%)`,
-              boxShadow: `0 8px 25px ${feature.color}40, inset 0 2px 8px rgba(255, 255, 255, 0.3)`,
-              transform: isHovered ? 'translate(3px, 3px) scale(1.1) rotate(10deg)' : 'translate(0, 0) scale(1) rotate(0deg)'
-            }}
-          >
-            <span className="relative z-10">{icons[feature.id] || "✨"}</span>
-            <div 
-              className="absolute inset-0 rounded-full animate-ping opacity-20"
-              style={{ backgroundColor: feature.color }}
-            />
-          </div>
+            {/* <div 
+              className="absolute -top-4 -right-4 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center text-2xl sm:text-3xl transition-all duration-500 z-10"
+              style={{
+                background: `linear-gradient(135deg, ${feature.color} 0%, ${feature.secondaryColor} 100%)`,
+                boxShadow: `0 8px 25px ${feature.color}40, inset 0 2px 8px rgba(255, 255, 255, 0.3)`,
+                transform: isHovered ? 'translate(3px, 3px) scale(1.1) rotate(10deg)' : 'translate(0, 0) scale(1) rotate(0deg)'
+              }}
+            >
+              <span className="relative z-10">{icons[feature.id] || "✨"}</span>
+              <div 
+                className="absolute inset-0 rounded-full animate-ping opacity-20"
+                style={{ backgroundColor: feature.color }}
+              />
+            </div> */}
 
           {/* Content Container */}
           <div className="p-4 sm:p-6 md:p-7 flex flex-col flex-grow relative z-10 pt-12 sm:pt-14">
@@ -163,23 +163,23 @@ const FeatureCard = ({ feature, index, onClick }) => {
           {/* Corner Accent */}
           <div 
             className="absolute bottom-0 right-0 w-20 h-20 sm:w-24 sm:h-24 opacity-10 group-hover:opacity-20 transition-opacity duration-500"
-            style={{
-              background: `radial-gradient(circle at top left, ${feature.color}, transparent)`,
-              transform: isHovered ? 'scale(1.2)' : 'scale(1)',
-              transition: 'all 0.5s ease'
-            }}
+            // style={{
+            //   background: `radial-gradient(circle at top left, ${feature.color}, transparent)`,
+            //   transform: isHovered ? 'scale(1.2)' : 'scale(1)',
+            //   transition: 'all 0.5s ease'
+            // }}
           />
         </div>
 
         {/* Glow Effect Behind Card */}
-        <div 
+        {/* <div 
           className="absolute inset-0 rounded-3xl sm:rounded-[2rem] -z-10 blur-2xl transition-opacity duration-500"
           style={{
             background: `linear-gradient(135deg, ${feature.color}40, ${feature.secondaryColor}40)`,
             opacity: isHovered ? 0.6 : 0,
             transform: isHovered ? 'scale(1.05)' : 'scale(1)'
           }}
-        />
+        /> */}
       </div>
     </div>
   );
@@ -235,11 +235,11 @@ const Features = React.forwardRef((props, ref) => {
     },
     {
       id: 5,
-      title: "AI Chatbot",
+      title: "Smart Dashboard",
       description: "Intelligent legal assistant powered by AI to answer queries, provide legal guidance, and assist with research.",
       color: "#CF9B63",
       secondaryColor: "#8C969F",
-      path: "/legal-chatbot"
+      path: "/dashboard"
     },
     {
       id: 6,
@@ -300,7 +300,7 @@ const Features = React.forwardRef((props, ref) => {
             className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-4xl mx-auto leading-relaxed mb-4 sm:mb-6 md:mb-8 px-3 sm:px-4"
             style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}
           >
-            Comprehensive legal technology solutions designed to empower legal professionals and students
+            Comprehensive legal-tech solutions for lawyers, students, and researchers that save hours every week.
           </p>
           
           <div className="w-12 sm:w-16 md:w-20 lg:w-24 h-0.5 sm:h-1 mx-auto rounded-full" style={{ backgroundColor: '#CF9B63' }}></div>

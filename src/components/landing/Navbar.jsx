@@ -126,62 +126,62 @@ const Navbar = () => {
   };
 
   // Handle scroll effect and progress bar
-  useEffect(() => {
-    let rafId = null;
+  // useEffect(() => {
+  //   let rafId = null;
     
-    const updateScrollProgress = () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  //   const updateScrollProgress = () => {
+  //     const scrollTop = window.scrollY;
+  //     const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  //     const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
       
-      setIsScrolled(scrollTop > 50);
-      setScrollProgress(Math.min(100, Math.max(0, scrollPercent)));
-    };
+  //     setIsScrolled(scrollTop > 50);
+  //     setScrollProgress(Math.min(100, Math.max(0, scrollPercent)));
+  //   };
 
-    const handleScroll = () => {
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-      }
-      rafId = requestAnimationFrame(updateScrollProgress);
-    };
+  //   const handleScroll = () => {
+  //     if (rafId) {
+  //       cancelAnimationFrame(rafId);
+  //     }
+  //     rafId = requestAnimationFrame(updateScrollProgress);
+  //   };
 
-    const handleResize = () => {
-      updateScrollProgress();
-    };
+  //   const handleResize = () => {
+  //     updateScrollProgress();
+  //   };
 
-    // Initial calculation
-    updateScrollProgress();
+  //   // Initial calculation
+  //   updateScrollProgress();
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleResize, { passive: true });
+  //   window.addEventListener('scroll', handleScroll, { passive: true });
+  //   window.addEventListener('resize', handleResize, { passive: true });
     
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleResize);
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-      }
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener('scroll', handleScroll);
+  //     window.removeEventListener('resize', handleResize);
+  //     if (rafId) {
+  //       cancelAnimationFrame(rafId);
+  //     }
+  //   };
+  // }, []);
 
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (navRef.current && !navRef.current.contains(event.target)) {
-        setDropdownOpen(null);
-        setSubDropdownOpen({ main: null, sub: null });
-        setUserDropdownOpen(false);
-      }
-    };
+  // // Close dropdowns when clicking outside
+  // useEffect(() => {
+  //   const handleClickOutside = (event) => {
+  //     if (navRef.current && !navRef.current.contains(event.target)) {
+  //       setDropdownOpen(null);
+  //       setSubDropdownOpen({ main: null, sub: null });
+  //       setUserDropdownOpen(false);
+  //     }
+  //   };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      // Clear timeouts on cleanup
-      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-      if (subHoverTimeoutRef.current) clearTimeout(subHoverTimeoutRef.current);
-    };
-  }, []);
+  //   document.addEventListener('mousedown', handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener('mousedown', handleClickOutside);
+  //     // Clear timeouts on cleanup
+  //     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+  //     if (subHoverTimeoutRef.current) clearTimeout(subHoverTimeoutRef.current);
+  //   };
+  // }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -747,19 +747,19 @@ const Navbar = () => {
               style={{ 
                 color: '#FFFFFF',
                 fontFamily: 'Roboto, sans-serif',
-                background: 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)',
+                background: 'linear-gradient(135deg, #1E65AD 100%)',
                 borderColor: '#1E65AD',
                 minHeight: '50px',
                 minWidth: '100px',
                 boxShadow: '0 2px 8px rgba(30, 101, 173, 0.3)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'linear-gradient(135deg, #CF9B63 0%, #1E65AD 100%)';
+                e.currentTarget.style.background = 'linear-gradient(135deg,rgba(207, 155, 99, 0.5) 100%)';
                 e.currentTarget.style.boxShadow = '0 6px 20px rgba(207, 155, 99, 0.5)';
                 e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)';
+                e.currentTarget.style.background = 'linear-gradient(135deg, #1E65AD 100%)';
                 e.currentTarget.style.boxShadow = '0 2px 8px rgba(30, 101, 173, 0.3)';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
