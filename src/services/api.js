@@ -1381,6 +1381,191 @@ class ApiService {
     return await this.handleResponse(response);
   }
 
+  // Get central act by ID
+  async getCentralActById(actId) {
+    try {
+      // Try to get by ID endpoint first
+      const response = await fetch(`${this.baseURL}/api/acts/central-acts/${actId}`, {
+        method: 'GET',
+        headers: this.getPublicHeaders()
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        // Handle both direct object and wrapped response
+        return data.data || data;
+      } else if (response.status === 404) {
+        // Fallback: search by filtering using the ID field
+        const searchResponse = await this.getCentralActs({ limit: 100 });
+        if (searchResponse.data && searchResponse.data.length > 0) {
+          // Find the act by ID in the response
+          const foundAct = searchResponse.data.find(act => act.id === parseInt(actId) || act.id === actId);
+          if (foundAct) {
+            return foundAct;
+          }
+        }
+        throw new Error('Central act not found');
+      }
+      return await this.handleResponse(response);
+    } catch (err) {
+      // Fallback: try to get from list and search
+      try {
+        const searchResponse = await this.getCentralActs({ limit: 100 });
+        if (searchResponse.data && searchResponse.data.length > 0) {
+          const foundAct = searchResponse.data.find(act => act.id === parseInt(actId) || act.id === actId);
+          if (foundAct) {
+            return foundAct;
+          }
+        }
+        // If still not found, try with larger limit
+        const largeSearchResponse = await this.getCentralActs({ limit: 1000, offset: 0 });
+        if (largeSearchResponse.data && largeSearchResponse.data.length > 0) {
+          const foundAct = largeSearchResponse.data.find(act => act.id === parseInt(actId) || act.id === actId);
+          if (foundAct) {
+            return foundAct;
+          }
+        }
+      } catch (fallbackErr) {
+        console.error('Fallback search also failed:', fallbackErr);
+      }
+      throw err;
+    }
+  }
+
+  // Get state act by ID
+  async getStateActById(actId) {
+    try {
+      // Try to get by ID endpoint first
+      const response = await fetch(`${this.baseURL}/api/acts/state-acts/${actId}`, {
+        method: 'GET',
+        headers: this.getPublicHeaders()
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        // Handle both direct object and wrapped response
+        return data.data || data;
+      } else if (response.status === 404) {
+        // Fallback: search by filtering using the ID field
+        const searchResponse = await this.getStateActs({ limit: 100 });
+        if (searchResponse.data && searchResponse.data.length > 0) {
+          // Find the act by ID in the response
+          const foundAct = searchResponse.data.find(act => act.id === parseInt(actId) || act.id === actId);
+          if (foundAct) {
+            return foundAct;
+          }
+        }
+        throw new Error('State act not found');
+      }
+      return await this.handleResponse(response);
+    } catch (err) {
+      // Fallback: try to get from list and search
+      try {
+        const searchResponse = await this.getStateActs({ limit: 100 });
+        if (searchResponse.data && searchResponse.data.length > 0) {
+          const foundAct = searchResponse.data.find(act => act.id === parseInt(actId) || act.id === actId);
+          if (foundAct) {
+            return foundAct;
+          }
+        }
+        // If still not found, try with larger limit
+        const largeSearchResponse = await this.getStateActs({ limit: 1000, offset: 0 });
+        if (largeSearchResponse.data && largeSearchResponse.data.length > 0) {
+          const foundAct = largeSearchResponse.data.find(act => act.id === parseInt(actId) || act.id === actId);
+          if (foundAct) {
+            return foundAct;
+          }
+        }
+      } catch (fallbackErr) {
+        console.error('Fallback search also failed:', fallbackErr);
+      }
+      throw err;
+    }
+  }
+
+  // Get law mapping by ID
+  async getLawMappingById(mappingId, mappingType) {
+    try {
+      // Try to get by ID endpoint first
+      const response = await fetch(`${this.baseURL}/api/law_mapping/${mappingId}`, {
+        method: 'GET',
+        headers: this.getPublicHeaders()
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        // Handle both direct object and wrapped response
+        return data.data || data;
+      } else if (response.status === 404) {
+        // Fallback: search by filtering with mapping type
+        const searchResponse = await this.getLawMappings({ 
+          mapping_type: mappingType, 
+          limit: 100 
+        });
+        if (searchResponse.data && searchResponse.data.length > 0) {
+          // Find the mapping by ID in the response
+          const foundMapping = searchResponse.data.find(
+            mapping => mapping.id === parseInt(mappingId) || mapping.id === mappingId
+          );
+          if (foundMapping) {
+            return foundMapping;
+          }
+        }
+        throw new Error('Mapping not found');
+      }
+      return await this.handleResponse(response);
+    } catch (err) {
+      // Fallback: try to get from list and search
+      try {
+        const searchResponse = await this.getLawMappings({ 
+          mapping_type: mappingType, 
+          limit: 100 
+        });
+        if (searchResponse.data && searchResponse.data.length > 0) {
+          const foundMapping = searchResponse.data.find(
+            mapping => mapping.id === parseInt(mappingId) || mapping.id === mappingId
+          );
+          if (foundMapping) {
+            return foundMapping;
+          }
+        }
+        // If still not found, try with larger limit (pagination)
+        let offset = 0;
+        let found = false;
+        let foundMapping = null;
+        while (!found && offset < 1000) {
+          const largeSearchResponse = await this.getLawMappings({ 
+            mapping_type: mappingType, 
+            limit: 100,
+            offset: offset
+          });
+          if (largeSearchResponse.data && largeSearchResponse.data.length > 0) {
+            foundMapping = largeSearchResponse.data.find(
+              mapping => mapping.id === parseInt(mappingId) || mapping.id === mappingId
+            );
+            if (foundMapping) {
+              found = true;
+              break;
+            }
+            // Check if there are more results
+            if (!largeSearchResponse.pagination_info || !largeSearchResponse.pagination_info.has_more) {
+              break;
+            }
+            offset += 100;
+          } else {
+            break;
+          }
+        }
+        if (foundMapping) {
+          return foundMapping;
+        }
+      } catch (fallbackErr) {
+        console.error('Fallback search also failed:', fallbackErr);
+      }
+      throw err;
+    }
+  }
+
   async getJudgementByIdHTML(judgementId) {
     const token = localStorage.getItem('access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
     const headers = {

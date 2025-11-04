@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Bookmark, 
   BookmarkPlus, 
@@ -32,6 +33,7 @@ import BookmarkAnalytics from './BookmarkAnalytics';
 import BookmarkImportExport from './BookmarkImportExport';
 
 const Bookmarks = () => {
+  const navigate = useNavigate();
   const [bookmarks, setBookmarks] = useState([]);
   const [folders, setFolders] = useState([]);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
@@ -73,6 +75,131 @@ const Bookmarks = () => {
   });
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [activeTab, setActiveTab] = useState('bookmarks'); // 'bookmarks', 'analytics', 'import-export'
+
+  // Function to navigate to the appropriate page based on bookmark type
+  const handleViewBookmark = async (bookmark) => {
+    const item = bookmark.item || bookmark;
+    const bookmarkType = bookmark.type;
+    const itemId = item.id;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      switch (bookmarkType) {
+        case 'judgement':
+          // Fetch full judgment details and navigate to view page
+          try {
+            const judgmentData = await apiService.getJudgementById(itemId);
+            navigate('/view-pdf', { state: { judgment: judgmentData } });
+          } catch (err) {
+            console.error('Error fetching judgment:', err);
+            // Fallback: use item data if available
+            if (item.title || item.pdf_url) {
+              navigate('/view-pdf', { state: { judgment: item } });
+            } else {
+              throw new Error('Failed to load judgment details');
+            }
+          }
+          break;
+        
+        case 'central_act':
+          // Fetch full central act details and navigate to act details page
+          try {
+            const actData = await apiService.getCentralActById(itemId);
+            navigate('/act-details', { state: { act: actData } });
+          } catch (err) {
+            console.error('Error fetching central act:', err);
+            // Fallback: use item data if available
+            if (item.short_title || item.long_title) {
+              navigate('/act-details', { state: { act: item } });
+            } else {
+              throw new Error('Failed to load central act details');
+            }
+          }
+          break;
+        
+        case 'state_act':
+          // Fetch full state act details and navigate to act details page
+          try {
+            const actData = await apiService.getStateActById(itemId);
+            navigate('/act-details', { state: { act: actData } });
+          } catch (err) {
+            console.error('Error fetching state act:', err);
+            // Fallback: use item data if available
+            if (item.short_title || item.long_title) {
+              navigate('/act-details', { state: { act: item } });
+            } else {
+              throw new Error('Failed to load state act details');
+            }
+          }
+          break;
+        
+        case 'bsa_iea_mapping':
+          // Fetch full mapping details and navigate to mapping details page
+          try {
+            const mappingData = await apiService.getLawMappingById(itemId, 'bsa_iea');
+            navigate('/mapping-details', { state: { mapping: mappingData } });
+          } catch (err) {
+            console.error('Error fetching BSA-IEA mapping:', err);
+            // Fallback: use item data if available
+            if (item.bsa_section || item.iea_section || item.subject) {
+              navigate('/mapping-details', { state: { mapping: item } });
+            } else {
+              throw new Error('Failed to load BSA-IEA mapping details');
+            }
+          }
+          break;
+        
+        case 'bns_ipc_mapping':
+          // Fetch full mapping details and navigate to mapping details page
+          try {
+            const mappingData = await apiService.getLawMappingById(itemId, 'bns_ipc');
+            navigate('/mapping-details', { state: { mapping: mappingData } });
+          } catch (err) {
+            console.error('Error fetching BNS-IPC mapping:', err);
+            // Fallback: use item data if available
+            if (item.bns_section || item.ipc_section || item.subject) {
+              navigate('/mapping-details', { state: { mapping: item } });
+            } else {
+              throw new Error('Failed to load BNS-IPC mapping details');
+            }
+          }
+          break;
+
+        case 'bnss_crpc_mapping':
+          // Fetch full mapping details and navigate to mapping details page
+          try {
+            const mappingData = await apiService.getLawMappingById(itemId, 'bnss_crpc');
+            navigate('/mapping-details', { state: { mapping: mappingData } });
+          } catch (err) {
+            console.error('Error fetching BNSS-CrPC mapping:', err);
+            // Fallback: use item data if available
+            if (item.bnss_section || item.crpc_section || item.subject) {
+              navigate('/mapping-details', { state: { mapping: item } });
+            } else {
+              throw new Error('Failed to load BNSS-CrPC mapping details');
+            }
+          }
+          break;
+        
+        default:
+          console.warn('Unknown bookmark type:', bookmarkType);
+          setError(`Unknown bookmark type: ${bookmarkType}`);
+          // Fallback: try to open URL if available
+          if (item.pdf_url || item.url) {
+            window.open(item.pdf_url || item.url, '_blank');
+          } else {
+            throw new Error(`Unsupported bookmark type: ${bookmarkType}`);
+          }
+      }
+    } catch (err) {
+      console.error('Error navigating to bookmark:', err);
+      setError(err.message || 'Failed to load bookmark content. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Load bookmarks and folders from API
   useEffect(() => {
@@ -262,9 +389,38 @@ const Bookmarks = () => {
     }
   };
 
-  const handleDeleteBookmark = async (bookmarkId) => {
+  const handleDeleteBookmark = async (bookmark) => {
     try {
-      await apiService.deleteBookmark(bookmarkId);
+      const bookmarkId = typeof bookmark === 'object' ? bookmark.id : bookmark;
+      const bookmarkType = typeof bookmark === 'object' ? bookmark.type : null;
+      const item = typeof bookmark === 'object' ? (bookmark.item || bookmark) : null;
+      const itemId = item?.id;
+
+      if (!itemId || !bookmarkType) {
+        // Fallback to generic delete if we don't have type info
+        await apiService.deleteBookmark(bookmarkId);
+      } else {
+        // Use the correct endpoint based on bookmark type
+        switch (bookmarkType) {
+          case 'judgement':
+            await apiService.removeJudgementBookmark(itemId);
+            break;
+          case 'central_act':
+            await apiService.removeActBookmark('central', itemId);
+            break;
+          case 'state_act':
+            await apiService.removeActBookmark('state', itemId);
+            break;
+          case 'bsa_iea_mapping':
+            await apiService.removeMappingBookmark('bsa_iea', itemId);
+            break;
+          case 'bns_ipc_mapping':
+            await apiService.removeMappingBookmark('bns_ipc', itemId);
+            break;
+          default:
+            await apiService.deleteBookmark(bookmarkId);
+        }
+      }
       
       // Remove from local state
       setBookmarks(prev => prev.filter(item => item.id !== bookmarkId));
@@ -367,89 +523,96 @@ const Bookmarks = () => {
     <div className="space-y-6">
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center">
-          <AlertCircle className="h-5 w-5 text-red-600 mr-3" />
-          <div>
-            <h3 className="text-sm font-medium text-red-800">Error</h3>
-            <p className="text-sm text-red-700 mt-1">{error}</p>
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
+          <div className="flex items-center">
+            <AlertCircle className="h-5 w-5 text-red-600 mr-3 flex-shrink-0" />
+            <div>
+              <h3 className="text-sm font-medium text-red-800" style={{ fontFamily: 'Roboto, sans-serif' }}>Error</h3>
+              <p className="text-sm text-red-700 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>{error}</p>
+            </div>
           </div>
           <button
             onClick={() => setError(null)}
-            className="ml-auto text-red-600 hover:text-red-800"
+            className="ml-4 text-red-600 hover:text-red-800 p-1 hover:bg-red-100 rounded transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>My Bookmarks</h1>
-          <p className="mt-1" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}>
-            {sortedBookmarks.length} bookmarks • {folders.length} folders
-            {(filterType !== 'all' || searchQuery || Object.values(advancedFilters).some(v => 
-              v !== null && v !== '' && (typeof v !== 'object' || Object.values(v).some(subV => subV !== ''))
-            )) && (
-              <span className="ml-2 text-blue-600 font-medium">• Filtered</span>
-            )}
-          </p>
-        </div>
-        
-        <div className="flex items-center space-x-3 mt-4 sm:mt-0">
-          <button
-            onClick={() => setShowAddBookmark(true)}
-            className="flex items-center px-4 py-2 text-white rounded-lg transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
-            style={{ backgroundColor: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}
-          >
-            <BookmarkPlus className="h-4 w-4 mr-2" />
-            Add Bookmark
-          </button>
-          <button
-            onClick={() => setShowCreateFolder(true)}
-            className="flex items-center px-4 py-2 text-white rounded-lg transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
-            style={{ backgroundColor: '#CF9B63', fontFamily: 'Roboto, sans-serif' }}
-          >
-            <FolderPlus className="h-4 w-4 mr-2" />
-            New Folder
-          </button>
+      {/* Perfect Header */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold mb-1" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>My Bookmarks</h1>
+            <p className="text-gray-600 text-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
+              {sortedBookmarks.length} bookmarks • {folders.length} folders
+              {(filterType !== 'all' || searchQuery || Object.values(advancedFilters).some(v => 
+                v !== null && v !== '' && (typeof v !== 'object' || Object.values(v).some(subV => subV !== ''))
+              )) && (
+                <span className="ml-2 text-blue-600 font-medium">• Filtered</span>
+              )}
+            </p>
+          </div>
+          
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => setShowAddBookmark(true)}
+              className="flex items-center px-4 py-2.5 text-white rounded-lg transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 font-medium text-sm"
+              style={{ backgroundColor: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}
+            >
+              <BookmarkPlus className="h-4 w-4 mr-2" />
+              Add Bookmark
+            </button>
+            <button
+              onClick={() => setShowCreateFolder(true)}
+              className="flex items-center px-4 py-2.5 text-white rounded-lg transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 font-medium text-sm"
+              style={{ backgroundColor: '#CF9B63', fontFamily: 'Roboto, sans-serif' }}
+            >
+              <FolderPlus className="h-4 w-4 mr-2" />
+              New Folder
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <nav className="flex space-x-1 p-1">
           <button
             onClick={() => setActiveTab('bookmarks')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+            className={`flex items-center px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
               activeTab === 'bookmarks'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'text-gray-600 hover:bg-gray-100'
             }`}
+            style={{ fontFamily: 'Roboto, sans-serif' }}
           >
-            <Bookmark className="h-4 w-4 inline mr-2" />
+            <Bookmark className={`h-4 w-4 mr-2 ${activeTab === 'bookmarks' ? 'text-white' : 'text-gray-500'}`} />
             Bookmarks
           </button>
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+            className={`flex items-center px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
               activeTab === 'analytics'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'text-gray-600 hover:bg-gray-100'
             }`}
+            style={{ fontFamily: 'Roboto, sans-serif' }}
           >
-            <BarChart3 className="h-4 w-4 inline mr-2" />
+            <BarChart3 className={`h-4 w-4 mr-2 ${activeTab === 'analytics' ? 'text-white' : 'text-gray-500'}`} />
             Analytics
           </button>
           <button
             onClick={() => setActiveTab('import-export')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+            className={`flex items-center px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
               activeTab === 'import-export'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'text-gray-600 hover:bg-gray-100'
             }`}
+            style={{ fontFamily: 'Roboto, sans-serif' }}
           >
-            <Upload className="h-4 w-4 inline mr-2" />
+            <Upload className={`h-4 w-4 mr-2 ${activeTab === 'import-export' ? 'text-white' : 'text-gray-500'}`} />
             Import/Export
           </button>
         </nav>
@@ -459,81 +622,99 @@ const Bookmarks = () => {
       {activeTab === 'bookmarks' && (
         <>
           {/* Search and Filters */}
-      <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-        <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
-          {/* Search */}
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search bookmarks..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+              {/* Search */}
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search bookmarks..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                  style={{ fontFamily: 'Roboto, sans-serif' }}
+                />
+              </div>
+
+              {/* Sort */}
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
+                style={{ fontFamily: 'Roboto, sans-serif' }}
+              >
+                <option value="recent">Most Recent</option>
+                <option value="name">Name A-Z</option>
+                <option value="date">Date Added</option>
+                <option value="type">Type</option>
+              </select>
+
+              {/* Filter */}
+              <select
+                value={filterType}
+                onChange={(e) => handleFilterChange('type', e.target.value)}
+                className="px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm bg-white"
+                style={{ fontFamily: 'Roboto, sans-serif' }}
+              >
+                <option value="all">All Types</option>
+                <option value="judgement">Judgements</option>
+                <option value="central_act">Central Acts</option>
+                <option value="state_act">State Acts</option>
+                <option value="bsa_iea_mapping">BSA-IEA Mappings</option>
+                <option value="bns_ipc_mapping">BNS-IPC Mappings</option>
+              </select>
+
+              {/* View Mode */}
+              <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2.5 transition-colors ${
+                    viewMode === 'grid' 
+                      ? 'bg-blue-600 text-white' 
+                      : 'text-gray-600 hover:bg-gray-50 bg-white'
+                  }`}
+                  title="Grid View"
+                >
+                  <Grid className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2.5 transition-colors border-l border-gray-300 ${
+                    viewMode === 'list' 
+                      ? 'bg-blue-600 text-white' 
+                      : 'text-gray-600 hover:bg-gray-50 bg-white'
+                  }`}
+                  title="List View"
+                >
+                  <List className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* Advanced Filters Toggle */}
+              <button
+                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                className={`flex items-center px-4 py-2.5 border rounded-lg transition-all duration-200 ${
+                  showAdvancedFilters
+                    ? 'bg-blue-50 border-blue-300 text-blue-700'
+                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+                style={{ fontFamily: 'Roboto, sans-serif' }}
+              >
+                <Filter className="h-4 w-4 mr-2" />
+                <span className="text-sm font-medium">Advanced</span>
+              </button>
+            </div>
           </div>
-
-          {/* Sort */}
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="recent">Most Recent</option>
-            <option value="name">Name A-Z</option>
-            <option value="date">Date Added</option>
-            <option value="type">Type</option>
-          </select>
-
-          {/* Filter */}
-          <select
-            value={filterType}
-            onChange={(e) => handleFilterChange('type', e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="all">All Types</option>
-            <option value="judgement">Judgements</option>
-            <option value="central_act">Central Acts</option>
-            <option value="state_act">State Acts</option>
-            <option value="bsa_iea_mapping">BSA-IEA Mappings</option>
-            <option value="bns_ipc_mapping">BNS-IPC Mappings</option>
-          </select>
-
-          {/* View Mode */}
-          <div className="flex border border-gray-300 rounded-lg">
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`p-2 ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
-            >
-              <Grid className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`p-2 ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
-            >
-              <List className="h-4 w-4" />
-            </button>
-          </div>
-
-          {/* Advanced Filters Toggle */}
-          <button
-            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-            className="flex items-center px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <Filter className="h-4 w-4 mr-2" />
-            Advanced Filters
-          </button>
-        </div>
-      </div>
 
       {/* Advanced Filters Panel */}
       {showAdvancedFilters && (
-        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Advanced Filters</h3>
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>Advanced Filters</h3>
             <button
               onClick={() => setShowAdvancedFilters(false)}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 hover:text-gray-600 p-1 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <X className="h-5 w-5" />
             </button>
@@ -652,16 +833,18 @@ const Bookmarks = () => {
           </div>
 
           {/* Filter Actions */}
-          <div className="flex justify-end space-x-3 mt-6">
+          <div className="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
             <button
               onClick={clearAllFilters}
-              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium text-sm"
+              style={{ fontFamily: 'Roboto, sans-serif' }}
             >
-              Clear All Filters
+              Clear All
             </button>
             <button
               onClick={applyFilters}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm shadow-sm"
+              style={{ fontFamily: 'Roboto, sans-serif' }}
             >
               Apply Filters
             </button>
@@ -734,18 +917,28 @@ const Bookmarks = () => {
       )}
 
       {/* Folders */}
-      {!currentFolder && (
-        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Folders</h2>
+      {!currentFolder && folders.length > 0 && (
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>Folders</h2>
+            <button
+              onClick={() => setShowCreateFolder(true)}
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center"
+              style={{ fontFamily: 'Roboto, sans-serif' }}
+            >
+              <FolderPlus className="h-4 w-4 mr-1" />
+              New Folder
+            </button>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             {folders.map((folder) => (
               <button
                 key={folder.id}
                 onClick={() => setCurrentFolder(folder)}
-                className="flex flex-col items-center p-4 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-colors group"
+                className="flex flex-col items-center p-4 rounded-xl border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group hover:shadow-md"
               >
                 <div 
-                  className="p-3 rounded-lg mb-2"
+                  className="p-3 rounded-lg mb-2 transition-transform group-hover:scale-110"
                   style={{ backgroundColor: (folder.color || '#1E65AD') + '20' }}
                 >
                   <Folder 
@@ -753,10 +946,10 @@ const Bookmarks = () => {
                     style={{ color: folder.color || '#1E65AD' }}
                   />
                 </div>
-                <h3 className="font-medium text-gray-900 text-sm text-center group-hover:text-blue-700">
+                <h3 className="font-medium text-gray-900 text-sm text-center group-hover:text-blue-700 mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   {folder.name}
                 </h3>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   {folder.item_count || 0} items
                 </p>
               </button>
@@ -767,16 +960,19 @@ const Bookmarks = () => {
 
       {/* Current Folder Header */}
       {currentFolder && (
-        <div className="flex items-center justify-between bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+        <div className="flex items-center justify-between bg-white rounded-xl p-5 shadow-sm border border-gray-200">
           <div className="flex items-center">
             <button
               onClick={() => setCurrentFolder(null)}
-              className="mr-3 p-1 hover:bg-gray-100 rounded"
+              className="mr-4 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              title="Back to all folders"
             >
-              ←
+              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
             </button>
             <div 
-              className="p-2 rounded-lg mr-3"
+              className="p-3 rounded-lg mr-3"
               style={{ backgroundColor: (currentFolder.color || '#1E65AD') + '20' }}
             >
               <Folder 
@@ -785,9 +981,9 @@ const Bookmarks = () => {
               />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">{currentFolder.name}</h2>
-              <p className="text-sm text-gray-500">
-                {sortedBookmarks.length} bookmarks
+              <h2 className="text-lg font-semibold text-gray-900 mb-1" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>{currentFolder.name}</h2>
+              <p className="text-sm text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                {sortedBookmarks.length} bookmark{sortedBookmarks.length !== 1 ? 's' : ''}
               </p>
             </div>
           </div>
@@ -795,36 +991,53 @@ const Bookmarks = () => {
       )}
 
       {/* Bookmarks Grid/List */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {loading && bookmarks.length === 0 ? (
-          <div className="p-12 text-center">
-            <Loader2 className="h-8 w-8 text-blue-600 mx-auto mb-4 animate-spin" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Loading bookmarks...</h3>
-            <p className="text-gray-500">Please wait while we fetch your bookmarks</p>
+          <div className="p-16 text-center">
+            <Loader2 className="h-10 w-10 text-blue-600 mx-auto mb-4 animate-spin" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>Loading bookmarks...</h3>
+            <p className="text-gray-500 text-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>Please wait while we fetch your bookmarks</p>
           </div>
         ) : sortedBookmarks.length === 0 ? (
-          <div className="p-12 text-center">
-            <Bookmark className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No bookmarks found</h3>
-            <p className="text-gray-500">
+          <div className="p-16 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+              <Bookmark className="h-8 w-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>No bookmarks found</h3>
+            <p className="text-gray-500 text-sm mb-4" style={{ fontFamily: 'Roboto, sans-serif' }}>
               {searchQuery ? 'Try adjusting your search criteria' : 'Start by adding some bookmarks'}
             </p>
+            {!searchQuery && (
+              <button
+                onClick={() => setShowAddBookmark(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                style={{ fontFamily: 'Roboto, sans-serif' }}
+              >
+                Add Your First Bookmark
+              </button>
+            )}
           </div>
         ) : (
           <>
             {/* Bulk Actions */}
             {selectedItems.length > 0 && (
-              <div className="p-4 bg-blue-50 border-b border-gray-200">
+              <div className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-blue-700">
+                  <span className="text-sm font-medium text-blue-800" style={{ fontFamily: 'Roboto, sans-serif' }}>
                     {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} selected
                   </span>
                   <div className="flex items-center space-x-2">
-                    <button className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">
+                    <button 
+                      className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
+                      style={{ fontFamily: 'Roboto, sans-serif' }}
+                    >
                       Move to Folder
                     </button>
-                    <button className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700">
-                      Delete
+                    <button 
+                      className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium shadow-sm"
+                      style={{ fontFamily: 'Roboto, sans-serif' }}
+                    >
+                      Delete Selected
                     </button>
                   </div>
                 </div>
@@ -837,17 +1050,23 @@ const Bookmarks = () => {
                   {sortedBookmarks.map((bookmark) => (
                     <div
                       key={bookmark.id}
-                      className={`relative border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer ${
-                        selectedItems.includes(bookmark.id) ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                      className={`relative bg-white border rounded-xl p-5 hover:shadow-lg transition-all duration-200 cursor-pointer group ${
+                        selectedItems.includes(bookmark.id) ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200' : 'border-gray-200 hover:border-gray-300'
                       }`}
-                      onClick={() => handleSelectItem(bookmark.id)}
+                      onClick={(e) => {
+                        // Only select if clicking on the card itself, not on buttons
+                        if (e.target.closest('button') || e.target.closest('input')) {
+                          return;
+                        }
+                        handleViewBookmark(bookmark);
+                      }}
                     >
                       {/* Selection Checkbox */}
                       <input
                         type="checkbox"
                         checked={selectedItems.includes(bookmark.id)}
                         onChange={() => handleSelectItem(bookmark.id)}
-                        className="absolute top-2 left-2"
+                        className="absolute top-3 left-3 w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer"
                         onClick={(e) => e.stopPropagation()}
                       />
 
@@ -857,74 +1076,88 @@ const Bookmarks = () => {
                           e.stopPropagation();
                           handleToggleFavorite(bookmark.id);
                         }}
-                        className="absolute top-2 right-2 p-1 hover:bg-gray-100 rounded"
+                        className="absolute top-3 right-3 p-1.5 hover:bg-gray-100 rounded-lg transition-colors z-10"
+                        title={bookmark.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
                       >
                         {bookmark.is_favorite ? (
                           <Star className="h-4 w-4 text-yellow-500 fill-current" />
                         ) : (
-                          <StarOff className="h-4 w-4 text-gray-400" />
+                          <StarOff className="h-4 w-4 text-gray-400 group-hover:text-yellow-400" />
                         )}
                       </button>
 
                       {/* File Icon */}
-                      <div className="flex justify-center mb-3">
-                        {getFileIcon(bookmark.type)}
+                      <div className="flex justify-center mb-4 mt-2">
+                        <div className={`p-3 rounded-lg ${
+                          bookmark.type === 'judgement' ? 'bg-blue-50' :
+                          bookmark.type === 'central_act' || bookmark.type === 'state_act' ? 'bg-green-50' :
+                          'bg-purple-50'
+                        }`}>
+                          {getFileIcon(bookmark.type)}
+                        </div>
                       </div>
 
                       {/* Bookmark Info */}
                       <div className="text-center">
-                        <h3 className="font-medium text-gray-900 text-sm mb-1 line-clamp-2">
+                        <h3 className="font-semibold text-gray-900 text-sm mb-2 line-clamp-2 min-h-[2.5rem]" style={{ fontFamily: 'Roboto, sans-serif' }}>
                           {(bookmark.item || bookmark).title || 'Untitled'}
                         </h3>
-                        <p className="text-xs text-gray-500 mb-2 line-clamp-2">
-                          {(bookmark.item || bookmark).description || ''}
-                        </p>
+                        
+                        {/* Type Badge */}
+                        <div className="mb-3">
+                          <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${
+                            bookmark.type === 'judgement' ? 'bg-blue-100 text-blue-800' :
+                            bookmark.type === 'central_act' || bookmark.type === 'state_act' ? 'bg-green-100 text-green-800' :
+                            'bg-purple-100 text-purple-800'
+                          }`} style={{ fontFamily: 'Roboto, sans-serif' }}>
+                            {bookmark.type.replace('_', ' ').replace('mapping', '').trim()}
+                          </span>
+                        </div>
                         
                         {/* Tags */}
-                        <div className="flex flex-wrap justify-center gap-1 mb-2">
-                          {(bookmark.tags || []).slice(0, 2).map((tag, index) => (
-                            <span
-                              key={index}
-                              className="inline-flex px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                          {(bookmark.tags || []).length > 2 && (
-                            <span className="text-xs text-gray-400">
-                              +{(bookmark.tags || []).length - 2}
-                            </span>
-                          )}
-                        </div>
+                        {(bookmark.tags || []).length > 0 && (
+                          <div className="flex flex-wrap justify-center gap-1 mb-3">
+                            {(bookmark.tags || []).slice(0, 2).map((tag, index) => (
+                              <span
+                                key={index}
+                                className="inline-flex px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded-md"
+                                style={{ fontFamily: 'Roboto, sans-serif' }}
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                            {(bookmark.tags || []).length > 2 && (
+                              <span className="text-xs text-gray-400" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                                +{(bookmark.tags || []).length - 2}
+                              </span>
+                            )}
+                          </div>
+                        )}
 
-                        <div className="flex items-center justify-between text-xs text-gray-500">
-                          <span>{(bookmark.item || bookmark).source || 'Unknown'}</span>
-                          <span>{formatDate(bookmark.created_at || bookmark.dateAdded)}</span>
+                        <div className="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          <span className="truncate">{formatDate(bookmark.created_at || bookmark.dateAdded)}</span>
                         </div>
                       </div>
 
                       {/* Actions */}
-                      <div className="absolute bottom-2 right-2">
-                        <div className="flex space-x-1">
+                      <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex space-x-1 bg-white rounded-lg shadow-md p-1">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              const url = (bookmark.item || bookmark).url || bookmark.url;
-                              if (url) {
-                                window.open(url, '_blank');
-                              }
+                              handleViewBookmark(bookmark);
                             }}
-                            className="p-1 hover:bg-gray-100 rounded"
+                            className="p-1.5 hover:bg-blue-50 rounded transition-colors"
                             title="View"
                           >
-                            <Eye className="h-4 w-4 text-gray-600" />
+                            <Eye className="h-4 w-4 text-blue-600" />
                           </button>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDeleteBookmark(bookmark.id);
+                              handleDeleteBookmark(bookmark);
                             }}
-                            className="p-1 hover:bg-red-100 rounded"
+                            className="p-1.5 hover:bg-red-50 rounded transition-colors"
                             title="Delete"
                           >
                             <Trash2 className="h-4 w-4 text-red-600" />
@@ -1027,19 +1260,14 @@ const Bookmarks = () => {
                               <Star className="h-4 w-4" />
                             </button>
                             <button
-                              onClick={() => {
-                                const url = (bookmark.item || bookmark).url || bookmark.url;
-                                if (url) {
-                                  window.open(url, '_blank');
-                                }
-                              }}
+                              onClick={() => handleViewBookmark(bookmark)}
                               className="text-blue-600 hover:text-blue-900"
                               title="View"
                             >
                               <Eye className="h-4 w-4" />
                             </button>
                             <button
-                              onClick={() => handleDeleteBookmark(bookmark.id)}
+                              onClick={() => handleDeleteBookmark(bookmark)}
                               className="text-red-600 hover:text-red-900"
                               title="Delete"
                             >

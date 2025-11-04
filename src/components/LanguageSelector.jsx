@@ -97,77 +97,129 @@ const LanguageSelector = () => {
 
   return (
     <>
+      <style>{`
+        .gradient-border-wrapper {
+          position: relative;
+          border-radius: 12px;
+          padding: 3px;
+          display: inline-block;
+          width: 100%;
+        }
+        
+        .gradient-border-wrapper::before {
+          content: '';
+          position: absolute;
+          inset: -3px;
+          border-radius: 15px;
+          background: conic-gradient(
+            from 0deg,
+            #ff6b9d,
+            #ff8c42,
+            #ffd93d,
+            #6bcf7f,
+            #4dabf7,
+            #9775fa,
+            #ff6b9d
+          );
+          z-index: -2;
+        }
+        
+        .gradient-border-wrapper::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 12px;
+          background: white;
+          z-index: -1;
+        }
+        
+        .gradient-border-inner {
+          background: transparent;
+          border-radius: 9px;
+          width: 100%;
+          height: 100%;
+          position: relative;
+          z-index: 1;
+        }
+      `}</style>
       <div className="relative" ref={dropdownRef}>
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          onKeyDown={handleKeyDown}
-          className="flex items-center justify-between gap-1.5 px-2.5 py-1.5 rounded-lg border-2 transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          style={{ 
-            color: '#FFFFFF',
-            fontFamily: 'Roboto, sans-serif',
-            background: isOpen 
-              ? 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)' 
-              : 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)',
-            borderColor: isOpen ? '#CF9B63' : '#1E65AD',
-            minHeight: '50px',
-            minWidth: '70px',
-            boxShadow: isOpen ? '0 4px 15px rgba(30, 101, 173, 0.4)' : '0 2px 8px rgba(30, 101, 173, 0.3)'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'linear-gradient(135deg, #CF9B63 0%, #1E65AD 100%)';
-            e.currentTarget.style.boxShadow = '0 6px 20px rgba(207, 155, 99, 0.5)';
-            e.currentTarget.style.transform = 'translateY(-2px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)';
-            e.currentTarget.style.boxShadow = isOpen ? '0 4px 15px rgba(30, 101, 173, 0.4)' : '0 2px 8px rgba(30, 101, 173, 0.3)';
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
-          aria-label={`Current language: ${currentLanguage.name}. Click to change language.`}
-          aria-expanded={isOpen}
-          aria-haspopup="listbox"
-        >
-          <div className="flex items-center gap-1.5">
-            <span className="text-base" aria-hidden="true">
-              {currentLanguage.flag}
-            </span>
-            <span className="text-xs font-semibold">{currentLanguage.display}</span>
+        <div className="gradient-border-wrapper">
+          <div className="gradient-border-inner">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              onKeyDown={handleKeyDown}
+              className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full relative z-10"
+              style={{ 
+                color: '#1E65AD',
+                fontFamily: 'Roboto, sans-serif',
+                background: 'white',
+                minHeight: '38px',
+              }}
+              aria-label={`Current language: ${currentLanguage.name}. Click to change language.`}
+              aria-expanded={isOpen}
+              aria-haspopup="listbox"
+            >
+              <div className="flex items-center gap-2">
+                {/* Globe Icon */}
+                <svg 
+                  className="w-4 h-4 flex-shrink-0"
+                  style={{ color: '#1E65AD' }}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                
+                {/* Language Code and Name */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                    {currentLanguage.langCode}
+                  </span>
+                  <span className="text-xs font-medium" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                    {currentLanguage.name}
+                  </span>
+                </div>
+              </div>
+              
+              {/* Chevron Icon */}
+              <svg 
+                className={`w-3.5 h-3.5 transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
+                style={{ color: '#1E65AD' }}
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
           </div>
-          <svg 
-            className={`w-3 h-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-            style={{ color: '#FFFFFF' }}
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
+        </div>
 
       {/* Dropdown Menu */}
       {isOpen && (
         <div 
-          className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-2xl border-2 overflow-hidden z-50 transition-all duration-200 ease-out opacity-100 transform scale-100"
+          className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-2xl overflow-hidden z-50 transition-all duration-200 ease-out flex"
           style={{ 
-            borderColor: '#1E65AD',
             backgroundColor: '#FFFFFF',
-            boxShadow: '0 20px 40px rgba(30, 101, 173, 0.2)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
             maxHeight: '400px',
-            overflowY: 'auto'
           }}
           role="listbox"
           aria-label="Language selection"
         >
-          {/* Dropdown Header */}
-          <div className="px-4 py-3 border-b-2 bg-gradient-to-r from-blue-50 to-blue-100" style={{ borderColor: '#E5E7EB' }}>
-            <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
-              Select Language
-            </h3>
-          </div>
-
+          {/* Gradient Left Border */}
+          <div 
+            className="w-1 flex-shrink-0"
+            style={{
+              background: 'linear-gradient(180deg, #ff6b9d 0%, #ff8c42 20%, #ffd93d 40%, #6bcf7f 60%, #4dabf7 80%, #9775fa 100%)',
+            }}
+          />
+          
           {/* Language List */}
-          <div className="py-2">
+          <div className="flex-1 py-2 overflow-y-auto">
             {languages.map((language, index) => {
               const isSelected = currentLang.toLowerCase() === language.code.toLowerCase();
               return (
@@ -184,62 +236,38 @@ const LanguageSelector = () => {
                       setIsOpen(false);
                     }
                   }}
-                  className={`w-full text-left px-4 py-3 transition-all duration-150 flex items-center gap-3 focus:outline-none focus:bg-blue-50 ${
+                  className={`w-full text-left px-4 py-3 transition-all duration-150 flex items-center justify-between gap-3 focus:outline-none ${
                     isSelected 
-                      ? 'bg-blue-50 border-l-4' 
-                      : 'hover:bg-gray-50 border-l-4 border-transparent'
+                      ? 'bg-gray-50' 
+                      : 'hover:bg-gray-50'
                   }`}
                   style={{ 
                     fontFamily: 'Roboto, sans-serif',
-                    backgroundColor: isSelected ? '#F0F7FF' : 'transparent',
-                    borderLeftColor: isSelected ? '#1E65AD' : 'transparent'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isSelected) {
-                      e.currentTarget.style.backgroundColor = '#F9FAFB';
-                      e.currentTarget.style.borderLeftColor = '#E5E7EB';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isSelected) {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.borderLeftColor = 'transparent';
-                    }
+                    backgroundColor: isSelected ? '#F9FAFB' : 'transparent',
                   }}
                   role="option"
                   aria-selected={isSelected}
                 >
-                  <span className="text-2xl flex-shrink-0" aria-hidden="true">{language.flag}</span>
-                  <div className="flex-1 min-w-0">
-                    <div 
-                      className="font-semibold truncate"
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <span className="text-sm font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                      {language.langCode}
+                    </span>
+                    <span 
+                      className="text-sm font-medium truncate"
                       style={{ 
-                        color: isSelected ? '#1E65AD' : '#374151',
-                        fontFamily: isSelected 
-                          ? 'Helvetica Hebrew Bold, sans-serif' 
-                          : 'Roboto, sans-serif',
-                        fontSize: '14px'
+                        color: '#1E65AD',
+                        fontFamily: 'Roboto, sans-serif',
                       }}
                     >
                       {language.name}
-                    </div>
-                    <div 
-                      className="text-xs mt-0.5"
-                      style={{ color: '#6B7280' }}
-                    >
-                      {language.langCode} • {language.country}
-                    </div>
+                    </span>
                   </div>
                   {isSelected && (
-                    <svg 
-                      className="w-5 h-5 flex-shrink-0" 
-                      style={{ color: '#1E65AD' }} 
-                      fill="currentColor" 
-                      viewBox="0 0 20 20" 
+                    <div 
+                      className="w-2 h-2 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: '#ff6b9d' }}
                       aria-hidden="true"
-                    >
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+                    />
                   )}
                 </button>
               );

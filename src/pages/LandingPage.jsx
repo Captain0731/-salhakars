@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero";
+import Stats from "../components/landing/Stats";
 import Features from "../components/landing/Features";
 import VideoSection from "../components/landing/VideoSection";
 import Testimonials from "../components/landing/Testimonials";
@@ -16,6 +17,7 @@ function LandingPage() {
       <div id="features">
         <Features />
       </div>
+      <Stats />
       <VideoSection />
       <Testimonials />
       <div id="blogs">

@@ -25,7 +25,6 @@ export default function ViewPDF() {
     // Get act or judgment data from location state
     const actData = location.state?.act;
     const judgmentData = location.state?.judgment;
-    console.log("=-=-=-=-=", judgmentData)
    
     if (judgmentData) {
       setJudgmentInfo(judgmentData);
@@ -94,10 +93,10 @@ export default function ViewPDF() {
     return (
       <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
         <Navbar />
-        <div className="flex justify-center items-center h-96">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-            <p className="mt-2 text-gray-600">Loading PDF...</p>
+        <div className="pt-16 sm:pt-20 flex justify-center items-center h-96">
+          <div className="text-center px-4">
+            <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2 border-gray-900 mx-auto"></div>
+            <p className="mt-3 sm:mt-4 text-gray-600 text-sm sm:text-base">Loading PDF...</p>
           </div>
         </div>
       </div>
@@ -108,13 +107,14 @@ export default function ViewPDF() {
     return (
       <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
         <Navbar />
-        <div className="flex justify-center items-center h-96">
-          <div className="text-center">
-            <div className="text-red-600 text-lg mb-4">Error loading PDF</div>
-            <p className="text-gray-600 mb-4">{error}</p>
+        <div className="pt-16 sm:pt-20 flex justify-center items-center h-96 px-4">
+          <div className="text-center max-w-md w-full">
+            <div className="text-red-600 text-base sm:text-lg mb-3 sm:mb-4 font-semibold">Error loading PDF</div>
+            <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">{error}</p>
             <button
               onClick={() => navigate(-1)}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-5 sm:px-6 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base font-medium"
+              style={{ fontFamily: 'Roboto, sans-serif' }}
             >
               Go Back
             </button>
@@ -127,7 +127,7 @@ export default function ViewPDF() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
-      <div className="pt-20">
+      <div className="pt-16 sm:pt-20">
       
       {/* PDF Translator Component - Handles PDF translation */}
       <PDFTranslator 
@@ -136,15 +136,15 @@ export default function ViewPDF() {
       />
 
       {/* Responsive Layout: Stacked on mobile, side-by-side on desktop */}
-      <div className="flex-1 p-3 sm:p-4 lg:p-6" style={{ minHeight: 'calc(100vh - 80px)' }}>
+      <div className="flex-1 p-2 sm:p-3 md:p-4 lg:p-6" style={{ minHeight: 'calc(100vh - 80px)' }}>
         <div className="max-w-7xl mx-auto h-full">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 h-full">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 h-full">
             {/* Details - Left Side */}
-            <div className="lg:col-span-1 order-2 lg:order-1">
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 h-full max-h-96 lg:max-h-none overflow-y-auto">
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+            <div className="lg:col-span-1 order-1 lg:order-1">
+              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-3 sm:p-4 md:p-6 h-auto lg:h-full max-h-[45vh] sm:max-h-96 lg:max-h-none overflow-y-auto">
+                <div className="mb-4 sm:mb-6">
+                  <div className="flex items-center justify-between mb-2 sm:mb-3">
+                    <h3 className="text-base sm:text-lg md:text-xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                       {location.state?.act ? 'Act Details' : 'Judgment Details'}
                     </h3>
                     {isAuthenticated && !location.state?.act && judgmentInfo && (
@@ -156,10 +156,10 @@ export default function ViewPDF() {
                       />
                     )}
                   </div>
-                  <div className="w-12 h-1 bg-gradient-to-r" style={{ background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)' }}></div>
+                  <div className="w-10 sm:w-12 h-0.5 sm:h-1 bg-gradient-to-r" style={{ background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)' }}></div>
                 </div>
 
-                <div className="space-y-4 sm:space-y-6">
+                <div className="space-y-3 sm:space-y-4 md:space-y-6">
                   {/* Title */}
                   <div>
                     <h4 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
@@ -310,14 +310,14 @@ export default function ViewPDF() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
+                <div className="mt-4 sm:mt-6 md:mt-8 pt-3 sm:pt-4 md:pt-6 border-t border-gray-200">
                   <div className="space-y-2 sm:space-y-3">
                     <button
                       onClick={() => navigate(-1)}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium shadow-sm hover:shadow-md flex items-center justify-center gap-2 text-xs sm:text-sm"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 border-2 border-gray-300 text-gray-700 rounded-lg sm:rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium shadow-sm hover:shadow-md flex items-center justify-center gap-2 text-xs sm:text-sm"
                       style={{ fontFamily: 'Roboto, sans-serif' }}
                     >
-                      <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                       </svg>
                       Back to Results
@@ -328,15 +328,16 @@ export default function ViewPDF() {
             </div>
 
             {/* PDF Viewer - Right Side */}
-            <div className="lg:col-span-2 order-1 lg:order-2">
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden h-96 sm:h-[500px] lg:h-full">
+            <div className="lg:col-span-2 order-2 lg:order-2">
+              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 overflow-hidden h-[calc(100vh-350px)] sm:h-[500px] md:h-[600px] lg:h-full min-h-[450px] sm:min-h-[500px]">
                 {pdfUrl && pdfUrl.trim() !== "" ? (
-                  <div className="relative h-full" style={{ minHeight: '300px' }}>
+                  <div className="relative h-full w-full" style={{ minHeight: '400px' }}>
                     {/* PDF Embed - Try iframe first, fallback to button */}
                     <iframe
                       src={`${translatedPdfUrl || pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&page=${currentPage}&zoom=${zoom}`}
                       className="w-full h-full border-0 rounded-lg"
                       title={location.state?.act ? 'Act PDF' : 'Judgment PDF'}
+                      style={{ minHeight: '400px', width: '100%' }}
                       onLoad={() => {
                         setLoading(false);
                         setIsTranslating(false);
@@ -352,24 +353,24 @@ export default function ViewPDF() {
                     
                     {/* Fallback PDF Access - Show when iframe fails */}
                     {translationError && (
-                      <div className="absolute inset-0 bg-white flex items-center justify-center p-4 sm:p-8">
-                        <div className="text-center max-w-md">
-                          <div className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 rounded-full bg-gradient-to-br flex items-center justify-center" 
+                      <div className="absolute inset-0 bg-white flex items-center justify-center p-3 sm:p-4 md:p-8">
+                        <div className="text-center max-w-md w-full px-2">
+                          <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-24 md:h-24 mx-auto mb-3 sm:mb-4 md:mb-6 rounded-full bg-gradient-to-br flex items-center justify-center" 
                                style={{ background: 'linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)' }}>
-                            <svg className="w-8 h-8 sm:w-12 sm:h-12" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-7 h-7 sm:w-8 sm:h-8 md:w-12 md:h-12" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                           </div>
-                          <h3 className="text-lg sm:text-2xl font-bold mb-3 sm:mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                          <h3 className="text-base sm:text-lg md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4 px-2" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                             {location.state?.act ? 'Act PDF Document' : 'Judgment PDF Document'}
                           </h3>
-                          <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          <p className="text-xs sm:text-sm md:text-base text-gray-600 mb-3 sm:mb-4 md:mb-6 px-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                             The PDF cannot be embedded due to security restrictions. Click the button below to view the {location.state?.act ? 'act' : 'judgment'} PDF document in a new tab.
                           </p>
-                          <div className="space-y-2 sm:space-y-3">
+                          <div className="space-y-2 sm:space-y-3 px-2">
                             <button
                               onClick={() => window.open(translatedPdfUrl || pdfUrl, '_blank')}
-                              className="w-full px-4 sm:px-8 py-3 sm:py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-lg hover:shadow-xl flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base"
+                              className="w-full px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-lg hover:shadow-xl flex items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm md:text-base"
                               style={{ fontFamily: 'Roboto, sans-serif' }}
                             >
                               <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -384,9 +385,9 @@ export default function ViewPDF() {
 
                     {/* Translation Status Indicator */}
                     {isTranslating && (
-                      <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-blue-100 border border-blue-300 text-blue-700 px-2 sm:px-3 py-1 sm:py-2 rounded-lg text-xs sm:text-sm font-medium shadow-lg z-10">
+                      <div className="absolute top-2 right-2 sm:top-3 md:top-4 sm:right-3 md:right-4 bg-blue-100 border border-blue-300 text-blue-700 px-2 sm:px-2.5 md:px-3 py-1 sm:py-1.5 md:py-2 rounded-lg text-xs sm:text-sm font-medium shadow-lg z-10 max-w-[calc(100%-1rem)] sm:max-w-none">
                         <div className="flex items-center gap-1 sm:gap-2">
-                          <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-blue-600 border-t-transparent"></div>
+                          <div className="animate-spin rounded-full h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 border-2 border-blue-600 border-t-transparent flex-shrink-0"></div>
                           <span className="hidden sm:inline">Translating PDF...</span>
                           <span className="sm:hidden">Translating...</span>
                         </div>
@@ -398,9 +399,9 @@ export default function ViewPDF() {
 
                     {/* Translation Error Indicator */}
                     {translationError && !error && (
-                      <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-yellow-100 border border-yellow-300 text-yellow-700 px-2 sm:px-3 py-1 sm:py-2 rounded-lg text-xs sm:text-sm font-medium shadow-lg z-10">
+                      <div className="absolute top-2 right-2 sm:top-3 md:top-4 sm:right-3 md:right-4 bg-yellow-100 border border-yellow-300 text-yellow-700 px-2 sm:px-2.5 md:px-3 py-1 sm:py-1.5 md:py-2 rounded-lg text-xs sm:text-sm font-medium shadow-lg z-10 max-w-[calc(100%-1rem)] sm:max-w-none">
                         <div className="flex items-center gap-1 sm:gap-2">
-                          <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                           </svg>
                           <span className="hidden sm:inline">Fast fallback - showing original</span>
@@ -412,15 +413,15 @@ export default function ViewPDF() {
                     {/* Loading Overlay */}
                     {loading && (
                       <div className="absolute inset-0 bg-gradient-to-br from-white to-gray-50 flex items-center justify-center rounded-lg">
-                        <div className="text-center p-4">
+                        <div className="text-center p-3 sm:p-4 md:p-6">
                           <div className="relative">
-                            <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-4 border-gray-200 mx-auto"></div>
-                            <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-4 border-transparent border-t-blue-600 absolute top-0 left-0"></div>
+                            <div className="animate-spin rounded-full h-7 w-7 sm:h-8 sm:w-8 md:h-12 md:w-12 border-4 border-gray-200 mx-auto"></div>
+                            <div className="animate-spin rounded-full h-7 w-7 sm:h-8 sm:w-8 md:h-12 md:w-12 border-4 border-transparent border-t-blue-600 absolute top-0 left-0"></div>
                           </div>
-                          <p className="mt-3 sm:mt-4 text-gray-600 font-medium text-sm sm:text-base" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          <p className="mt-2 sm:mt-3 md:mt-4 text-gray-600 font-medium text-xs sm:text-sm md:text-base px-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                             {translatedPdfUrl !== pdfUrl ? 'Loading Translated PDF...' : 'Loading PDF Document...'}
                           </p>
-                          <p className="mt-1 text-xs sm:text-sm text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          <p className="mt-1 text-xs sm:text-sm text-gray-500 px-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                             {translatedPdfUrl !== pdfUrl ? 'Please wait while we load the translated document' : 'Please wait while we prepare the document'}
                           </p>
                         </div>
@@ -428,18 +429,18 @@ export default function ViewPDF() {
                     )}
                   </div>
                 ) : (
-                  <div className="flex items-center justify-center h-96">
-                    <div className="text-center p-4 sm:p-8">
-                      <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 rounded-full bg-gradient-to-br flex items-center justify-center" 
+                  <div className="flex items-center justify-center h-[calc(100vh-350px)] sm:h-[500px] md:h-[600px] min-h-[450px] sm:min-h-[500px]">
+                    <div className="text-center p-3 sm:p-4 md:p-8">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 mx-auto mb-2 sm:mb-3 md:mb-4 rounded-full bg-gradient-to-br flex items-center justify-center" 
                            style={{ background: 'linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)' }}>
-                        <svg className="w-8 h-8 sm:w-10 sm:h-10" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                       </div>
-                      <h3 className="text-lg sm:text-xl font-bold mb-2" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                      <h3 className="text-base sm:text-lg md:text-xl font-bold mb-1 sm:mb-2 px-2" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                         PDF Not Available
                       </h3>
-                      <p className="text-gray-600 text-xs sm:text-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      <p className="text-gray-600 text-xs sm:text-sm px-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         This {location.state?.act ? 'act' : 'judgment'} does not have a PDF document available.
                       </p>
                     </div>

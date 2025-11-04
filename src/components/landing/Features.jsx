@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import useScrollAnimation from "../../hooks/useScrollAnimation";
 
-// Separate component for feature cards with unique modern design
+// Separate component for feature cards with clean modern design
 const FeatureCard = ({ feature, index, onClick }) => {
   const { ref: featureRef, isVisible: isFeatureVisible } = useScrollAnimation({ 
     threshold: 0.2, 
@@ -12,20 +12,32 @@ const FeatureCard = ({ feature, index, onClick }) => {
   
   const [isHovered, setIsHovered] = React.useState(false);
 
-  // Unique icons for each feature
-  const icons = {
-    1: "⚖️",
-    2: "🔗",
-    3: "📚",
-    4: "📄",
-    5: "🤖",
-    6: "🎬"
+  // Determine colors for each card based on feature ID
+  const getCardColors = (id) => {
+    switch(id) {
+      case 1: // Legal Judgment
+        return { linkColor: '#1E65AD', buttonBg: '#E5E7EB', buttonIcon: '#6B7280' };
+      case 2: // Law Mapping
+        return { linkColor: '#CF9B63', buttonBg: '#FED7AA', buttonIcon: '#CF9B63' };
+      case 3: // Law Library
+        return { linkColor: '#1E65AD', buttonBg: '#E5E7EB', buttonIcon: '#6B7280' };
+      case 4: // Legal Templates
+        return { linkColor: '#1E65AD', buttonBg: '#1E65AD', buttonIcon: '#FFFFFF' };
+      case 5: // Smart Dashboard
+        return { linkColor: '#CF9B63', buttonBg: '#FED7AA', buttonIcon: '#CF9B63' };
+      case 6: // YouTube Summarizer
+        return { linkColor: '#1E65AD', buttonBg: '#E5E7EB', buttonIcon: '#6B7280' };
+      default:
+        return { linkColor: '#1E65AD', buttonBg: '#E5E7EB', buttonIcon: '#6B7280' };
+    }
   };
+
+  const colors = getCardColors(feature.id);
 
   return (
     <div
       ref={featureRef}
-      className={`group cursor-pointer transform transition-all duration-500 flex ${
+      className={`group cursor-pointer transform transition-all duration-300 flex ${
         isFeatureVisible 
           ? 'opacity-100 translate-y-0 scale-100' 
           : 'opacity-0 translate-y-12 scale-90'
@@ -35,67 +47,35 @@ const FeatureCard = ({ feature, index, onClick }) => {
       onMouseLeave={() => setIsHovered(false)}
       style={{ 
         transitionDelay: `${index * 80}ms`,
-        perspective: '1000px'
+        cursor: 'pointer'
       }}
     >
       <div 
         className="relative w-full flex flex-col overflow-hidden"
-        // style={{
-        //   transformStyle: 'preserve-3d',
-        //   transform: isHovered ? 'rotateY(5deg) rotateX(-5deg)' : 'rotateY(0deg) rotateX(0deg)',
-        //   transition: 'transform 0.5s cubic-bezier(0.23, 1, 0.32, 1)'
-        // }}
+        style={{
+          transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+          transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+        }}
       >
-        {/* Glassmorphism Card with Gradient Background */}
+        {/* Clean White Card */}
         <div 
-          className="relative rounded-3xl sm:rounded-[2rem] flex flex-col flex-grow backdrop-blur-xl border border-white/200  overflow-hidden"
-          // style={{
-          //   background: isHovered 
-          //     ? `linear-gradient(145deg, ${feature.color}15 0%, ${feature.secondaryColor}25 50%, ${feature.color}15 100%)`
-          //     : `linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%)`,
-          //   boxShadow: isHovered 
-          //     ? `0 20px 60px -15px ${feature.color}40, 0 0 30px ${feature.color}20, inset 0 1px 0 rgba(255, 255, 255, 0.6)`
-          //     : '0 10px 40px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)',
-          //   transition: 'all 0.5s cubic-bezier(0.23, 1, 0.32, 1)'
-          // }}
+          className="relative rounded-2xl sm:rounded-3xl flex flex-col flex-grow bg-white overflow-hidden"
+          style={{
+            boxShadow: isHovered 
+              ? '0 20px 40px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)'
+              : '0 4px 20px -5px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+            transition: 'box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}
         >
-          {/* Animated Gradient Overlay */}
-          <div 
-            // className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-            // style={{
-            //   background: `linear-gradient(135deg, ${feature.color}08 0%, ${feature.secondaryColor}12 50%, ${feature.color}08 100%)`,
-            //   backgroundSize: '200% 200%',
-            //   animation: isHovered ? 'gradientShift 3s ease infinite' : 'none'
-            // }}
-          />
-
-          {/* Floating Icon Badge */}
-            {/* <div 
-              className="absolute -top-4 -right-4 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center text-2xl sm:text-3xl transition-all duration-500 z-10"
-              style={{
-                background: `linear-gradient(135deg, ${feature.color} 0%, ${feature.secondaryColor} 100%)`,
-                boxShadow: `0 8px 25px ${feature.color}40, inset 0 2px 8px rgba(255, 255, 255, 0.3)`,
-                transform: isHovered ? 'translate(3px, 3px) scale(1.1) rotate(10deg)' : 'translate(0, 0) scale(1) rotate(0deg)'
-              }}
-            >
-              <span className="relative z-10">{icons[feature.id] || "✨"}</span>
-              <div 
-                className="absolute inset-0 rounded-full animate-ping opacity-20"
-                style={{ backgroundColor: feature.color }}
-              />
-            </div> */}
-
           {/* Content Container */}
-          <div className="p-4 sm:p-6 md:p-7 flex flex-col flex-grow relative z-10 pt-12 sm:pt-14">
+          <div className="p-6 sm:p-8 flex flex-col flex-grow relative z-10">
             {/* Title */}
             <h3 
-              className="text-lg sm:text-xl md:text-2xl font-semibold mb-2 sm:mb-3 leading-tight transition-all duration-300"
+              className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 leading-tight"
               style={{ 
-                color: isHovered ? feature.color : '#1E65AD',
+                color: '#1E65AD',
                 fontFamily: 'Helvetica Hebrew Bold, sans-serif',
-                transform: isHovered ? 'translateX(5px)' : 'translateX(0)',
-                textShadow: isHovered ? `0 2px 10px ${feature.color}30` : 'none',
-                fontWeight: 600
+                fontWeight: 700
               }}
             >
               {feature.title}
@@ -103,83 +83,59 @@ const FeatureCard = ({ feature, index, onClick }) => {
 
             {/* Description */}
             <p 
-              className="text-xs sm:text-sm text-gray-600 leading-relaxed mb-4 sm:mb-5 flex-grow transition-colors duration-300"
+              className="text-sm sm:text-base text-gray-500 leading-relaxed mb-6 sm:mb-8 flex-grow"
               style={{ 
                 fontFamily: 'Roboto, sans-serif',
-                color: isHovered ? '#4B5563' : '#6B7280'
+                color: '#6B7280',
+                lineHeight: '1.6'
               }}
             >
               {feature.description}
             </p>
 
-            {/* Interactive Footer */}
-            <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-200/50">
+            {/* Footer with Explore Feature Link and Circular Button */}
+            <div className="flex items-center justify-between mt-auto">
               <span 
-                className="text-xs sm:text-sm font-normal transition-all duration-300 inline-flex items-center gap-2"
+                className="text-sm sm:text-base font-medium transition-all duration-300"
                 style={{ 
-                  color: feature.color,
+                  color: colors.linkColor,
                   fontFamily: 'Roboto, sans-serif',
-                  transform: isHovered ? 'translateX(5px)' : 'translateX(0)',
-                  fontWeight: 400
+                  fontWeight: 500
                 }}
               >
                 Explore Feature
-                <svg 
-                  className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-300 ${isHovered ? 'translate-x-2' : ''}`}
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
               </span>
               
-              {/* Animated Arrow Circle */}
+              {/* Circular Arrow Button */}
               <div 
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all duration-500"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-300"
                 style={{
-                  background: isHovered 
-                    ? `linear-gradient(135deg, ${feature.color} 0%, ${feature.secondaryColor} 100%)`
-                    : `${feature.color}10`,
-                  transform: isHovered ? 'rotate(45deg) scale(1.1)' : 'rotate(0deg) scale(1)',
+                  background: colors.buttonBg,
+                  transform: isHovered ? 'scale(1.1)' : 'scale(1)',
                   boxShadow: isHovered 
-                    ? `0 6px 18px ${feature.color}40`
-                    : `0 2px 6px ${feature.color}20`
+                    ? '0 4px 12px rgba(0, 0, 0, 0.15)'
+                    : '0 2px 6px rgba(0, 0, 0, 0.1)'
                 }}
               >
                 <svg 
-                  className="w-4 h-4 sm:w-4.5 sm:h-4.5" 
-                  style={{ color: isHovered ? 'white' : feature.color }}
+                  className="w-5 h-5 sm:w-6 sm:h-6" 
+                  style={{ color: colors.buttonIcon }}
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  {feature.id === 4 ? (
+                    // Down arrow for Legal Templates
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                  ) : (
+                    // Right arrow for others
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  )}
                 </svg>
               </div>
             </div>
           </div>
-
-          {/* Corner Accent */}
-          <div 
-            className="absolute bottom-0 right-0 w-20 h-20 sm:w-24 sm:h-24 opacity-10 group-hover:opacity-20 transition-opacity duration-500"
-            // style={{
-            //   background: `radial-gradient(circle at top left, ${feature.color}, transparent)`,
-            //   transform: isHovered ? 'scale(1.2)' : 'scale(1)',
-            //   transition: 'all 0.5s ease'
-            // }}
-          />
         </div>
-
-        {/* Glow Effect Behind Card */}
-        {/* <div 
-          className="absolute inset-0 rounded-3xl sm:rounded-[2rem] -z-10 blur-2xl transition-opacity duration-500"
-          style={{
-            background: `linear-gradient(135deg, ${feature.color}40, ${feature.secondaryColor}40)`,
-            opacity: isHovered ? 0.6 : 0,
-            transform: isHovered ? 'scale(1.05)' : 'scale(1)'
-          }}
-        /> */}
       </div>
     </div>
   );

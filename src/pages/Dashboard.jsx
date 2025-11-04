@@ -46,13 +46,13 @@ const Dashboard = () => {
         return (
           <div className="space-y-6">
             {/* Perfect Header */}
-            <div className="bg-gradient-to-r from-white to-gray-50 rounded-xl border border-gray-200 p-6 shadow-sm">
-              <div className="flex items-center justify-between">
+            <div className="mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl font-bold mb-2" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                  <h1 className="text-3xl font-bold mb-1" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                     Dashboard
                   </h1>
-                  <p className="text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  <p className="text-gray-600 text-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
                     Legal research overview
                   </p>
                 </div>
@@ -62,14 +62,17 @@ const Dashboard = () => {
                     <input
                       type="text"
                       placeholder="Search documents..."
-                      className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-64 bg-white"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSearch(e)}
+                      className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors w-64 bg-white text-sm"
                       style={{ fontFamily: 'Roboto, sans-serif' }}
                     />
                   </div>
-                  <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                  <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
                     <Filter className="h-5 w-5 text-gray-600" />
                   </button>
-                  <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                  <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
                     <Grid className="h-5 w-5 text-gray-600" />
                   </button>
                 </div>
@@ -134,94 +137,94 @@ const Dashboard = () => {
             {/* Professional Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Recent Activity */}
-              <div className="bg-white rounded-lg border" style={{ borderColor: '#E5E7EB' }}>
-                <div className="p-4 border-b" style={{ borderColor: '#E5E7EB' }}>
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+                <div className="p-5 border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <h2 className="text-lg font-semibold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>Recent Activity</h2>
-                    <button className="text-sm text-blue-600 hover:text-blue-700 font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <button className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       View All
                     </button>
                   </div>
                 </div>
-                <div className="p-6 space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="p-2 rounded-md" style={{ backgroundColor: '#1E65AD' }}>
-                      <Download className="h-4 w-4 text-white" />
+                <div className="p-5 space-y-4">
+                  <div className="flex items-start space-x-4">
+                    <div className="p-2.5 rounded-lg flex-shrink-0" style={{ backgroundColor: '#1E65AD' }}>
+                      <Download className="h-5 w-5 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900" style={{ fontFamily: 'Roboto, sans-serif' }}>Downloaded Supreme Court Judgment</p>
-                      <p className="text-sm text-gray-500 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Contract Law Case 2023 - Civil Appeal No. 1234</p>
-                      <p className="text-xs text-gray-400 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>2 hours ago</p>
+                      <p className="text-sm font-medium text-gray-900 mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Downloaded Supreme Court Judgment</p>
+                      <p className="text-sm text-gray-500 mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Contract Law Case 2023 - Civil Appeal No. 1234</p>
+                      <p className="text-xs text-gray-400" style={{ fontFamily: 'Roboto, sans-serif' }}>2 hours ago</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-start space-x-3">
-                    <div className="p-2 rounded-md" style={{ backgroundColor: '#CF9B63' }}>
-                      <Bookmark className="h-4 w-4 text-white" />
+                  <div className="flex items-start space-x-4">
+                    <div className="p-2.5 rounded-lg flex-shrink-0" style={{ backgroundColor: '#CF9B63' }}>
+                      <Bookmark className="h-5 w-5 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900" style={{ fontFamily: 'Roboto, sans-serif' }}>Bookmarked IPC Act 2023</p>
-                      <p className="text-sm text-gray-500 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Indian Penal Code - Bharatiya Nyaya Sanhita</p>
-                      <p className="text-xs text-gray-400 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>1 day ago</p>
+                      <p className="text-sm font-medium text-gray-900 mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Bookmarked IPC Act 2023</p>
+                      <p className="text-sm text-gray-500 mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Indian Penal Code - Bharatiya Nyaya Sanhita</p>
+                      <p className="text-xs text-gray-400" style={{ fontFamily: 'Roboto, sans-serif' }}>1 day ago</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-start space-x-3">
-                    <div className="p-2 rounded-md" style={{ backgroundColor: '#8C969F' }}>
-                      <CalendarIcon className="h-4 w-4 text-white" />
+                  <div className="flex items-start space-x-4">
+                    <div className="p-2.5 rounded-lg flex-shrink-0" style={{ backgroundColor: '#8C969F' }}>
+                      <CalendarIcon className="h-5 w-5 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900" style={{ fontFamily: 'Roboto, sans-serif' }}>Added Court Hearing Event</p>
-                      <p className="text-sm text-gray-500 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Supreme Court - Contract Dispute Hearing</p>
-                      <p className="text-xs text-gray-400 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>3 days ago</p>
+                      <p className="text-sm font-medium text-gray-900 mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Added Court Hearing Event</p>
+                      <p className="text-sm text-gray-500 mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Supreme Court - Contract Dispute Hearing</p>
+                      <p className="text-xs text-gray-400" style={{ fontFamily: 'Roboto, sans-serif' }}>3 days ago</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Quick Actions */}
-              <div className="bg-white rounded-lg border" style={{ borderColor: '#E5E7EB' }}>
-                <div className="p-4 border-b" style={{ borderColor: '#E5E7EB' }}>
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+                <div className="p-5 border-b border-gray-200">
                   <h2 className="text-lg font-semibold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>Quick Actions</h2>
                 </div>
-                <div className="p-6 space-y-3">
-                  <button className="w-full flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors" style={{ borderColor: '#E5E7EB' }}>
+                <div className="p-5 space-y-3">
+                  <button className="w-full flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 group">
                     <div className="flex items-center space-x-3">
-                      <div className="p-2 rounded-md" style={{ backgroundColor: '#1E65AD' }}>
-                        <Plus className="h-4 w-4 text-white" />
+                      <div className="p-2.5 rounded-lg flex-shrink-0" style={{ backgroundColor: '#1E65AD' }}>
+                        <Plus className="h-5 w-5 text-white" />
                       </div>
                       <div className="text-left">
-                        <p className="text-sm font-medium text-gray-900" style={{ fontFamily: 'Roboto, sans-serif' }}>Add New Document</p>
+                        <p className="text-sm font-medium text-gray-900 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>Add New Document</p>
                         <p className="text-xs text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>Upload or bookmark a legal document</p>
                       </div>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-gray-400" />
+                    <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
                   </button>
                   
-                  <button className="w-full flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors" style={{ borderColor: '#E5E7EB' }}>
+                  <button className="w-full flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 group">
                     <div className="flex items-center space-x-3">
-                      <div className="p-2 rounded-md" style={{ backgroundColor: '#CF9B63' }}>
-                        <CalendarIcon className="h-4 w-4 text-white" />
+                      <div className="p-2.5 rounded-lg flex-shrink-0" style={{ backgroundColor: '#CF9B63' }}>
+                        <CalendarIcon className="h-5 w-5 text-white" />
                       </div>
                       <div className="text-left">
-                        <p className="text-sm font-medium text-gray-900" style={{ fontFamily: 'Roboto, sans-serif' }}>Schedule Event</p>
+                        <p className="text-sm font-medium text-gray-900 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>Schedule Event</p>
                         <p className="text-xs text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>Add important dates and reminders</p>
                       </div>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-gray-400" />
+                    <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
                   </button>
                   
-                  <button className="w-full flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors" style={{ borderColor: '#E5E7EB' }}>
+                  <button className="w-full flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 group">
                     <div className="flex items-center space-x-3">
-                      <div className="p-2 rounded-md" style={{ backgroundColor: '#8C969F' }}>
-                        <Eye className="h-4 w-4 text-white" />
+                      <div className="p-2.5 rounded-lg flex-shrink-0" style={{ backgroundColor: '#8C969F' }}>
+                        <Eye className="h-5 w-5 text-white" />
                       </div>
                       <div className="text-left">
-                        <p className="text-sm font-medium text-gray-900" style={{ fontFamily: 'Roboto, sans-serif' }}>View Analytics</p>
+                        <p className="text-sm font-medium text-gray-900 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>View Analytics</p>
                         <p className="text-xs text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>Track your research progress</p>
                       </div>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-gray-400" />
+                    <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
                   </button>
                 </div>
               </div>
@@ -250,87 +253,96 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="h-screen" style={{ backgroundColor: '#F9FAFC' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
       
-      <div className="flex h-full">
-        {/* Modern Attractive Sidebar */}
-        <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-gradient-to-b from-white to-gray-50 shadow-xl transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+      <div className="flex h-screen" style={{ paddingTop: '80px' }}>
+        {/* Perfect Sidebar */}
+        <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`} style={{ top: '80px', height: 'calc(100vh - 100px)' }}>
-          <div className="h-full flex flex-col">
-            {/* Elegant Header */}
+        }`} style={{ top: '80px', height: 'calc(100vh - 80px)' }}>
+          <div className="h-full flex flex-col border-r border-gray-200">
+            {/* Logo and Dashboard Button */}
             <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center mr-4 shadow-lg" style={{ 
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center mr-3" style={{ 
                     background: 'linear-gradient(135deg, #1E65AD, #CF9B63)' 
                   }}>
-                    <span className="text-lg">⚖️</span>
+                    <span className="text-white font-bold text-lg">S</span>
                   </div>
-                  <div>
-                    <h2 className="text-lg font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>Dashboard</h2>
-                    <p className="text-sm text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>Legal Research Hub</p>
-                  </div>
+                  <span className="text-lg font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>Salhakar</span>
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors lg:hidden" style={{ color: '#8C969F' }}
+                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors lg:hidden"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="h-5 w-5 text-gray-600" />
                 </button>
               </div>
+              
+              {/* Dashboard Button */}
+              <button
+                onClick={() => {
+                  setActiveTab('home');
+                  setSidebarOpen(false);
+                }}
+                className={`w-full flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                  activeTab === 'home'
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+                style={{ fontFamily: 'Roboto, sans-serif' }}
+              >
+                <Home className={`h-5 w-5 mr-3 ${activeTab === 'home' ? 'text-white' : 'text-gray-600'}`} />
+                <span className="font-semibold">Dashboard</span>
+                {activeTab === 'home' && (
+                  <div className="ml-auto w-2 h-2 rounded-full bg-white"></div>
+                )}
+              </button>
             </div>
 
-            {/* Beautiful Navigation */}
+            {/* Navigation Menu */}
             <nav className="flex-1 p-4 overflow-y-auto">
-              <div className="space-y-2">
-                {sidebarItems.map((item) => (
+              <div className="space-y-1">
+                {sidebarItems.filter(item => item.id !== 'home').map((item) => (
                   <button
                     key={item.id}
                     onClick={() => {
                       setActiveTab(item.id);
                       setSidebarOpen(false);
                     }}
-                    className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
+                    className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
                       activeTab === item.id
-                        ? 'shadow-lg transform scale-105'
-                        : 'hover:shadow-md hover:scale-102'
+                        ? 'bg-gray-100 text-blue-600'
+                        : 'text-gray-700 hover:bg-gray-50'
                     }`}
-                    style={{
-                      fontFamily: 'Roboto, sans-serif',
-                      backgroundColor: activeTab === item.id ? '#1E65AD' : 'transparent',
-                      color: activeTab === item.id ? 'white' : '#374151',
-                      borderLeft: activeTab === item.id ? '4px solid #CF9B63' : 'none'
-                    }}
+                    style={{ fontFamily: 'Roboto, sans-serif' }}
                   >
-                    <item.icon className={`h-5 w-5 mr-3 transition-colors ${
-                      activeTab === item.id ? 'text-white' : 'text-gray-500 group-hover:text-gray-700'
+                    <item.icon className={`h-5 w-5 mr-3 ${
+                      activeTab === item.id ? 'text-blue-600' : 'text-gray-500'
                     }`} />
-                    <span className="font-semibold">{item.label}</span>
-                    {activeTab === item.id && (
-                      <div className="ml-auto w-2 h-2 rounded-full bg-white"></div>
-                    )}
+                    <span>{item.label}</span>
                   </button>
                 ))}
               </div>
             </nav>
 
-            {/* Premium Footer */}
+            {/* Premium Card */}
             <div className="p-4 border-t border-gray-200">
-              <div className="bg-gradient-to-r rounded-2xl p-4 shadow-lg" style={{ 
+              <div className="bg-gradient-to-r rounded-xl p-4 shadow-md" style={{ 
                 background: 'linear-gradient(135deg, #1E65AD, #CF9B63)' 
               }}>
                 <div className="flex items-center mb-3">
                   <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center mr-3">
-                    <Award className="h-4 w-4 text-white" />
+                    <Bookmark className="h-4 w-4 text-white" />
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-white" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>Premium</h3>
-                    <p className="text-xs text-white/80" style={{ fontFamily: 'Roboto, sans-serif' }}>Unlock all features</p>
+                    <p className="text-xs text-white/90" style={{ fontFamily: 'Roboto, sans-serif' }}>Unlock all features</p>
                   </div>
                 </div>
-                <button className="w-full py-2 bg-white text-sm font-semibold rounded-xl transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5" style={{ 
+                <button className="w-full py-2.5 bg-white text-sm font-semibold rounded-lg transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5" style={{ 
                   color: '#1E65AD', 
                   fontFamily: 'Roboto, sans-serif' 
                 }}>
@@ -342,10 +354,12 @@ const Dashboard = () => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col overflow-hidden">
           {/* Content Area */}
-          <main className="flex-1 px-4 py-6 overflow-y-auto pt-24" style={{ backgroundColor: '#F9FAFC' }}>
-            {renderContent()}
+          <main className="flex-1 overflow-y-auto" style={{ backgroundColor: '#F9FAFC' }}>
+            <div className="max-w-7xl mx-auto px-6 py-6">
+              {renderContent()}
+            </div>
           </main>
         </div>
       </div>
@@ -357,6 +371,14 @@ const Dashboard = () => {
           onClick={() => setSidebarOpen(false)}
         />
       )}
+
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setSidebarOpen(true)}
+        className="fixed bottom-4 right-4 lg:hidden z-50 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+      >
+        <Menu className="h-6 w-6" />
+      </button>
     </div>
   );
 };

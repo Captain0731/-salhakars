@@ -164,45 +164,61 @@ const VideoSection = () => {
           <div className="relative">
             <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
               {/* Video Container */}
-              <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
-                {!isVideoPlaying ? (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 z-10">
-                    <div className="text-center">
-                      {/* Play Button */}
-                      <button
-                        onClick={handlePlayVideo}
-                        className="w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 hover:shadow-lg"
-                        style={{ 
-                          backgroundColor: '#1E65AD',
-                          boxShadow: '0 8px 25px rgba(30, 101, 173, 0.4)'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.target.style.backgroundColor = '#CF9B63';
-                          e.target.style.boxShadow = '0 12px 30px rgba(207, 155, 99, 0.5)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.backgroundColor = '#1E65AD';
-                          e.target.style.boxShadow = '0 8px 25px rgba(30, 101, 173, 0.4)';
-                        }}
-                      >
-                        <svg 
-                          className="w-8 h-8 text-white ml-1" 
-                          fill="currentColor" 
-                          viewBox="0 0 24 24"
+              <div className="relative aspect-video bg-gray-300 overflow-hidden">
+                {/* Gray Cover Photo - Shows when video is not playing */}
+                {!isVideoPlaying && (
+                  <div 
+                    className="absolute inset-0 flex items-center justify-center z-10"
+                    style={{ backgroundColor: '#9CA3AF' }}
+                  >
+                    <img 
+                      src="/slaha.png" 
+                      alt="Video Cover" 
+                      className="w-full h-full object-cover opacity-50"
+                      onError={(e) => {
+                        // If image fails to load, just show gray background
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center">
+                        {/* Play Button */}
+                        <button
+                          onClick={handlePlayVideo}
+                          className="w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 hover:shadow-lg"
+                          style={{ 
+                            backgroundColor: '#FFFFFF',
+                            boxShadow: '0 8px 25px rgba(255, 255, 255, 0.3)'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = '#F3F4F6';
+                            e.target.style.boxShadow = '0 12px 30px rgba(255, 255, 255, 0.4)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = '#FFFFFF';
+                            e.target.style.boxShadow = '0 8px 25px rgba(255, 255, 255, 0.3)';
+                          }}
                         >
-                          <path d="M8 5v14l11-7z"/>
-                        </svg>
-                      </button>
-                      
-                      <p 
-                        className="mt-4 text-lg font-semibold"
-                        style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}
-                      >
-                        Watch Video
-                      </p>
+                          <svg 
+                            className="w-8 h-8 ml-1" 
+                            fill="currentColor" 
+                            viewBox="0 0 24 24"
+                            style={{ color: '#1E65AD' }}
+                          >
+                            <path d="M8 5v14l11-7z"/>
+                          </svg>
+                        </button>
+                        
+                        <p 
+                          className="mt-4 text-lg font-semibold"
+                          style={{ color: '#FFFFFF', fontFamily: 'Roboto, sans-serif' }}
+                        >
+                          Watch Video
+                        </p>
+                      </div>
                     </div>
                   </div>
-                ) : null}
+                )}
                 <video
                   ref={videoRef}
                   className={`w-full h-full object-cover ${!isVideoPlaying ? 'opacity-0 absolute' : 'opacity-100 relative'} transition-opacity duration-300`}
@@ -210,7 +226,7 @@ const VideoSection = () => {
                   onPlay={() => setIsVideoPlaying(true)}
                   onPause={() => setIsVideoPlaying(false)}
                   onEnded={() => setIsVideoPlaying(false)}
-                  poster=""
+                  poster="/slaha.png"
                 >
                   <source src="/sl.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
