@@ -8,32 +8,32 @@ const VideoSection = () => {
 
   const features = [
     {
-      icon: "⚡",
+      icon: "/research (1).png",
       title: "Instant research",
       description: "Judgments and acts in just one to three clicks."
     },
     {
-      icon: "🔒",
+      icon: "/uni.png",
       title: "Multilingual Access",
       description: "Instantly view research in any Indian language."
     },
     {
-      icon: "📱",
+      icon: "/voice-assistants.png",
       title: "Voice assistance",
       description: "Speak your query; get instant, accurate results."
     },
     {
-      icon: "🎯",
+      icon: "/letter.png",
       title: "Concise Summaries",
       description: "Get the gist in two to three lines instantly."
     },
     {
-      icon: "📊",
+      icon: "/SEARCH.png",
       title: "Universal Search",
       description: "Find cases with keywords or simple questions - no details needed."
     },
     {
-      icon: "🔄",
+      icon: "/microchip.png",
       title: "Kiki AI",
       description: "Smart assistant answers, automates, and guides your legal research."
     }
@@ -95,10 +95,19 @@ const VideoSection = () => {
                   style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}
                 >
                   <div 
-                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center text-xl sm:text-2xl flex-shrink-0"
-                    style={{ backgroundColor: '#1E65AD' }}
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center text-xl sm:text-2xl flex-shrink-0 overflow-hidden"
+                    // style={{ backgroundColor: '#1E65AD' }}
                   >
-                    {feature.icon}
+                    {feature.icon.startsWith('/') ? (
+                      <img 
+                        src={feature.icon} 
+                        alt={feature.title}
+                        className="w-full h-full object-contain p-1.5"
+                        style={{ filter: 'brightness(1) invert(0)' }}
+                      />
+                    ) : (
+                      <span>{feature.icon}</span>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 
@@ -119,7 +128,7 @@ const VideoSection = () => {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4 px-4 lg:px-0">
+            <div className="flex flex-col sm:flex-row gap-4 pt-4 px-4 lg:px-0 grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
               <button
                 className="px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-white transition-all duration-300 transform hover:scale-105 hover:shadow-lg text-sm sm:text-base"
                 style={{ 

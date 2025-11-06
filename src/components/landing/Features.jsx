@@ -60,12 +60,12 @@ const FeatureCard = ({ feature, index, onClick }) => {
         {/* Clean White Card */}
         <div 
           className="relative rounded-2xl sm:rounded-3xl flex flex-col flex-grow bg-white overflow-hidden"
-          style={{
-            boxShadow: isHovered 
-              ? '0 20px 40px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)'
-              : '0 4px 20px -5px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)',
-            transition: 'box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
+          // style={{
+          //   boxShadow: isHovered 
+          //     ? '0 20px 40px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)'
+          //     : '0 4px 20px -5px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+          //   transition: 'box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+          // }}
         >
           {/* Content Container */}
           <div className="p-4 sm:p-6 md:p-8 flex flex-col flex-grow relative z-10">
@@ -127,7 +127,7 @@ const FeatureCard = ({ feature, index, onClick }) => {
                 >
                   {feature.id === 4 ? (
                     // Down arrow for Legal Templates
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   ) : (
                     // Right arrow for others
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -264,7 +264,7 @@ const Features = React.forwardRef((props, ref) => {
         </div>
 
         {/* Features Grid - 2 columns (pairs) on all screen sizes */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-6 md:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 sm:grid-cols-2 gap-3 sm:gap-6 md:gap-8">
           {features.map((feature, index) => (
             <FeatureCard 
               key={feature.id}
