@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
+import { Send, Bot, User, Sparkles, X, RotateCcw } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function LegalChatbot() {
   const navigate = useNavigate();
@@ -8,11 +10,9 @@ export default function LegalChatbot() {
   const [inputMessage, setInputMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const [userScrolling, setUserScrolling] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const messagesContainerRef = useRef(null);
-
 
   const quickQuestions = [
     "What are my rights as a tenant?",
@@ -25,75 +25,12 @@ export default function LegalChatbot() {
     "How to file an RTI application?"
   ];
 
-  const legalTopics = [
-    {
-      category: "Property Law",
-      icon: "🏠",
-      description: "Property ownership, transfer, disputes, and rights",
-      questions: [
-        "How to transfer property ownership?",
-        "What are property registration requirements?",
-        "How to resolve property disputes?"
-      ]
-    },
-    {
-      category: "Family Law",
-      icon: "👨‍👩‍👧‍👦",
-      description: "Marriage, divorce, custody, and family matters",
-      questions: [
-        "What are the grounds for divorce?",
-        "How to get child custody?",
-        "What is the process for adoption?"
-      ]
-    },
-    {
-      category: "Criminal Law",
-      icon: "⚖️",
-      description: "Criminal offenses, procedures, and rights",
-      questions: [
-        "What are my rights if arrested?",
-        "How to file a criminal complaint?",
-        "What is the bail process?"
-      ]
-    },
-    {
-      category: "Consumer Law",
-      icon: "🛒",
-      description: "Consumer rights and protection",
-      questions: [
-        "How to file a consumer complaint?",
-        "What are consumer rights?",
-        "How to get refund for defective product?"
-      ]
-    },
-    {
-      category: "Employment Law",
-      icon: "💼",
-      description: "Workplace rights and employment issues",
-      questions: [
-        "What are employee rights?",
-        "How to handle workplace harassment?",
-        "What is the notice period for resignation?"
-      ]
-    },
-    {
-      category: "Corporate Law",
-      icon: "🏢",
-      description: "Business formation and corporate matters",
-      questions: [
-        "How to register a company?",
-        "What are director responsibilities?",
-        "How to dissolve a partnership?"
-      ]
-    }
-  ];
-
   useEffect(() => {
     // Initialize with welcome message
     setMessages([
       {
         id: 1,
-        text: "Hello! I'm your AI Legal Assistant. I can help you with various legal questions and provide guidance on legal matters. How can I assist you today?",
+        text: "Hello! I'm Kiki, your AI Legal Assistant. I can help you with various legal questions and provide guidance on legal matters. How can I assist you today?",
         sender: "bot",
         timestamp: new Date().toISOString()
       }
@@ -101,32 +38,18 @@ export default function LegalChatbot() {
   }, []);
 
   useEffect(() => {
-    // Always scroll to bottom when new messages are added
-    if (messages.length > 1) {
+    // Auto-scroll to bottom when new messages are added
+    if (messages.length > 0) {
       scrollToBottom();
     }
-  }, [messages]);
+  }, [messages, isTyping]);
 
   const scrollToBottom = () => {
-    // Use setTimeout to ensure DOM is updated before scrolling
     setTimeout(() => {
       if (messagesEndRef.current) {
         messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
       }
     }, 100);
-  };
-
-  const handleScroll = () => {
-    if (messagesContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
-      const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
-      
-      if (isAtBottom) {
-        setUserScrolling(false);
-      } else {
-        setUserScrolling(true);
-      }
-    }
   };
 
   const getBotResponse = (userMessage) => {
@@ -135,7 +58,7 @@ export default function LegalChatbot() {
   };
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+    if (!inputMessage.trim() || loading) return;
 
     const userMessage = {
       id: Date.now(),
@@ -145,21 +68,16 @@ export default function LegalChatbot() {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = inputMessage;
     setInputMessage("");
     setLoading(true);
     setIsTyping(true);
-    
-    // Force scroll to bottom when user sends message
-    setUserScrolling(false);
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
 
     // Simulate AI processing time
     setTimeout(() => {
       const botResponse = {
         id: Date.now() + 1,
-        text: getBotResponse(inputMessage),
+        text: getBotResponse(currentInput),
         sender: "bot",
         timestamp: new Date().toISOString()
       };
@@ -167,18 +85,11 @@ export default function LegalChatbot() {
       setMessages(prev => [...prev, botResponse]);
       setLoading(false);
       setIsTyping(false);
-      
-      // Always scroll to bottom after bot response
-      setTimeout(() => {
-        setUserScrolling(false);
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 200);
     }, 1500);
   };
 
   const handleQuickQuestion = (question) => {
     setInputMessage(question);
-    // Focus input after a short delay to ensure it's rendered
     setTimeout(() => {
       inputRef.current?.focus();
     }, 100);
@@ -195,7 +106,7 @@ export default function LegalChatbot() {
     setMessages([
       {
         id: 1,
-        text: "Hello! I'm your AI Legal Assistant. I can help you with various legal questions and provide guidance on legal matters. How can I assist you today?",
+        text: "Hello! I'm Kiki, your AI Legal Assistant. I can help you with various legal questions and provide guidance on legal matters. How can I assist you today?",
         sender: "bot",
         timestamp: new Date().toISOString()
       }
@@ -209,186 +120,299 @@ export default function LegalChatbot() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
-      <div className="p-4 sm:p-6">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="mb-6">
-            <h1 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+      
+      {/* Enhanced Header Section */}
+      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 pt-40 pb-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="flex items-center justify-center gap-3 mb-4"
+            >
+              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30">
+                <Sparkles className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
               Legal AI Chatbot
             </h1>
-            <p className="text-lg" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}>
-              Get instant legal guidance and answers to your legal questions with our AI-powered legal assistant
-            </p>
+            </motion.div>
+            <motion.p
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-lg sm:text-xl text-blue-100 max-w-2xl mx-auto"
+              style={{ fontFamily: 'Roboto, sans-serif' }}
+            >
+              Get instant legal guidance and answers to your legal questions with Kiki AI
+            </motion.p>
+          </div>
+        </div>
           </div>
 
+      <div className="p-4 sm:p-6 lg:p-8 -mt-4">
+        <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
-            {/* Chat Interface */}
+            
+            {/* Chat Interface - Main */}
             <div className="lg:col-span-3 order-2 lg:order-1">
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 h-[500px] flex flex-col">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden flex flex-col"
+                style={{ height: 'calc(100vh - 280px)', minHeight: '600px' }}
+              >
                 {/* Chat Header */}
-                <div className="p-3 border-b border-gray-200 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-xl">🤖</span>
+                <div className="p-4 sm:p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="relative">
+                        <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center shadow-lg">
+                          <Bot className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
                     </div>
                     <div>
-                      <h3 className="font-semibold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                        Legal AI Assistant
+                        <h3 className="text-lg font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                          Kiki AI Assistant
                       </h3>
-                      <p className="text-sm" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}>
+                        <p className="text-sm flex items-center gap-2" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}>
+                          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                         Online • Ready to help
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={clearChat}
-                    className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
+                      title="Clear Chat"
                   >
-                    Clear Chat
+                      <RotateCcw className="w-4 h-4" />
+                      <span className="hidden sm:inline">Clear</span>
                   </button>
+                  </div>
                 </div>
 
-                {/* Messages */}
+                {/* Messages Container */}
                 <div 
                   ref={messagesContainerRef}
-                  className="flex-1 overflow-y-auto p-3 space-y-3"
-                  onScroll={handleScroll}
+                  className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-gradient-to-b from-gray-50 to-white"
+                  style={{ 
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: '#CBD5E0 #F7FAFC'
+                  }}
                 >
-                  {messages.map((message) => (
-                    <div
+                  <AnimatePresence>
+                    {messages.map((message, index) => (
+                      <motion.div
                       key={message.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.3, delay: index * 0.05 }}
                       className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-[80%] p-2 rounded-lg ${
-                          message.sender === 'user'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}
                       >
-                        <p className="text-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                        <div className={`flex items-start gap-3 max-w-[85%] sm:max-w-[75%] ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                          {/* Avatar */}
+                          <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                            message.sender === 'user' 
+                              ? 'bg-gradient-to-br from-blue-600 to-blue-700' 
+                              : 'bg-gradient-to-br from-gray-100 to-gray-200'
+                          }`}>
+                            {message.sender === 'user' ? (
+                              <User className="w-4 h-4 text-white" />
+                            ) : (
+                              <Bot className="w-4 h-4 text-gray-600" />
+                            )}
+                          </div>
+                          
+                          {/* Message Bubble */}
+                          <div className={`rounded-2xl px-4 py-3 shadow-sm ${
+                            message.sender === 'user'
+                              ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-tr-sm'
+                              : 'bg-white text-gray-800 border border-gray-200 rounded-tl-sm'
+                          }`}>
+                            <p className="text-sm sm:text-base leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
                           {message.text}
                         </p>
-                        <p className={`text-xs mt-1 ${
+                            <p className={`text-xs mt-2 ${
                           message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
-                        }`}>
+                            }`} style={{ fontFamily: 'Roboto, sans-serif' }}>
                           {formatTime(message.timestamp)}
                         </p>
                       </div>
                     </div>
+                      </motion.div>
                   ))}
+                  </AnimatePresence>
                   
+                  {/* Typing Indicator */}
                   {isTyping && (
-                    <div className="flex justify-start">
-                      <div className="bg-gray-100 p-3 rounded-lg">
-                        <div className="flex space-x-1">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex justify-start"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center flex-shrink-0">
+                          <Bot className="w-4 h-4 text-gray-600" />
+                        </div>
+                        <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
+                          <div className="flex space-x-1.5">
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
                           <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   )}
                   
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Input */}
-                <div className="p-3 border-t border-gray-200">
-                  <div className="flex gap-2">
-                    <input
+                {/* Input Area */}
+                <div className="p-4 sm:p-6 border-t border-gray-200 bg-white">
+                  <div className="flex items-end gap-3">
+                    <div className="flex-1 relative">
+                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                        <img 
+                          src="/uit3.GIF" 
+                          alt="Message" 
+                          className="w-5 h-5"
+                          style={{ objectFit: 'contain' }}
+                        />
+                      </div>
+                      <textarea
                       ref={inputRef}
-                      type="text"
                       value={inputMessage}
                       onChange={(e) => setInputMessage(e.target.value)}
                       onKeyPress={handleKeyPress}
-                      placeholder="Type your legal question here..."
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent focus:outline-none"
-                      style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
+                        placeholder="Ask your legal question..."
+                        rows={1}
+                        className="w-full pl-11 pr-12 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none overflow-hidden"
+                        style={{ 
+                          fontFamily: 'Roboto, sans-serif',
+                          minHeight: '48px',
+                          maxHeight: '120px'
+                        }}
                       disabled={loading}
-                    />
+                        onInput={(e) => {
+                          e.target.style.height = 'auto';
+                          e.target.style.height = e.target.scrollHeight + 'px';
+                        }}
+                      />
+                      {inputMessage && (
+                        <button
+                          onClick={() => setInputMessage("")}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                     <button
                       onClick={handleSendMessage}
                       disabled={loading || !inputMessage.trim()}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
-                      style={{ fontFamily: 'Roboto, sans-serif' }}
+                      className="px-5 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 flex-shrink-0"
+                      style={{ fontFamily: 'Roboto, sans-serif', minWidth: '56px' }}
                     >
-                      Send
+                      {loading ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <Send className="w-5 h-5" />
+                      )}
                     </button>
                   </div>
+                  <p className="text-xs text-gray-500 mt-2 text-center" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    Press Enter to send • Shift+Enter for new line
+                  </p>
                 </div>
-              </div>
+              </motion.div>
             </div>
 
             {/* Sidebar */}
-            <div className="lg:col-span-1 order-1 lg:order-2">
+            <div className="lg:col-span-1 order-1 lg:order-2 space-y-6">
               {/* Quick Questions */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5 mb-4">
-                <h3 className="font-semibold mb-3" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="bg-white rounded-2xl shadow-xl border border-gray-200 p-5 overflow-hidden"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+                    <Sparkles className="w-4 h-4 text-white" />
+                  </div>
+                  <h3 className="font-bold text-lg" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   Quick Questions
                 </h3>
-                <div className="space-y-1">
+                </div>
+                <div className="space-y-2 max-h-[300px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
                   {quickQuestions.map((question, index) => (
-                    <button
+                    <motion.button
                       key={index}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.5 + index * 0.05 }}
                       onClick={() => handleQuickQuestion(question)}
-                      className="w-full text-left p-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors border border-gray-200 hover:border-blue-200"
+                      className="w-full text-left p-3 text-sm rounded-xl transition-all duration-200 border border-gray-200 hover:border-blue-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-white hover:shadow-md group"
                       style={{ fontFamily: 'Roboto, sans-serif', minHeight: '44px' }}
                     >
+                      <span className="text-gray-700 group-hover:text-blue-700 font-medium block">
                       {question}
-                    </button>
+                      </span>
+                    </motion.button>
                   ))}
                 </div>
-              </div>
-
-              {/* Legal Topics */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5">
-                <h3 className="font-semibold mb-3" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                  Legal Topics
-                </h3>
-                <div className="space-y-2">
-                  {legalTopics.map((topic, index) => (
-                    <div key={index} className="border border-gray-200 rounded-lg p-2 hover:bg-gray-50 transition-colors">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-lg flex-shrink-0">{topic.icon}</span>
-                        <h4 className="font-medium text-sm" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                          {topic.category}
-                        </h4>
-                      </div>
-                      <p className="text-xs text-gray-600 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                        {topic.description}
-                      </p>
-                      <div className="space-y-1">
-                        {topic.questions.map((question, qIndex) => (
-                          <button
-                            key={qIndex}
-                            onClick={() => handleQuickQuestion(question)}
-                            className="block w-full text-left text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-1 rounded transition-colors"
-                            style={{ fontFamily: 'Roboto, sans-serif' }}
-                          >
-                            {question}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              </motion.div>
 
               {/* Disclaimer */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3 sm:p-4 mt-4">
-                <h4 className="font-semibold text-sm mb-2" style={{ color: '#1E65AD' }}>
-                  ⚠️ Legal Disclaimer
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+                className="bg-gradient-to-br from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-2xl p-4 shadow-sm"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 bg-yellow-400 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-lg">⚠️</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm mb-2" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                      Legal Disclaimer
                 </h4>
-                <p className="text-xs text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <p className="text-xs text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   This AI assistant provides general legal information only. It does not constitute legal advice. For specific legal matters, please consult with a qualified lawyer.
                 </p>
               </div>
+                </div>
+              </motion.div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Custom Scrollbar Styles */}
+      <style>{`
+        .overflow-y-auto::-webkit-scrollbar {
+          width: 6px;
+        }
+        .overflow-y-auto::-webkit-scrollbar-track {
+          background: #F7FAFC;
+          border-radius: 10px;
+        }
+        .overflow-y-auto::-webkit-scrollbar-thumb {
+          background: #CBD5E0;
+          border-radius: 10px;
+        }
+        .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+          background: #A0AEC0;
+        }
+      `}</style>
     </div>
   );
 }

@@ -852,7 +852,10 @@ export default function LawLibrary() {
               <div className="space-y-4">
                 {acts.map((act, index) => (
                   <SmoothTransitionWrapper key={act.id || act.act_id || `act-${index}`} delay={index * 50}>
-                    <div className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-300 bg-white group">
+                    <div 
+                      onClick={() => viewActDetails(act)}
+                      className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-300 bg-white group cursor-pointer"
+                    >
                       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                         <div className="flex-1">
                           <div className="flex items-start gap-3 mb-3">
@@ -915,7 +918,10 @@ export default function LawLibrary() {
 
                         <div className="flex-shrink-0 flex flex-col gap-2">
                           <button
-                            onClick={() => viewActDetails(act)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              viewActDetails(act);
+                            }}
                             className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium shadow-sm hover:shadow-md"
                             style={{ fontFamily: 'Roboto, sans-serif' }}
                           >

@@ -215,9 +215,9 @@ const About = () => {
             </div>
 
             <div className="space-y-20 md:space-y-28 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-              {/* Founder 1: Pratham Shah - Image left, Text right */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-center">
-                <div className="bg-white rounded-2xl overflow-hidden p-6 shadow-lg transition-transform duration-300 hover:scale-[1.02] mx-auto md:mx-0"
+              {/* Founder 1: Pratham Shah */}
+              <div className="flex justify-center">
+                <div className="bg-white rounded-2xl overflow-hidden p-6 shadow-lg transition-transform duration-300 hover:scale-[1.02]"
                   style={{
                     border: '1px solid rgba(30, 101, 173, 0.1)',
                     boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)',
@@ -277,43 +277,11 @@ const About = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-col justify-center">
-                  <p
-                    className="text-base md:text-lg leading-relaxed"
-            style={{
-                      color: '#8C969F',
-                      fontFamily: "'Roboto', sans-serif",
-                      fontWeight: 400,
-                      lineHeight: '1.8'
-                    }}
-                  >
-                    We're committed to expanding Salhakar to cover every Indian court, act, and language,
-                    while continuing to advance our AI's capabilities. Our dream: no courtroom, student, or
-                    lawyer left behind. Salhakar will keep growing—always centred on the people who make
-                    law matter.
-                  </p>
-                </div>
               </div>
 
-              {/* Founder 2: Parth Chelani - Text left, Image right */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-center">
-                <div className="flex flex-col justify-center order-2 md:order-1">
-                  <p
-                    className="text-base md:text-lg leading-relaxed"
-                    style={{
-                      color: '#8C969F',
-                      fontFamily: "'Roboto', sans-serif",
-                      fontWeight: 400,
-                      lineHeight: '1.8'
-                    }}
-                  >
-                    Legal technology should feel invisible. We believe the right platform is one you trust—
-                    one that fits your life, your workflow, and your language. That's why Salhakar is built for
-                    people, not just for process: we take complexity out, bring simplicity in, and keep your
-                    data and voice secure at every step.
-                  </p>
-                </div>
-                <div className="bg-white rounded-2xl overflow-hidden p-6 shadow-lg transition-transform duration-300 hover:scale-[1.02] mx-auto md:mx-0 order-1 md:order-2"
+              {/* Founder 2: Parth Chelani */}
+              <div className="flex justify-center">
+                <div className="bg-white rounded-2xl overflow-hidden p-6 shadow-lg transition-transform duration-300 hover:scale-[1.02]"
                   style={{
                     border: '1px solid rgba(30, 101, 173, 0.1)',
                     boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)',
@@ -343,10 +311,10 @@ const About = () => {
                       className="text-sm md:text-base mb-4"
                       style={{ 
                         color: '#8C969F', 
-              fontFamily: "'Roboto', sans-serif",
-              fontWeight: 400
-            }}
-          >
+                        fontFamily: "'Roboto', sans-serif",
+                        fontWeight: 400
+                      }}
+                    >
                       Chief Operating Officer
                     </p>
                     <div className="flex gap-4 justify-center">

@@ -1,5 +1,5 @@
 // App.js
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import GoogleTranslate from "./components/GoogleTranslate";
 import LandingPage from "./pages/LandingPage";
@@ -38,12 +38,25 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Chatbot from "./components/Chatbot";
 
 function AppLayout() {
+  const location = useLocation();
+  
+  // Pages where chatbot should be hidden
+  const hideChatbotPaths = [
+    '/login',
+    '/signup',
+    '/view-pdf',
+    '/act-details',
+    '/mapping-details'
+  ];
+  
+  const shouldShowChatbot = !hideChatbotPaths.some(path => location.pathname.startsWith(path));
+  
   return (
     <div style={{ minHeight: "100vh", overflowY: "auto" }}>
       {/* Google Translate Component - Global mount point */}
       <GoogleTranslate />
-      {/* Chatbot Icon - Fixed position on all pages */}
-      <Chatbot />
+      {/* Chatbot Icon - Fixed position on all pages except specified ones */}
+      {shouldShowChatbot && <Chatbot />}
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
