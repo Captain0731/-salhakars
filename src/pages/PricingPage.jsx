@@ -647,9 +647,9 @@ function PricingPage() {
    
 
       {/* Let's Work Together Contact Form Section */}
-      <section className="py-12 md:py-16 bg-white">
+      <section className="py-12 md:py-16 bg-[#F9FAFC]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white">
+          <div className="bg-[#F9FAFC]">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 p-8 md:p-12">
               {/* Left Side - Contact Info */}
               <div>
@@ -662,7 +662,7 @@ function PricingPage() {
                 letterSpacing: "-0.02em"
               }}
             >
-                  Let's Work Together
+                  Need Customized Solution?
             </h2>
                 
                 <div className="space-y-6 mb-8">
@@ -674,7 +674,7 @@ function PricingPage() {
                 fontWeight: 400
               }}
             >
-                      500 Terry Francine St. San Francisco, CA 94158
+                      If you're a large law firm, law school, or have a sizable user base, connect with our team for a tailored solution designed to meet your specific needs. We offer enterprise options, bulk access, educational partnerships, and bespoke integrations, just reach out and let us create the perfect fit for you.
                     </p>
                   </div>
                   
@@ -686,7 +686,7 @@ function PricingPage() {
                         fontWeight: 400
                       }}
                     >
-                      info@mysite.com
+                      inquire@salhakar.com
                     </p>
                   </div>
                   
@@ -698,7 +698,7 @@ function PricingPage() {
                         fontWeight: 400
                       }}
                     >
-                      Tel: 123-456-7890
+                      Phone No:- +91 7069900088
                     </p>
                   </div>
                 </div>
@@ -789,6 +789,32 @@ function PricingPage() {
                     </div>
                   </div>
 
+                  {/* Phone Number - Full Width */}
+                  <div>
+                    <label
+                      htmlFor="phone"
+                      className="block text-sm font-semibold mb-2.5"
+                      style={{
+                        color: "#1E65AD",
+                        fontFamily: "'Roboto', sans-serif",
+                        fontWeight: 600
+                      }}
+                    >
+                      Phone Number *
+                    </label>
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      required
+                      className="w-full px-0 py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 bg-transparent"
+                      style={{
+                        fontFamily: "'Roboto', sans-serif"
+                      }}
+                    />
+                  </div>
+
+                 
                   {/* Email - Full Width */}
                   <div>
                     <label

@@ -23,15 +23,10 @@ import {
   StarOff,
   Loader2,
   AlertCircle,
-  X,
-  BarChart3,
-  Upload,
-  Download as DownloadIcon
+  X
 } from 'lucide-react';
 import apiService from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
-import BookmarkAnalytics from './BookmarkAnalytics';
-import BookmarkImportExport from './BookmarkImportExport';
 
 const Bookmarks = () => {
   const navigate = useNavigate();
@@ -136,7 +131,7 @@ const Bookmarks = () => {
     isFavorite: null // null, true, false
   });
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  const [activeTab, setActiveTab] = useState('bookmarks'); // 'bookmarks', 'analytics', 'import-export'
+  const [activeTab, setActiveTab] = useState('bookmarks'); // 'bookmarks'
 
   // Function to navigate to the appropriate page based on bookmark type
   const handleViewBookmark = async (bookmark) => {
@@ -764,47 +759,6 @@ const Bookmarks = () => {
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-        <nav className="flex space-x-1 p-1">
-          <button
-            onClick={() => setActiveTab('bookmarks')}
-            className={`flex items-center px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
-              activeTab === 'bookmarks'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-            style={{ fontFamily: 'Roboto, sans-serif' }}
-          >
-            <Bookmark className={`h-4 w-4 mr-2 ${activeTab === 'bookmarks' ? 'text-white' : 'text-gray-500'}`} />
-            Bookmarks
-          </button>
-          <button
-            onClick={() => setActiveTab('analytics')}
-            className={`flex items-center px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
-              activeTab === 'analytics'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-            style={{ fontFamily: 'Roboto, sans-serif' }}
-          >
-            <BarChart3 className={`h-4 w-4 mr-2 ${activeTab === 'analytics' ? 'text-white' : 'text-gray-500'}`} />
-            Analytics
-          </button>
-          <button
-            onClick={() => setActiveTab('import-export')}
-            className={`flex items-center px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
-              activeTab === 'import-export'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-            style={{ fontFamily: 'Roboto, sans-serif' }}
-          >
-            <Upload className={`h-4 w-4 mr-2 ${activeTab === 'import-export' ? 'text-white' : 'text-gray-500'}`} />
-            Import/Export
-          </button>
-        </nav>
-      </div>
 
       {/* Tab Content */}
       {activeTab === 'bookmarks' && (
@@ -1659,14 +1613,6 @@ const Bookmarks = () => {
         </div>
       )}
 
-      {/* Tab Content */}
-      {activeTab === 'analytics' && (
-        <BookmarkAnalytics />
-      )}
-
-      {activeTab === 'import-export' && (
-        <BookmarkImportExport onImportComplete={loadBookmarks} />
-      )}
     </div>
   );
 };

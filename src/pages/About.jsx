@@ -1,94 +1,1053 @@
 import React from "react";
 import Navbar from "../components/landing/Navbar";
+import Footer from "../components/landing/Footer";
 
 const About = () => {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' , border: '1px solid rgba(30, 101, 173, 0.1)' }}>
       <Navbar />
-      <div className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="text-center mb-16">
-            <h1 
-              className="text-4xl sm:text-5xl font-bold mb-6"
-              style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}
+      <div className="py-5 ">
+         {/* Hero Section */}
+        <section className="pt-20 pb-16 md:pt-28 md:pb-20 relative z-20 overflow-hidden border-2 border-gray-200 rounded-2xl shadow-lg"
+          style={{
+            background: 'linear-gradient(135deg, #F9FAFC 0%, #FFFFFF 100%)'
+          }}
+        >
+          <div className="absolute inset-0 opacity-5">
+            <div className="absolute top-20 left-10 w-72 h-72 rounded-full"
+              style={{ backgroundColor: '#1E65AD', filter: 'blur(80px)' }}
+            ></div>
+            <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full"
+              style={{ backgroundColor: '#CF9B63', filter: 'blur(100px)' }}
+            ></div>
+          </div>
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-7 relative z-10">
+            <h1
+              className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight"
+            style={{
+              color: "#1E65AD",
+              fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                fontWeight: 700,
+                letterSpacing: '-0.02em'
+            }}
+          >
+            Experience Salhakar
+          </h1>
+            <div className="w-24 h-1.5 mx-auto rounded-full mb-6"
+              style={{ backgroundColor: '#CF9B63' }}
+            ></div>
+            <p
+              className="text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed"
+            style={{
+                color: '#8C969F',
+                fontFamily: "'Roboto', sans-serif",
+                fontWeight: 400,
+                lineHeight: '1.6'
+              }}
             >
-              About सलहाकार
-            </h1>
-            <p 
-              className="text-xl max-w-3xl mx-auto leading-relaxed"
-              style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}
-            >
-              Empowering legal professionals with AI-driven tools and comprehensive legal resources
+              where legal research doesn't just keep up, but leads the way.
             </p>
           </div>
+      </section>
 
-          {/* Content */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-            <div className="prose prose-lg max-w-none">
-              <h2 
-                className="text-2xl font-bold mb-4"
-                style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}
+        {/* Main Content Section */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-20">
+          {/* Section 1: About Salhakar */}
+          <section className="mb-20 md:mb-24 relative">
+            <div className="bg-white rounded-2xl p-8 md:p-12 shadow-lg"
+              style={{
+                border: '1px solid rgba(30, 101, 173, 0.1)',
+                boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
+              }}
+            >
+              <h2
+                className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6"
+                style={{
+                  color: '#1E65AD',
+                  fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                  fontWeight: 700,
+                  letterSpacing: '-0.02em'
+                }}
               >
-                Our Mission
+                About <span style={{
+                  color: '#1E65AD',
+                  fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif"
+                }}>Salhakar</span>
               </h2>
+              <div className="w-16 h-1 rounded-full mb-6"
+                style={{ backgroundColor: '#CF9B63' }}
+              ></div>
               <p 
-                className="mb-6 leading-relaxed"
-                style={{ color: '#374151', fontFamily: 'Roboto, sans-serif' }}
-              >
-                सलहाकार is dedicated to revolutionizing the legal industry by providing cutting-edge AI-powered tools and comprehensive legal resources. We believe in making legal research, documentation, and practice management more efficient and accessible for legal professionals across India.
+                className="text-base md:text-lg leading-relaxed"
+                style={{ 
+                  color: '#8C969F', 
+              fontFamily: "'Roboto', sans-serif",
+                  lineHeight: '1.8',
+              fontWeight: 400
+            }}
+          >
+                India's legal world is changing and with Salhakar, it will change for everyone. We built
+                Salhakar to break down the old barriers of language, complexity, and slow-moving
+                tradition. We at Salhakar believe that advanced AI and technology, can make legal
+                research instant, conversational, and accessible - giving every legal mind, from firstyear student to leading advocate, the tools to succeed.
               </p>
+        </div>
+      </section>
 
-              <h2 
-                className="text-2xl font-bold mb-4"
-                style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}
+          {/* Section 2: Mission & Vision */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-20 md:mb-24">
+            <section className="bg-white rounded-2xl p-8 md:p-10 shadow-lg transition-transform duration-300 hover:scale-[1.02]"
+              style={{
+                border: '1px solid rgba(30, 101, 173, 0.1)',
+                boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
+              }}
+            >
+              <div className="mb-4">
+                <div className="w-12 h-12 rounded-lg mb-4 flex items-center justify-center"
+                  style={{ backgroundColor: 'rgba(30, 101, 173, 0.1)' }}
+                >
+                  <svg className="w-6 h-6" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h2
+                  className="text-2xl md:text-3xl font-bold mb-4"
+                  style={{
+                    color: '#1E65AD',
+                    fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                    fontWeight: 700,
+                    letterSpacing: '-0.02em'
+                  }}
+                >
+                  Our <span style={{
+                    color: '#1E65AD',
+                    fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif"
+                  }}>Mission</span>
+                </h2>
+                <div className="w-12 h-1 rounded-full mb-4"
+                  style={{ backgroundColor: '#CF9B63' }}
+                ></div>
+              </div>
+              <p
+                className="text-base md:text-lg leading-relaxed"
+            style={{
+                  color: '#8C969F', 
+                  fontFamily: "'Roboto', sans-serif",
+                  lineHeight: '1.8',
+                  fontWeight: 400
+                }}
               >
-                What We Offer
-              </h2>
-              <ul 
-                className="mb-6 space-y-3"
-                style={{ color: '#374151', fontFamily: 'Roboto, sans-serif' }}
-              >
-                <li className="flex items-start">
-                  <span className="text-blue-600 mr-3 mt-1">•</span>
-                  <span>AI-powered legal research and judgment search</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-600 mr-3 mt-1">•</span>
-                  <span>Comprehensive legal document templates</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-600 mr-3 mt-1">•</span>
-                  <span>Intelligent legal chatbot assistance</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-600 mr-3 mt-1">•</span>
-                  <span>Law mapping and legal framework analysis</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-600 mr-3 mt-1">•</span>
-                  <span>YouTube video summarization for legal content</span>
-                </li>
-              </ul>
+                To transform how India discovers and applies the law, making every judgment,
+                statute, and legal answer just a click, a question, or a voice command away. We
+                are redefining research by putting clarity, reliability, and the human experience
+                first.
+              </p>
+            </section>
 
-              <h2 
-                className="text-2xl font-bold mb-4"
-                style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}
-              >
-                Our Vision
-              </h2>
+            {/* Section 3: Vision */}
+            <section className="bg-white rounded-2xl p-8 md:p-10 shadow-lg transition-transform duration-300 hover:scale-[1.02]"
+              style={{
+                border: '1px solid rgba(30, 101, 173, 0.1)',
+                boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
+              }}
+            >
+              <div className="mb-4">
+                <div className="w-12 h-12 rounded-lg mb-4 flex items-center justify-center"
+                  style={{ backgroundColor: 'rgba(30, 101, 173, 0.1)' }}
+                >
+                  <svg className="w-6 h-6" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </div>
+                <h2
+                  className="text-2xl md:text-3xl font-bold mb-4"
+                  style={{
+                    color: '#1E65AD',
+                    fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                    fontWeight: 700,
+                    letterSpacing: '-0.02em'
+                  }}
+                >
+                  Our <span style={{
+                    color: '#1E65AD',
+                    fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif"
+                  }}>Vision</span>
+                </h2>
+                <div className="w-12 h-1 rounded-full mb-4"
+                  style={{ backgroundColor: '#CF9B63' }}
+                ></div>
+              </div>
               <p 
-                className="leading-relaxed"
-                style={{ color: '#374151', fontFamily: 'Roboto, sans-serif' }}
-              >
-                To become India's leading legal technology platform, empowering lawyers, law students, and legal professionals with innovative tools that enhance productivity, accuracy, and accessibility in legal practice. We envision a future where legal research and documentation are seamlessly integrated with artificial intelligence to deliver exceptional results.
+                className="text-base md:text-lg leading-relaxed"
+                style={{ 
+                  color: '#8C969F', 
+              fontFamily: "'Roboto', sans-serif",
+                  lineHeight: '1.8',
+              fontWeight: 400
+            }}
+          >
+                A future where law in India is transparent, understandable, and reachable for all.
+                Salhakar envisions a nation where legal knowledge flows freely across every
+                language, device, and demographic - empowering smarter, faster, and fairer
+                justice everywhere.
               </p>
+            </section>
+          </div>
+
+          {/* Section 4: Founders */}
+          <section className="mt-20 md:mt-28 mb-20 md:mb-24">
+            <div className="text-center mb-16 md:mb-20">
+              <h2
+                className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4"
+                style={{
+                  color: '#1E65AD',
+                  fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                  fontWeight: 700,
+                  letterSpacing: '-0.02em'
+                }}
+              >
+                Our Founders
+              </h2>
+              <div className="w-24 h-1.5 mx-auto rounded-full"
+                style={{ backgroundColor: '#CF9B63' }}
+              ></div>
+            </div>
+
+            <div className="space-y-20 md:space-y-28 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+              {/* Founder 1: Pratham Shah - Image left, Text right */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-center">
+                <div className="bg-white rounded-2xl overflow-hidden p-6 shadow-lg transition-transform duration-300 hover:scale-[1.02] mx-auto md:mx-0"
+                  style={{
+                    border: '1px solid rgba(30, 101, 173, 0.1)',
+                    boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)',
+                    maxWidth: '320px',
+                    width: '100%'
+                  }}
+                >
+                  <div className="relative w-full aspect-[3/4] mb-4 overflow-hidden rounded-xl">
+                    <img
+                      src="/founder.png"
+                      alt="Pratham Shah"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="text-center">
+                    <h3
+                      className="text-xl md:text-2xl font-bold mb-1"
+                      style={{
+                        color: '#1E65AD',
+                        fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                        fontWeight: 700
+                      }}
+                    >
+                      Pratham Shah
+                    </h3>
+                    <p 
+                      className="text-sm md:text-base mb-4"
+                      style={{ 
+                        color: '#8C969F', 
+                        fontFamily: "'Roboto', sans-serif", 
+                        fontWeight: 400 
+                      }}
+                    >
+                      Founder & CEO
+                    </p>
+                    <div className="flex gap-4 justify-center">
+                      <a
+                        href="https://linkedin.com/in/pratham-shah"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
+                        aria-label="LinkedIn"
+                      >
+                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                        </svg>
+                      </a>
+                      <a
+                        href="mailto:pratham@salhakar.com"
+                        className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
+                        aria-label="Email"
+                      >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col justify-center">
+                  <p
+                    className="text-base md:text-lg leading-relaxed"
+            style={{
+                      color: '#8C969F',
+                      fontFamily: "'Roboto', sans-serif",
+                      fontWeight: 400,
+                      lineHeight: '1.8'
+                    }}
+                  >
+                    We're committed to expanding Salhakar to cover every Indian court, act, and language,
+                    while continuing to advance our AI's capabilities. Our dream: no courtroom, student, or
+                    lawyer left behind. Salhakar will keep growing—always centred on the people who make
+                    law matter.
+                  </p>
+                </div>
+              </div>
+
+              {/* Founder 2: Parth Chelani - Text left, Image right */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-center">
+                <div className="flex flex-col justify-center order-2 md:order-1">
+                  <p
+                    className="text-base md:text-lg leading-relaxed"
+                    style={{
+                      color: '#8C969F',
+                      fontFamily: "'Roboto', sans-serif",
+                      fontWeight: 400,
+                      lineHeight: '1.8'
+                    }}
+                  >
+                    Legal technology should feel invisible. We believe the right platform is one you trust—
+                    one that fits your life, your workflow, and your language. That's why Salhakar is built for
+                    people, not just for process: we take complexity out, bring simplicity in, and keep your
+                    data and voice secure at every step.
+                  </p>
+                </div>
+                <div className="bg-white rounded-2xl overflow-hidden p-6 shadow-lg transition-transform duration-300 hover:scale-[1.02] mx-auto md:mx-0 order-1 md:order-2"
+                  style={{
+                    border: '1px solid rgba(30, 101, 173, 0.1)',
+                    boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)',
+                    maxWidth: '320px',
+                    width: '100%'
+                  }}
+                >
+                  <div className="relative w-full aspect-[3/4] mb-4 overflow-hidden rounded-xl">
+                    <img
+                      src="/cofounder.png"
+                      alt="Parth Chelani"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="text-center">
+                    <h3
+                      className="text-xl md:text-2xl font-bold mb-1"
+                      style={{
+                        color: '#1E65AD',
+                        fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                        fontWeight: 700
+                      }}
+                    >
+                      Parth Chelani
+                    </h3>
+                    <p 
+                      className="text-sm md:text-base mb-4"
+                      style={{ 
+                        color: '#8C969F', 
+              fontFamily: "'Roboto', sans-serif",
+              fontWeight: 400
+            }}
+          >
+                      Chief Operating Officer
+                    </p>
+                    <div className="flex gap-4 justify-center">
+                      <a
+                        href="https://linkedin.com/in/parth-chelani"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
+                        aria-label="LinkedIn"
+                      >
+                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                        </svg>
+                      </a>
+                      <a
+                        href="mailto:parth@salhakar.com"
+                        className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
+                        aria-label="Email"
+                      >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+        </div>
+      </section>
+
+          {/* Team Section */}
+          <section className="mt-20 md:mt-28 mb-20 md:mb-24">
+           <div className="text-center mb-12 md:mb-16">
+                 <h2
+                   className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4"
+                   style={{
+                     color: '#1E65AD',
+                     fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                     fontWeight: 700,
+                     letterSpacing: '-0.02em'
+                   }}
+                 >
+                   Our Team
+               </h2>
+               <div className="w-24 h-1.5 mx-auto rounded-full mb-6"
+                 style={{ backgroundColor: '#CF9B63' }}
+               ></div>
+                 <p
+                   className="text-lg md:text-xl max-w-3xl mx-auto"
+                   style={{
+                     color: '#8C969F',
+                     fontFamily: "'Roboto', sans-serif",
+                     fontWeight: 400,
+                     lineHeight: '1.75'
+                   }}
+                 >
+                   Our dedicated team at Salhakar is committed for providing the best fusion of tech and AI to our valued customers.
+                 </p>
+               </div>
+
+
+              {/* Bottom Row - 2 Cards Centered */}
+              <div className="flex justify-center">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 max-w-4xl">
+                {/* Team Member 4 */}
+                <div className="bg-white rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-[1.02]"
+                  style={{
+                    border: '1px solid rgba(30, 101, 173, 0.1)',
+                    boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
+                  }}
+                >
+                  <div className="h-64 flex items-center justify-center"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(30, 101, 173, 0.1) 0%, rgba(207, 155, 99, 0.1) 100%)'
+                    }}
+                  >
+                    <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center">
+                      <span className="text-4xl font-bold" style={{ color: '#1E65AD' }}>
+                      PS
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-6 text-center">
+                    <h3
+                      className="text-xl font-bold mb-2"
+                      style={{
+                        color: '#1E65AD',
+                        fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                        fontWeight: 700
+                      }}
+                    >
+                      Pratham Shah
+                    </h3>
+                    <p
+                      className="text-base mb-4"
+                      style={{
+                        color: '#8C969F',
+                        fontFamily: "'Roboto', sans-serif",
+                        fontWeight: 400
+                      }}
+                    >
+                      Chief  Executive Officer
+                    </p>
+                    <p
+                      className="text-sm mb-4 leading-relaxed"
+                      style={{
+                        color: '#8C969F',
+                        fontFamily: "'Roboto', sans-serif",
+                        fontWeight: 400,
+                        lineHeight: '1.6'
+                      }}
+                    >
+                      Legal research specialist with deep knowledge of case law and legal precedents. Expert in legal document analysis and research methodologies.
+                    </p>
+                    <div className="flex justify-center gap-4">
+                      <a
+                        href="https://linkedin.com/in/amit-patel"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
+                        aria-label="LinkedIn"
+                      >
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                        </svg>
+                      </a>
+                      <a
+                        href="mailto:amit@salhakar.com"
+                        className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
+                        aria-label="Email"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Team Member 5 */}
+                <div className="bg-white rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-[1.02]"
+                  style={{
+                    border: '1px solid rgba(30, 101, 173, 0.1)',
+                    boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
+                  }}
+                >
+                  <div className="h-64 flex items-center justify-center"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(30, 101, 173, 0.1) 0%, rgba(207, 155, 99, 0.1) 100%)'
+                    }}
+                  >
+                    <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center">
+                      <span className="text-4xl font-bold" style={{ color: '#1E65AD' }}>
+                        PC
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-6 text-center">
+                    <h3
+                      className="text-xl font-bold mb-2"
+                      style={{
+                        color: '#1E65AD',
+                        fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                        fontWeight: 700
+                      }}
+                    >
+                      Parth Chelani
+                    </h3>
+                    <p
+                      className="text-base mb-4"
+                      style={{
+                        color: '#8C969F',
+                        fontFamily: "'Roboto', sans-serif",
+                        fontWeight: 400
+                      }}
+                    >
+                      Chief Operating Officer
+                    </p>
+                    <p
+                      className="text-sm mb-4 leading-relaxed"
+                      style={{
+                        color: '#8C969F',
+                        fontFamily: "'Roboto', sans-serif",
+                        fontWeight: 400,
+                        lineHeight: '1.6'
+                      }}
+                    >
+                      Operations expert with experience in scaling legal tech startups. Focused on process optimization and team coordination.
+                    </p>
+                    <div className="flex justify-center gap-4">
+                      <a
+                        href="https://linkedin.com/in/sneha-reddy"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
+                        aria-label="LinkedIn"
+                      >
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                        </svg>
+                      </a>
+                      <a
+                        href="mailto:sneha@salhakar.com"
+                        className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
+                        aria-label="Email"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      </a>
             </div>
           </div>
         </div>
       </div>
+            </div>
+
+            {/* Top Row - 3 Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 max-w-6xl mx-auto mb-8 md:mb-12 pt-10">
+              {/* Team Member 1 */}
+              <div className="bg-white rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-[1.02]"
+                style={{
+                  border: '1px solid rgba(30, 101, 173, 0.1)',
+                  boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
+                }}
+              >
+                <div className="h-64 flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(30, 101, 173, 0.1) 0%, rgba(207, 155, 99, 0.1) 100%)'
+                  }}
+                >
+                  <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center">
+                    <span className="text-4xl font-bold" style={{ color: '#1E65AD' }}>
+                      AB
+                    </span>
+                  </div>
+                </div>
+                <div className="p-6 text-center">
+                  <h3
+                    className="text-xl font-bold mb-2"
+                    style={{
+                      color: '#1E65AD',
+                      fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                      fontWeight: 700
+                    }}
+                  >
+                   Aditya Barasiya
+                  </h3>
+                  <p
+                    className="text-base mb-4"
+                    style={{
+                      color: '#8C969F',
+                      fontFamily: "'Roboto', sans-serif",
+                      fontWeight: 400
+                    }}
+                  >
+                    Technical Lead
+                  </p>
+                  <p
+                    className="text-sm mb-4 leading-relaxed"
+                    style={{
+                      color: '#8C969F',
+                      fontFamily: "'Roboto', sans-serif",
+                      fontWeight: 400,
+                      lineHeight: '1.6'
+                    }}
+                  >
+                    Senior legal counsel with expertise in Indian law and regulatory compliance. Former Supreme Court advocate with 12+ years of experience.
+                  </p>
+                  <div className="flex justify-center gap-4">
+                    <a
+                      href="https://linkedin.com/in/anjali-mehta"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
+                      aria-label="LinkedIn"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                      </svg>
+                    </a>
+                    <a
+                      href="mailto:anjali@salhakar.com"
+                      className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
+                      aria-label="Email"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Team Member 2 */}
+              <div className="bg-white rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-[1.02]"
+                style={{
+                  border: '1px solid rgba(30, 101, 173, 0.1)',
+                  boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
+                }}
+              >
+                <div className="h-64 flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(30, 101, 173, 0.1) 0%, rgba(207, 155, 99, 0.1) 100%)'
+                  }}
+                >
+                  <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center">
+                    <span className="text-4xl font-bold" style={{ color: '#1E65AD' }}>
+                      HG
+                    </span>
+                  </div>
+                </div>
+                <div className="p-6 text-center">
+                  <h3
+                    className="text-xl font-bold mb-2"
+                    style={{
+                      color: '#1E65AD',
+                      fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                      fontWeight: 700
+                    }}
+                  >
+                    Harshil Gajjar
+                  </h3>
+                  <p
+                    className="text-base mb-4"
+                    style={{
+                      color: '#8C969F',
+                      fontFamily: "'Roboto', sans-serif",
+                      fontWeight: 400
+                    }}
+                  >
+                    Full Stack Developer
+                  </p>
+                  <p
+                    className="text-sm mb-4 leading-relaxed"
+            style={{
+                      color: '#8C969F',
+                      fontFamily: "'Roboto', sans-serif",
+                      fontWeight: 400,
+                      lineHeight: '1.6'
+                    }}
+                  >
+                    Full-stack developer and AI specialist with expertise in natural language processing and legal document analysis.
+                  </p>
+                  <div className="flex justify-center gap-4">
+                    <a
+                      href="https://linkedin.com/in/rajesh-kumar"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
+                      aria-label="LinkedIn"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                      </svg>
+                    </a>
+                    <a
+                      href="mailto:rajesh@salhakar.com"
+                      className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
+                      aria-label="Email"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+                  {/* Team Member 3 */}
+              <div className="bg-white rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-[1.02]"
+                style={{
+                  border: '1px solid rgba(30, 101, 173, 0.1)',
+                  boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
+                }}
+              >
+                <div className="h-64 flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(30, 101, 173, 0.1) 0%, rgba(207, 155, 99, 0.1) 100%)'
+                  }}
+                >
+                  <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center">
+                    <span className="text-4xl font-bold" style={{ color: '#1E65AD' }}>
+                      PS
+                    </span>
+                  </div>
+                </div>
+                <div className="p-6 text-center">
+                  <h3
+                    className="text-xl font-bold mb-2"
+                    style={{
+                      color: '#1E65AD',
+                      fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                      fontWeight: 700
+                    }}
+                  >
+                    Khushi Kothadia
+                  </h3>
+                  <p
+                    className="text-base mb-4"
+                    style={{
+                      color: '#8C969F',
+              fontFamily: "'Roboto', sans-serif",
+              fontWeight: 400
+            }}
+          >
+                    App Developer
+                  </p>
+                  <p
+                    className="text-sm mb-4 leading-relaxed"
+                    style={{
+                      color: '#8C969F',
+                      fontFamily: "'Roboto', sans-serif",
+                      fontWeight: 400,
+                      lineHeight: '1.6'
+                    }}
+                  >
+                    Product strategist with a background in legal tech and user experience design. Focused on creating intuitive legal solutions.
+                  </p>
+                  <div className="flex justify-center gap-4">
+                    <a
+                      href="https://linkedin.com/in/priya-sharma"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
+                      aria-label="LinkedIn"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                      </svg>
+                    </a>
+                    <a
+                      href="mailto:priya@salhakar.com"
+                      className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
+                      aria-label="Email"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+        </div>
+
+          
+          </section>
+
+          {/* Career Section */}
+          <section className="mt-20 md:mt-28 mb-20 md:mb-24">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12 md:mb-16">
+                <h2
+                  className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4"
+                  style={{
+                    color: '#1E65AD',
+                    fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                    fontWeight: 700,
+                    letterSpacing: '-0.02em'
+                  }}
+                >
+                  Join Our Team
+              </h2>
+              <div className="w-24 h-1.5 mx-auto rounded-full mb-6"
+                style={{ backgroundColor: '#CF9B63' }}
+              ></div>
+              <p 
+                  className="text-lg md:text-xl max-w-3xl mx-auto"
+                  style={{
+                    color: '#8C969F',
+                    fontFamily: "'Roboto', sans-serif",
+                    fontWeight: 400,
+                    lineHeight: '1.75'
+                  }}
+                >
+                  We're always looking for talented individuals who share our passion for making legal services 
+                  more accessible and efficient. Join us in building the future of legal technology.
+                </p>
+              </div>
+
+              <div className="bg-white rounded-2xl p-8 md:p-12 shadow-lg"
+                style={{
+                  border: '1px solid rgba(30, 101, 173, 0.1)',
+                  boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
+                }}
+              >
+                <div className="grid md:grid-cols-2 gap-8 md:gap-12">
+                  <div>
+                    <h3
+                      className="text-2xl font-bold mb-6"
+                      style={{
+                        color: '#1E65AD',
+                        fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                        fontWeight: 700
+                      }}
+                    >
+                      Why Join Salhakar?
+                    </h3>
+                    <ul className="space-y-4">
+                <li className="flex items-start">
+                        <svg className="w-6 h-6 text-[#1E65AD] mr-3 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p
+                          className="text-base"
+                          style={{
+                            color: '#8C969F',
+                            fontFamily: "'Roboto', sans-serif",
+                            fontWeight: 400,
+                            lineHeight: '1.75'
+                          }}
+                        >
+                          Work on cutting-edge AI and legal technology projects
+                        </p>
+                </li>
+                <li className="flex items-start">
+                        <svg className="w-6 h-6 text-[#1E65AD] mr-3 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p
+                          className="text-base"
+                          style={{
+                            color: '#8C969F',
+                            fontFamily: "'Roboto', sans-serif",
+                            fontWeight: 400,
+                            lineHeight: '1.75'
+                          }}
+                        >
+                          Collaborative and innovative work environment
+                        </p>
+                </li>
+                <li className="flex items-start">
+                        <svg className="w-6 h-6 text-[#1E65AD] mr-3 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p
+                          className="text-base"
+                          style={{
+                            color: '#8C969F',
+                            fontFamily: "'Roboto', sans-serif",
+                            fontWeight: 400,
+                            lineHeight: '1.75'
+                          }}
+                        >
+                          Opportunities for professional growth and development
+                        </p>
+                </li>
+                <li className="flex items-start">
+                        <svg className="w-6 h-6 text-[#1E65AD] mr-3 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p
+                          className="text-base"
+                          style={{
+                            color: '#8C969F',
+                            fontFamily: "'Roboto', sans-serif",
+                            fontWeight: 400,
+                            lineHeight: '1.75'
+                          }}
+                        >
+                          Make a meaningful impact on legal accessibility
+                        </p>
+                </li>
+              </ul>
+                  </div>
+
+                  <div>
+                    <h3
+                      className="text-2xl font-bold mb-6"
+                      style={{
+                        color: '#1E65AD',
+                        fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                        fontWeight: 700
+                      }}
+                    >
+                      Open Positions
+                    </h3>
+                    <div className="space-y-4 mb-8">
+                      <div className="p-5 rounded-xl transition-all duration-300 hover:shadow-md"
+                        style={{
+                          backgroundColor: '#F9FAFC',
+                          border: '1px solid rgba(30, 101, 173, 0.1)'
+                        }}
+                      >
+
+                        <div className="flex justify-between items-center">
+                        <h4
+                          className="text-lg font-semibold mb-2"
+                          style={{
+                            color: '#1E65AD',
+                            fontFamily: "'Heebo', sans-serif",
+                            fontWeight: 600
+                          }}
+                        >
+                          Software Engineer
+
+
+                          
+                        </h4>
+                        <a
+                          href="mailto:careers@salhakar.com?subject=Application for Software Engineer Position"
+                          className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-200"
+                          style={{
+                            backgroundColor: '#1E65AD',
+                            color: '#FFFFFF'
+                          }}
+                          onMouseEnter={(e) => e.target.style.backgroundColor = '#CF9B63'}
+                          onMouseLeave={(e) => e.target.style.backgroundColor = '#1E65AD'}
+                        >
+                          Apply Now
+                        </a>
+                        </div>
+                        
+                        <p
+                          className="text-sm mb-2"
+                          style={{
+                            color: '#8C969F',
+                            fontFamily: "'Roboto', sans-serif",
+                            fontWeight: 400
+                          }}
+                        >
+                          Full-time • Remote/On-site
+                        </p>
+                        <p
+                          className="text-sm mb-4"
+                          style={{
+                            color: '#8C969F',
+                            fontFamily: "'Roboto', sans-serif",
+                            fontWeight: 400
+                          }}
+                        >
+                          We're looking for experienced developers to help build our AI-powered legal platform.
+                        </p>
+                       
+                      </div>
+                      <div className="p-5 rounded-xl transition-all duration-300 hover:shadow-md"
+                        style={{
+                          backgroundColor: '#F9FAFC',
+                          border: '1px solid rgba(30, 101, 173, 0.1)'
+                        }}
+                      >
+                        <div className="flex justify-between items-center">
+                        <h4
+                          className="text-lg font-semibold mb-2"
+                          style={{
+                            color: '#1E65AD',
+                            fontFamily: "'Heebo', sans-serif",
+                            fontWeight: 600
+                          }}
+                        >
+                          Legal Researcher
+                        </h4>
+                        
+                        <a
+                          href="mailto:careers@salhakar.com?subject=Application for Legal Researcher Position"
+                          className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-200"
+                          style={{
+                            backgroundColor: '#1E65AD',
+                            color: '#FFFFFF'
+                          }}
+                          onMouseEnter={(e) => e.target.style.backgroundColor = '#CF9B63'}
+                          onMouseLeave={(e) => e.target.style.backgroundColor = '#1E65AD'}
+                        >
+                          Apply Now
+                        </a>
+                        </div>  
+                        <p
+                          className="text-sm mb-2"
+                          style={{
+                            color: '#8C969F',
+                            fontFamily: "'Roboto', sans-serif",
+                            fontWeight: 400
+                          }}
+                        >
+                          Full-time • Remote/On-site
+                        </p>
+                        <p
+                          className="text-sm mb-4"
+                          style={{
+                            color: '#8C969F',
+                            fontFamily: "'Roboto', sans-serif",
+                            fontWeight: 400
+                          }}
+                        >
+                          Join our team to help curate and organize legal content for our platform.
+                        </p>
+                        
+                      </div>
+                    </div>
+
+              
+            </div>
+          </div>
+        </div>
+      </div>
+          </section>
+        </div>
+      </div>
+      <Footer />
     </div>
   );
 };
 
 export default About;
+

@@ -1,0 +1,355 @@
+import React, { useState } from "react";
+import Navbar from "../components/landing/Navbar";
+import Footer from "../components/landing/Footer";
+import { useNavigate } from "react-router-dom";
+import { Calendar, Clock, User, ArrowRight, Search, Tag } from "lucide-react";
+
+const Blog = () => {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  const categories = ["All", "Legal Updates", "AI & Technology", "Case Studies", "Legal Tips", "Industry News"];
+
+  const blogPosts = [
+    {
+      id: 1,
+      title: "The Future of Legal Research: AI-Powered Solutions",
+      excerpt: "Discover how artificial intelligence is revolutionizing legal research and making it more accessible for lawyers, students, and researchers.",
+      author: "Salhakar Team",
+      date: "2024-01-15",
+      readTime: "5 min read",
+      category: "AI & Technology",
+      image: "/logo4.png",
+      tags: ["AI", "Legal Tech", "Innovation"]
+    },
+    {
+      id: 2,
+      title: "Understanding BNS to IPC Mapping: A Comprehensive Guide",
+      excerpt: "Navigate the transition from old legal frameworks to new ones with our detailed guide on BNS to IPC mapping.",
+      author: "Legal Experts",
+      date: "2024-01-10",
+      readTime: "8 min read",
+      category: "Legal Updates",
+      image: "/logo4.png",
+      tags: ["BNS", "IPC", "Legal Framework"]
+    },
+    {
+      id: 3,
+      title: "How to Conduct Efficient Legal Research",
+      excerpt: "Learn proven strategies and techniques to streamline your legal research process and save valuable time.",
+      author: "Research Team",
+      date: "2024-01-05",
+      readTime: "6 min read",
+      category: "Legal Tips",
+      image: "/logo4.png",
+      tags: ["Research", "Productivity", "Tips"]
+    },
+    {
+      id: 4,
+      title: "Case Study: Successful Legal Research Using Salhakar",
+      excerpt: "Read how a leading law firm improved their research efficiency by 300% using Salhakar's AI-powered platform.",
+      author: "Case Studies",
+      date: "2023-12-28",
+      readTime: "7 min read",
+      category: "Case Studies",
+      image: "/logo4.png",
+      tags: ["Case Study", "Success Story", "Efficiency"]
+    },
+    {
+      id: 5,
+      title: "Latest Updates in Indian Legal System",
+      excerpt: "Stay informed about the latest changes, amendments, and updates in the Indian legal system.",
+      author: "Legal Updates",
+      date: "2023-12-20",
+      readTime: "4 min read",
+      category: "Industry News",
+      image: "/logo4.png",
+      tags: ["Legal Updates", "India", "News"]
+    },
+    {
+      id: 6,
+      title: "Multilingual Legal Research: Breaking Language Barriers",
+      excerpt: "Explore how Salhakar enables legal research in multiple Indian languages, making legal information accessible to all.",
+      author: "Technology Team",
+      date: "2023-12-15",
+      readTime: "5 min read",
+      category: "AI & Technology",
+      image: "/logo4.png",
+      tags: ["Multilingual", "Accessibility", "Technology"]
+    }
+  ];
+
+  const filteredPosts = blogPosts.filter(post => {
+    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === "All" || post.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  };
+
+  return (
+    <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
+      <Navbar />
+      
+      {/* Hero Section */}
+      <section className="pt-24 pb-16 md:pt-32 md:pb-20 relative z-20 overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, #F9FAFC 0%, #FFFFFF 100%)'
+        }}
+      >
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-20 left-10 w-72 h-72 rounded-full"
+            style={{ backgroundColor: '#1E65AD', filter: 'blur(80px)' }}
+          ></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full"
+            style={{ backgroundColor: '#CF9B63', filter: 'blur(100px)' }}
+          ></div>
+        </div>
+        
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-7 relative z-10">
+          <h1
+            className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight"
+            style={{
+              color: "#1E65AD",
+              fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+              fontWeight: 700,
+              letterSpacing: '-0.02em'
+            }}
+          >
+            Salhakar Blog
+          </h1>
+          <div className="w-24 h-1.5 mx-auto rounded-full mb-6"
+            style={{ backgroundColor: '#CF9B63' }}
+          ></div>
+          <p
+            className="text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed"
+            style={{
+              color: '#8C969F',
+              fontFamily: "'Roboto', sans-serif",
+              fontWeight: 400,
+              lineHeight: '1.6'
+            }}
+          >
+            Insights, updates, and expert guidance on legal research, technology, and the future of law.
+          </p>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        {/* Search and Filter Section */}
+        <div className="mb-12">
+          <div className="bg-white rounded-2xl p-6 shadow-lg"
+            style={{
+              border: '1px solid rgba(30, 101, 173, 0.1)',
+              boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
+            }}
+          >
+            {/* Search Bar */}
+            <div className="relative mb-6">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5"
+                style={{ color: '#8C969F' }}
+              />
+              <input
+                type="text"
+                placeholder="Search blog posts..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                style={{
+                  borderColor: 'rgba(30, 101, 173, 0.2)',
+                  fontFamily: "'Roboto', sans-serif",
+                  color: '#1E65AD'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#1E65AD';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(30, 101, 173, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'rgba(30, 101, 173, 0.2)';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </div>
+
+            {/* Category Filters */}
+            <div className="flex flex-wrap gap-3">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className="px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                  style={{
+                    backgroundColor: selectedCategory === category ? '#1E65AD' : 'transparent',
+                    color: selectedCategory === category ? '#FFFFFF' : '#8C969F',
+                    border: `2px solid ${selectedCategory === category ? '#1E65AD' : 'rgba(30, 101, 173, 0.2)'}`,
+                    fontFamily: "'Roboto', sans-serif",
+                    fontWeight: selectedCategory === category ? 600 : 500
+                  }}
+                  onMouseEnter={(e) => {
+                    if (selectedCategory !== category) {
+                      e.target.style.borderColor = '#1E65AD';
+                      e.target.style.color = '#1E65AD';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedCategory !== category) {
+                      e.target.style.borderColor = 'rgba(30, 101, 173, 0.2)';
+                      e.target.style.color = '#8C969F';
+                    }
+                  }}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Blog Posts Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {filteredPosts.map((post) => (
+            <article
+              key={post.id}
+              className="bg-white rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl cursor-pointer"
+              style={{
+                border: '1px solid rgba(30, 101, 173, 0.1)',
+                boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
+              }}
+              onClick={() => navigate(`/blog/${post.id}`)}
+            >
+              {/* Post Image */}
+              <div className="relative h-48 overflow-hidden"
+                style={{ backgroundColor: '#F9FAFC' }}
+              >
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.parentElement.style.background = 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)';
+                  }}
+                />
+                <div className="absolute top-4 left-4">
+                  <span className="px-3 py-1 rounded-full text-xs font-semibold text-white"
+                    style={{
+                      backgroundColor: '#CF9B63',
+                      fontFamily: "'Roboto', sans-serif"
+                    }}
+                  >
+                    {post.category}
+                  </span>
+                </div>
+              </div>
+
+              {/* Post Content */}
+              <div className="p-6">
+                <h3
+                  className="text-xl md:text-2xl font-bold mb-3 leading-tight"
+                  style={{
+                    color: '#1E65AD',
+                    fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                    fontWeight: 700
+                  }}
+                >
+                  {post.title}
+                </h3>
+                <p
+                  className="text-sm md:text-base mb-4 leading-relaxed"
+                  style={{
+                    color: '#8C969F',
+                    fontFamily: "'Roboto', sans-serif",
+                    lineHeight: '1.6'
+                  }}
+                >
+                  {post.excerpt}
+                </p>
+
+                {/* Post Meta */}
+                <div className="flex items-center justify-between text-xs md:text-sm mb-4"
+                  style={{ color: '#8C969F', fontFamily: "'Roboto', sans-serif" }}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1">
+                      <User className="h-4 w-4" />
+                      <span>{post.author}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-4 w-4" />
+                      <span>{formatDate(post.date)}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    <span>{post.readTime}</span>
+                  </div>
+                </div>
+
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {post.tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="px-2 py-1 rounded text-xs"
+                      style={{
+                        backgroundColor: 'rgba(30, 101, 173, 0.1)',
+                        color: '#1E65AD',
+                        fontFamily: "'Roboto', sans-serif"
+                      }}
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Read More */}
+                <button
+                  className="flex items-center gap-2 font-semibold transition-all duration-200 group"
+                  style={{
+                    color: '#1E65AD',
+                    fontFamily: "'Roboto', sans-serif"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = '#CF9B63';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = '#1E65AD';
+                  }}
+                >
+                  Read More
+                  <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        {/* Empty State */}
+        {filteredPosts.length === 0 && (
+          <div className="text-center py-20">
+            <p
+              className="text-xl md:text-2xl font-semibold"
+              style={{
+                color: '#8C969F',
+                fontFamily: "'Roboto', sans-serif"
+              }}
+            >
+              No blog posts found. Try adjusting your search or filter.
+            </p>
+          </div>
+        )}
+      </div>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default Blog;
+

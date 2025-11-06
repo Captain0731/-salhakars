@@ -68,10 +68,10 @@ const FeatureCard = ({ feature, index, onClick }) => {
           }}
         >
           {/* Content Container */}
-          <div className="p-6 sm:p-8 flex flex-col flex-grow relative z-10">
+          <div className="p-4 sm:p-6 md:p-8 flex flex-col flex-grow relative z-10">
             {/* Title */}
             <h3 
-              className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 leading-tight"
+              className="text-base sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4 leading-tight"
               style={{ 
                 color: '#1E65AD',
                 fontFamily: 'Helvetica Hebrew Bold, sans-serif',
@@ -81,9 +81,9 @@ const FeatureCard = ({ feature, index, onClick }) => {
               {feature.title}
             </h3>
 
-            {/* Description */}
+            {/* Description - Hidden on mobile */}
             <p 
-              className="text-sm sm:text-base text-gray-500 leading-relaxed mb-6 sm:mb-8 flex-grow"
+              className="hidden sm:block text-sm sm:text-base text-gray-500 leading-relaxed mb-6 sm:mb-8 flex-grow"
               style={{ 
                 fontFamily: 'Roboto, sans-serif',
                 color: '#6B7280',
@@ -95,8 +95,9 @@ const FeatureCard = ({ feature, index, onClick }) => {
 
             {/* Footer with Explore Feature Link and Circular Button */}
             <div className="flex items-center justify-between mt-auto">
+              {/* Explore Feature Text - Hidden on mobile */}
               <span 
-                className="text-sm sm:text-base font-medium transition-all duration-300"
+                className="hidden sm:inline text-sm sm:text-base font-medium transition-all duration-300"
                 style={{ 
                   color: colors.linkColor,
                   fontFamily: 'Roboto, sans-serif',
@@ -108,7 +109,7 @@ const FeatureCard = ({ feature, index, onClick }) => {
               
               {/* Circular Arrow Button */}
               <div 
-                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-300"
+                className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 ml-auto sm:ml-0"
                 style={{
                   background: colors.buttonBg,
                   transform: isHovered ? 'scale(1.1)' : 'scale(1)',
@@ -118,7 +119,7 @@ const FeatureCard = ({ feature, index, onClick }) => {
                 }}
               >
                 <svg 
-                  className="w-5 h-5 sm:w-6 sm:h-6" 
+                  className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" 
                   style={{ color: colors.buttonIcon }}
                   fill="none" 
                   stroke="currentColor" 
@@ -262,8 +263,8 @@ const Features = React.forwardRef((props, ref) => {
           <div className="w-12 sm:w-16 md:w-20 lg:w-24 h-0.5 sm:h-1 mx-auto rounded-full" style={{ backgroundColor: '#CF9B63' }}></div>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+        {/* Features Grid - 2 columns (pairs) on all screen sizes */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-6 md:gap-8">
           {features.map((feature, index) => (
             <FeatureCard 
               key={feature.id}

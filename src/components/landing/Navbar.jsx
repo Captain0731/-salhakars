@@ -38,10 +38,6 @@ const navItems = [
     path: "/about",
   },
   {
-    label: "Support",
-    path: "/legal-chatbot",
-  },
-  {
     label: "Pricing",
     path: "/pricing",
   },
@@ -49,17 +45,16 @@ const navItems = [
     label: "More",
     links: [
       { 
-        label: "Our Team", 
-        path: "/our-team"
+        label: "Support", 
+        path: "/legal-chatbot"
       },
       { 
         label: "Referral Program", 
         path: "/referral",
-        subLinks: [
-          { label: "Invite Friends", path: "/invite-friends" },
-          { label: "Earn Rewards", path: "/earn-rewards" },
-          { label: "Track Referrals", path: "/track-referrals" },
-        ]
+      },
+      { 
+        label: "Blog", 
+        path: "/blog",
       },
     ],
   },

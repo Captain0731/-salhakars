@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 /**
  * LanguageSelector Component
@@ -10,12 +11,19 @@ import React, { useState, useEffect, useRef } from 'react';
  * - Screen reader friendly
  * - Responsive design
  * - Cookie persistence
+ * - Auto-scrolling language carousel animation
  */
 
 const LanguageSelector = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState('en');
+  const [currentScrollIndex, setCurrentScrollIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+  const [rowHeight, setRowHeight] = useState(24);
   const dropdownRef = useRef(null);
+  const intervalRef = useRef(null);
+  const measureRef = useRef(null);
 
   const languages = [
     { code: 'en', langCode: 'EN', country: 'US', name: 'English', flag: '🇺🇸', display: 'English' },
@@ -70,7 +78,74 @@ const LanguageSelector = () => {
   // Update current language on mount
   useEffect(() => {
     setCurrentLang(getCurrentLanguage());
+    // Set initial scroll index to current language
+    const initialLang = getCurrentLanguage();
+    const initialIndex = languages.findIndex(lang => lang.code === initialLang.toLowerCase());
+    setCurrentScrollIndex(initialIndex >= 0 ? initialIndex : 0);
   }, []);
+
+  // Measure row height for smooth scrolling
+  useEffect(() => {
+    const updateRowHeight = () => {
+      if (measureRef.current) {
+        setRowHeight(measureRef.current.offsetHeight || 24);
+      }
+    };
+    updateRowHeight();
+    window.addEventListener('resize', updateRowHeight);
+    return () => window.removeEventListener('resize', updateRowHeight);
+  }, []);
+
+  // Auto-scroll through languages
+  useEffect(() => {
+    const prefersReduced = typeof window !== 'undefined' &&
+      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReduced) return; // respect user preference
+
+    if (!isHovered && !isOpen) {
+      // Slightly longer interval than transition for calm feel
+      intervalRef.current = setInterval(() => {
+        setCurrentScrollIndex((prev) => {
+          // move forward; when we hit the cloned last item, advance and then we'll reset
+          return prev + 1;
+        });
+      }, 2600);
+    } else if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [isHovered, isOpen]);
+
+  // Extended languages for seamless loop (clone first item)
+  const extendedLanguages = [...languages, languages[0]];
+
+  // Seamless reset when reaching the cloned item
+  useEffect(() => {
+    const lastIndex = extendedLanguages.length - 1;
+    if (currentScrollIndex === lastIndex) {
+      // After the transition completes, jump back to 0 without transition
+      const TRANSITION_MS = 650;
+      const timeout = setTimeout(() => {
+        setIsResetting(true);
+        setCurrentScrollIndex(0);
+        // re-enable transition on the next frame
+        requestAnimationFrame(() => requestAnimationFrame(() => setIsResetting(false)));
+      }, TRANSITION_MS + 20);
+      return () => clearTimeout(timeout);
+    }
+    // Also keep index bounded to avoid unbounded growth
+    if (currentScrollIndex > lastIndex) {
+      setCurrentScrollIndex(0);
+    }
+  }, [currentScrollIndex, extendedLanguages.length]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -94,6 +169,7 @@ const LanguageSelector = () => {
   };
 
   const currentLanguage = languages.find(lang => lang.code === currentLang.toLowerCase()) || languages[0];
+  const [showTooltip, setShowTooltip] = useState(false);
 
   return (
     <>
@@ -141,6 +217,10 @@ const LanguageSelector = () => {
           position: relative;
           z-index: 1;
         }
+        
+        .language-carousel {
+          position: relative;
+        }
       `}</style>
       <div className="relative" ref={dropdownRef}>
         <div className="gradient-border-wrapper">
@@ -148,21 +228,31 @@ const LanguageSelector = () => {
             <button
               onClick={() => setIsOpen(!isOpen)}
               onKeyDown={handleKeyDown}
-              className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full relative z-10"
+              onMouseEnter={() => {
+                setShowTooltip(true);
+                setIsHovered(true);
+              }}
+              onMouseLeave={() => {
+                setShowTooltip(false);
+                setIsHovered(false);
+              }}
+              className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full relative z-10 group"
               style={{ 
                 color: '#1E65AD',
                 fontFamily: 'Roboto, sans-serif',
                 background: 'white',
                 minHeight: '38px',
+                cursor: 'pointer',
               }}
               aria-label={`Current language: ${currentLanguage.name}. Click to change language.`}
               aria-expanded={isOpen}
               aria-haspopup="listbox"
+              title="Select your language"
             >
               <div className="flex items-center gap-2">
                 {/* Globe Icon */}
                 <svg 
-                  className="w-4 h-4 flex-shrink-0"
+                  className="w-4 h-4 flex-shrink-0 transition-colors duration-500"
                   style={{ color: '#1E65AD' }}
                   fill="none" 
                   stroke="currentColor" 
@@ -172,20 +262,39 @@ const LanguageSelector = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 
-                {/* Language Code and Name */}
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                    {currentLanguage.langCode}
-                  </span>
-                  <span className="text-xs font-medium" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
-                    {currentLanguage.name}
-                  </span>
+                {/* Auto-scrolling language display */}
+                <div className="h-5 sm:h-6 w-auto min-w-[60px] overflow-hidden relative language-carousel select-none">
+                  {/* ticker content */}
+                  <div
+                    className="will-change-transform"
+                    style={{
+                      transform: `translateY(-${currentScrollIndex * rowHeight}px)`,
+                      transition: isResetting ? 'none' : 'transform 650ms cubic-bezier(0.22, 1, 0.36, 1)'
+                    }}
+                    aria-live="polite"
+                    aria-atomic="true"
+                  >
+                    {extendedLanguages.map((language, index) => (
+                      <div
+                        key={`${language.code}-${index}`}
+                        ref={index === 0 ? measureRef : null}
+                        className="h-5 sm:h-6 flex items-center gap-1.5"
+                      >
+                        <span className="text-xs font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                          {language.langCode}
+                        </span>
+                        <span className="text-xs font-medium" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                          {language.name}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
               
               {/* Chevron Icon */}
               <svg 
-                className={`w-3.5 h-3.5 transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
+                className={`w-3.5 h-3.5 transition-all duration-300 flex-shrink-0 ${isOpen ? 'rotate-180' : ''} ${isHovered ? 'translate-y-0.5' : ''}`}
                 style={{ color: '#1E65AD' }}
                 fill="none" 
                 stroke="currentColor" 
@@ -195,21 +304,57 @@ const LanguageSelector = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
               </svg>
             </button>
+            
+            {/* Tooltip */}
+            {showTooltip && !isOpen && (
+              <div
+                className="absolute top-full left-2/2 transform -translate-x-1/2 mb-2 px-5 py-1.5 rounded-lg shadow-lg z-50 pointer-events-none whitespace-nowrap transition-opacity duration-200"
+                style={{
+                  backgroundColor: '#1E65AD',
+                  color: '#FFFFFF',
+                  fontFamily: 'Roboto, sans-serif',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  boxShadow: '0 4px 12px rgba(30, 101, 173, 0.3)',
+                }}
+              >
+                Select your Preferred language
+                {/* Tooltip Arrow */}
+                <div
+                  className="absolute -full left-5/6 transform -translate-x-2/2 -mt-1"
+                  style={{
+                    width: 0,
+                    height: 0,
+                    borderLeft: '6px solid transparent',
+                    borderRight: '6px solid transparent',
+                    borderTop: '6px solidrgb(255, 255, 255)',
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
 
       {/* Dropdown Menu */}
-      {isOpen && (
-        <div 
-          className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-2xl overflow-hidden z-50 transition-all duration-200 ease-out flex"
-          style={{ 
-            backgroundColor: '#FFFFFF',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
-            maxHeight: '400px',
-          }}
-          role="listbox"
-          aria-label="Language selection"
-        >
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            transition={{ 
+              duration: 0.2,
+              ease: [0.4, 0, 0.2, 1]
+            }}
+            className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-2xl overflow-hidden z-50 flex"
+            style={{ 
+              backgroundColor: '#FFFFFF',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+              maxHeight: '400px',
+            }}
+            role="listbox"
+            aria-label="Language selection"
+          >
           {/* Gradient Left Border */}
           <div 
             className="w-1 flex-shrink-0"
@@ -273,8 +418,9 @@ const LanguageSelector = () => {
               );
             })}
           </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
       </div>
     </>
   );

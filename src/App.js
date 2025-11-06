@@ -31,6 +31,8 @@ import PricingPage from "./pages/PricingPage";
 import Dashboard from "./pages/Dashboard";
 import NotesPage from "./pages/NotesPage";
 import LanguageSelectorDemo from "./pages/LanguageSelectorDemo";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import Chatbot from "./components/Chatbot";
@@ -50,6 +52,8 @@ function AppLayout() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/about" element={<About />} />
         <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:id" element={<BlogPost />} />
         <Route path="/our-team" element={<OurTeam />} />
         <Route path="/language-demo" element={<LanguageSelectorDemo />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -76,8 +80,10 @@ function AppLayout() {
         <Route path="/earn-rewards" element={<EarnRewards />} />
         <Route path="/track-referrals" element={<TrackReferrals />} />
         
+        {/* Dashboard - Public Route (no login required) */}
+        <Route path="/dashboard" element={<Dashboard />} />
+        
         {/* Protected Routes - Authentication Required */}
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/notes/:id" element={<ProtectedRoute><NotesPage /></ProtectedRoute>} />
         
         {/* Referral Program Routes */}

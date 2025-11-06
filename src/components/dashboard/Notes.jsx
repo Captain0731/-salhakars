@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   FileText, 
@@ -20,52 +20,17 @@ const Notes = () => {
   const [selectedFolder, setSelectedFolder] = useState(null);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
 
-  // Mock data - in production, this would come from API
-  const [folders] = useState([
-    { id: 1, name: 'Legal Cases', color: '#1E65AD', noteCount: 8 },
-    { id: 2, name: 'Research Notes', color: '#CF9B63', noteCount: 12 },
-    { id: 3, name: 'Court Proceedings', color: '#8C969F', noteCount: 5 },
-    { id: 4, name: 'Judgment Analysis', color: '#1E65AD', noteCount: 15 },
-  ]);
+  const [folders, setFolders] = useState([]);
+  const [notes, setNotes] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const [notes] = useState([
-    {
-      id: 1,
-      title: 'Contract Law Case Analysis',
-      content: 'Detailed analysis of contract dispute case...',
-      folderId: 1,
-      createdAt: '2024-01-15',
-      updatedAt: '2024-01-20',
-      tags: ['Contract Law', 'Supreme Court']
-    },
-    {
-      id: 2,
-      title: 'Evidence Act Section 65B',
-      content: 'Notes on digital evidence admissibility...',
-      folderId: 2,
-      createdAt: '2024-01-18',
-      updatedAt: '2024-01-22',
-      tags: ['Evidence Act', 'Digital Evidence']
-    },
-    {
-      id: 3,
-      title: 'Hearing Notes - Case No. 1234',
-      content: 'Key points from today\'s hearing...',
-      folderId: 3,
-      createdAt: '2024-01-20',
-      updatedAt: '2024-01-20',
-      tags: ['Hearing', 'Criminal']
-    },
-    {
-      id: 4,
-      title: 'BNS vs IPC Comparison',
-      content: 'Comparative analysis of Bharatiya Nyaya Sanhita...',
-      folderId: 4,
-      createdAt: '2024-01-22',
-      updatedAt: '2024-01-23',
-      tags: ['BNS', 'IPC', 'Legal Reform']
-    },
-  ]);
+  // Load folders and notes from API
+  useEffect(() => {
+    // TODO: Load folders and notes from API
+    // For now, initialize with empty arrays
+    setFolders([]);
+    setNotes([]);
+  }, []);
 
   const filteredNotes = notes.filter(note => {
     const matchesSearch = note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

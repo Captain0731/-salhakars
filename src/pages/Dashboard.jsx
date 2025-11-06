@@ -25,7 +25,6 @@ import {
   MoreVertical
 } from 'lucide-react';
 import Navbar from '../components/landing/Navbar';
-import MyDownloads from '../components/dashboard/MyDownloads';
 import Calendar from '../components/dashboard/Calendar';
 import Bookmarks from '../components/dashboard/Bookmarks';
 import Notes from '../components/dashboard/Notes';
@@ -175,8 +174,8 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>Downloads</p>
-                    <p className="text-3xl font-bold mb-1" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>24</p>
-                    <p className="text-sm text-green-600 font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>+3</p>
+                    <p className="text-3xl font-bold mb-1" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>0</p>
+                    <p className="text-sm text-gray-500 font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>No downloads yet</p>
                   </div>
                   <div className="p-3 rounded-xl shadow-sm" style={{ backgroundColor: '#1E65AD' }}>
                     <Download className="h-6 w-6 text-white" />
@@ -205,8 +204,8 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>Upcoming Events</p>
-                    <p className="text-3xl font-bold mb-1" style={{ color: '#8C969F', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>8</p>
-                    <p className="text-sm text-green-600 font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>+1 this week</p>
+                    <p className="text-3xl font-bold mb-1" style={{ color: '#8C969F', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>0</p>
+                    <p className="text-sm text-gray-500 font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>No events scheduled</p>
                   </div>
                   <div className="p-3 rounded-xl shadow-sm" style={{ backgroundColor: '#8C969F' }}>
                     <CalendarIcon className="h-6 w-6 text-white" />
@@ -217,9 +216,9 @@ const Dashboard = () => {
               <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>High Court Judgments</p>
-                    <p className="text-3xl font-bold mb-1" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>10</p>
-                    <p className="text-sm text-green-600 font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>Available now</p>
+                    <p className="text-sm font-medium text-gray-600 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>Notes</p>
+                    <p className="text-3xl font-bold mb-1" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>0</p>
+                    <p className="text-sm text-gray-500 font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>No notes yet</p>
                   </div>
                   <div className="p-3 rounded-xl shadow-sm" style={{ backgroundColor: '#1E65AD' }}>
                     <FileText className="h-6 w-6 text-white" />
@@ -323,8 +322,6 @@ const Dashboard = () => {
             </div>
           </div>
         );
-      case 'downloads':
-        return <MyDownloads />;
       case 'calendar':
         return <Calendar />;
       case 'bookmarks':
@@ -338,7 +335,6 @@ const Dashboard = () => {
 
   const sidebarItems = [
     { id: 'home', label: 'Dashboard', icon: Home },
-    { id: 'downloads', label: 'My Downloads', icon: Download },
     { id: 'calendar', label: 'Calendar', icon: CalendarIcon },
     { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark },
     { id: 'notes', label: 'Notes', icon: Note },

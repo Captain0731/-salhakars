@@ -18,9 +18,12 @@ const Chatbot = () => {
         backgroundColor: 'transparent',
       }}
     >
-      <img
-        src="/chatbot.png"
-        alt="Chatbot"
+      <video
+        src="/ai.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
         style={{
           width: '100%',
           height: '100%',
@@ -28,9 +31,6 @@ const Chatbot = () => {
           boxShadow: '0 4px 20px rgba(30, 101, 173, 0.4)',
           borderRadius: '50%',
           pointerEvents: 'none',
-        }}
-        onError={(e) => {
-          e.target.style.display = 'none';
         }}
       />
     </div>

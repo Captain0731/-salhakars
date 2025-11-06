@@ -86,29 +86,29 @@ const VideoSection = () => {
               </p>
             </div>
 
-            {/* Features Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 px-4 lg:px-0">
+            {/* Features Grid - 2 columns (pairs) on mobile */}
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 px-4 lg:px-0">
               {features.map((feature, index) => (
                 <div 
                   key={index}
-                  className="flex items-start space-x-4 p-4 rounded-2xl transition-all duration-300 hover:scale-105"
+                  className="flex flex-col sm:flex-row items-start space-y-2 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 rounded-xl sm:rounded-2xl transition-all duration-300 hover:scale-105"
                   style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}
                 >
                   <div 
-                    className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center text-xl sm:text-2xl flex-shrink-0"
                     style={{ backgroundColor: '#1E65AD' }}
                   >
                     {feature.icon}
                   </div>
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <h3 
-                      className="font-semibold mb-1"
+                      className="font-semibold mb-1 text-sm sm:text-base"
                       style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}
                     >
                       {feature.title}
                     </h3>
                     <p 
-                      className="text-sm"
+                      className="text-xs sm:text-sm leading-tight"
                       style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}
                     >
                       {feature.description}

@@ -30,59 +30,11 @@ const Calendar = () => {
     reminderTime: '15'
   });
 
-  // Mock events data
+  // Load events from API
   useEffect(() => {
-    const mockEvents = [
-      {
-        id: 1,
-        title: 'Court Hearing - Contract Dispute',
-        description: 'Supreme Court hearing for contract law case',
-        date: new Date(2024, 0, 15), // January 15, 2024
-        time: '10:00',
-        type: 'hearing',
-        reminder: true,
-        reminderTime: '30',
-        pinned: true,
-        completed: false
-      },
-      {
-        id: 2,
-        title: 'IPC Act Update Notification',
-        description: 'New amendments to IPC Act 2023',
-        date: new Date(2024, 0, 20), // January 20, 2024
-        time: '09:00',
-        type: 'notification',
-        reminder: true,
-        reminderTime: '60',
-        pinned: false,
-        completed: false
-      },
-      {
-        id: 3,
-        title: 'Legal Research Deadline',
-        description: 'Submit research paper on constitutional law',
-        date: new Date(2024, 0, 25), // January 25, 2024
-        time: '17:00',
-        type: 'deadline',
-        reminder: true,
-        reminderTime: '120',
-        pinned: true,
-        completed: false
-      },
-      {
-        id: 4,
-        title: 'BNS Act Training Session',
-        description: 'Training session on new Bharatiya Nyaya Sanhita',
-        date: new Date(2024, 0, 28), // January 28, 2024
-        time: '14:00',
-        type: 'training',
-        reminder: false,
-        reminderTime: '15',
-        pinned: false,
-        completed: false
-      }
-    ];
-    setEvents(mockEvents);
+    // TODO: Load events from API
+    // For now, initialize with empty array
+    setEvents([]);
   }, []);
 
   const getDaysInMonth = (date) => {
