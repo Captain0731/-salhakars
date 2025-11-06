@@ -5,24 +5,28 @@ const Stats = () => {
   const { ref: sectionRef, isVisible } = useScrollAnimation({ threshold: 0.1, rootMargin: '50px' });
   const stats = [
     {
-      number: "15",
-      label: "Years of Experience",
+      number: "16",
+      CharacterDataSupported: "M",
+      label: "Legal Judgments",
       suffix: "+"
     },
     {
-      number: "36",
-      label: "Qualified Experts",
+      number: "11",
+      CharacterDataSupported: "K",
+      label: "Total Acts",
       suffix: "+"
     },
     {
-      number: "120",
-      label: "Clients Every Year",
+      number: "10",
+      CharacterDataSupported: "K",
+      label: "Legal Templates",
       suffix: "+"
     },
     {
-      number: "9",
-      label: "Intl. Partners",
-      suffix: "+"
+      number: "12",
+      // CharacterDataSupported: "M",
+      label: "Languages Supported",
+      // suffix: "+"
     }
   ];
   const [countedStats, setCountedStats] = useState(stats.map(stat => parseInt(stat.number)));
@@ -147,6 +151,11 @@ const Stats = () => {
                     }}>
                       {countedStats[index]}
                     </span>
+                    <span style={{ 
+                      display: 'inline-block',
+                      color: '#1E65AD',
+                      textShadow: '0 2px 8px rgba(30, 101, 173, 0.2)'
+                    }}>{stat.CharacterDataSupported}</span>
                     <span style={{ 
                       color: '#CF9B63',
                       marginLeft: '2px',

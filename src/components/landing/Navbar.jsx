@@ -45,6 +45,10 @@ const navItems = [
     label: "More",
     links: [
       { 
+        label: "Blog", 
+        path: "/blog",
+      },
+      { 
         label: "Support", 
         path: "/legal-chatbot"
       },
@@ -52,10 +56,7 @@ const navItems = [
         label: "Referral Program", 
         path: "/referral",
       },
-      { 
-        label: "Blog", 
-        path: "/blog",
-      },
+      
     ],
   },
 ];

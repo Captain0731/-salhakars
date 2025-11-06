@@ -92,7 +92,10 @@ const BookmarkButton = ({
     
     if (!itemId) {
       console.error('❌ No valid ID found for bookmark:', { item, type });
-      setError('Item ID is missing. Cannot bookmark.');
+      // Only set error if showText is true
+      if (showText) {
+        setError('Item ID is missing. Cannot bookmark.');
+      }
       return;
     }
     
@@ -214,9 +217,14 @@ const BookmarkButton = ({
       
     } catch (err) {
       const errorMessage = err.message || 'Failed to update bookmark';
-      setError(errorMessage);
-      showNotificationMessage(errorMessage, 'error');
-      console.error('Bookmark error:', err);
+      // Only set error if showText is true, otherwise just log it
+      if (showText) {
+        setError(errorMessage);
+        showNotificationMessage(errorMessage, 'error');
+      } else {
+        // For icon-only mode, just log the error silently
+        console.error('Bookmark error:', err);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -225,26 +233,42 @@ const BookmarkButton = ({
   const getButtonStyles = () => {
     const baseStyles = "flex items-center justify-center transition-all duration-200 font-medium rounded-lg shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2";
     
+    // For icon-only buttons, use square padding and no width constraint
+    // Match share button sizing: p-1.5 sm:p-2
+    if (!showText) {
+      if (size === 'small') {
+        return `${baseStyles} p-1.5 sm:p-2`;
+      } else if (size === 'large') {
+        return `${baseStyles} p-3 sm:p-4`;
+      } else {
+        return `${baseStyles} p-2 sm:p-2.5`;
+      }
+    }
+    
+    // For buttons with text, use horizontal padding and full width
     if (size === 'small') {
-      return `${baseStyles} px-3 py-1.5 text-sm`;
+      return `${baseStyles} px-3 py-1.5 text-sm w-full`;
     } else if (size === 'large') {
-      return `${baseStyles} px-6 py-3 text-lg`;
+      return `${baseStyles} px-6 py-3 text-lg w-full`;
     } else {
-      return `${baseStyles} px-4 py-2 text-sm`;
+      return `${baseStyles} px-4 py-2 text-sm w-full`;
     }
   };
 
   const getIconSize = () => {
-    if (size === 'small') return 'h-4 w-4';
-    if (size === 'large') return 'h-6 w-6';
-    return 'h-5 w-5';
+    // Match share button icon sizing: h-4 w-4 sm:h-5 sm:w-5
+    if (size === 'small') return 'h-4 w-4 sm:h-5 sm:w-5';
+    if (size === 'large') return 'h-6 w-6 sm:h-7 sm:w-7';
+    return 'h-5 w-5 sm:h-6 sm:w-6';
   };
 
   const getButtonContent = () => {
+    const iconStyle = { color: '#FFFFFF' };
+    
     if (isCheckingStatus) {
       return (
         <>
-          <Loader2 className={`${getIconSize()} animate-spin mr-2`} />
+          <Loader2 className={`${getIconSize()} ${showText ? 'mr-2' : ''} animate-spin`} style={iconStyle} />
           {showText && 'Checking...'}
         </>
       );
@@ -253,7 +277,7 @@ const BookmarkButton = ({
     if (isLoading) {
       return (
         <>
-          <Loader2 className={`${getIconSize()} animate-spin mr-2`} />
+          <Loader2 className={`${getIconSize()} ${showText ? 'mr-2' : ''} animate-spin`} style={iconStyle} />
           {showText && 'Processing...'}
         </>
       );
@@ -262,7 +286,7 @@ const BookmarkButton = ({
     if (isBookmarked) {
       return (
         <>
-          <BookmarkCheck className={`${getIconSize()} mr-2`} />
+          <BookmarkCheck className={`${getIconSize()} ${showText ? 'mr-2' : ''}`} style={iconStyle} />
           {showText && 'Bookmarked'}
         </>
       );
@@ -270,17 +294,15 @@ const BookmarkButton = ({
 
     return (
       <>
-        <Bookmark className={`${getIconSize()} mr-2`} />
+        <Bookmark className={`${getIconSize()} ${showText ? 'mr-2' : ''}`} style={iconStyle} />
         {showText && 'Bookmark'}
       </>
     );
   };
 
   const getButtonColors = () => {
-    if (isBookmarked) {
-      return 'bg-green-600 text-white hover:bg-green-700 border-green-600';
-    }
-    return 'bg-blue-600 text-white hover:bg-blue-700 border-blue-600';
+    // Always use the same blue background as share button
+    return 'text-white';
   };
 
   return (
@@ -288,15 +310,29 @@ const BookmarkButton = ({
       <button
         onClick={handleBookmarkToggle}
         disabled={isLoading || isCheckingStatus}
-        className={`${getButtonStyles()} ${getButtonColors()} w-full`}
+        className={`${getButtonStyles()} ${getButtonColors()}`}
+        style={{ 
+          backgroundColor: '#1E65AD',
+          color: '#FFFFFF'
+        }}
+        onMouseEnter={(e) => {
+          if (!isLoading && !isCheckingStatus) {
+            e.target.style.backgroundColor = '#1a5a9a';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isLoading && !isCheckingStatus) {
+            e.target.style.backgroundColor = '#1E65AD';
+          }
+        }}
         title={isBookmarked ? 'Remove from bookmarks' : 'Add to bookmarks'}
         aria-label={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
       >
         {getButtonContent()}
       </button>
       
-      {/* Error Tooltip */}
-      {error && (
+      {/* Error Tooltip - Only show if showText is true */}
+      {error && showText && (
         <div className="absolute top-full left-0 mt-1 p-2 bg-red-100 border border-red-300 rounded text-xs text-red-700 whitespace-nowrap z-10 shadow-lg">
           <div className="flex items-center">
             <XCircle className="h-3 w-3 mr-1" />
@@ -305,8 +341,8 @@ const BookmarkButton = ({
         </div>
       )}
       
-      {/* Success Notification */}
-      {notification && notification.type === 'success' && (
+      {/* Success Notification - Only show if showText is true */}
+      {notification && notification.type === 'success' && showText && (
         <div className="absolute top-full left-0 mt-1 p-2 bg-green-100 border border-green-300 rounded text-xs text-green-700 whitespace-nowrap z-10 shadow-lg">
           <div className="flex items-center">
             <CheckCircle className="h-3 w-3 mr-1" />
@@ -315,8 +351,8 @@ const BookmarkButton = ({
         </div>
       )}
       
-      {/* Error Notification */}
-      {notification && notification.type === 'error' && (
+      {/* Error Notification - Only show if showText is true */}
+      {notification && notification.type === 'error' && showText && (
         <div className="absolute top-full left-0 mt-1 p-2 bg-red-100 border border-red-300 rounded text-xs text-red-700 whitespace-nowrap z-10 shadow-lg">
           <div className="flex items-center">
             <XCircle className="h-3 w-3 mr-1" />

@@ -4,7 +4,7 @@ import Navbar from "../components/landing/Navbar";
 import PDFTranslator from "../components/PDFTranslator";
 import BookmarkButton from "../components/BookmarkButton";
 import { useAuth } from "../contexts/AuthContext";
-import { Search, FileText, StickyNote } from "lucide-react";
+import { FileText, StickyNote, Share2 } from "lucide-react";
 
 export default function ViewPDF() {
   const navigate = useNavigate();
@@ -201,12 +201,38 @@ export default function ViewPDF() {
                       {location.state?.act ? 'Act Details' : 'Judgment Details'}
                     </h3>
                     {isAuthenticated && !location.state?.act && judgmentInfo && (
-                      <BookmarkButton
-                        item={judgmentInfo}
-                        type="judgement"
-                        size="small"
-                        showText={false}
-                      />
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            const url = window.location.href;
+                            navigator.clipboard.writeText(url).then(() => {
+                              alert('Link copied to clipboard!');
+                            }).catch(() => {
+                              alert('Failed to copy link');
+                            });
+                          }}
+                          className="p-1.5 sm:p-2 rounded-lg transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
+                          style={{ 
+                            backgroundColor: '#1E65AD',
+                            color: '#FFFFFF'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = '#1a5a9a';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = '#1E65AD';
+                          }}
+                          title="Share"
+                        >
+                          <Share2 className="h-4 w-4 sm:h-5 sm:w-5" style={{ color: '#FFFFFF' }} />
+                        </button>
+                        <BookmarkButton
+                          item={judgmentInfo}
+                          type="judgement"
+                          size="small"
+                          showText={false}
+                        />
+                      </div>
                     )}
                   </div>
                   <div className="w-10 sm:w-12 h-0.5 sm:h-1 bg-gradient-to-r" style={{ background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)' }}></div>
@@ -387,10 +413,16 @@ export default function ViewPDF() {
                 <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 border-b border-gray-200 bg-gray-50 flex-shrink-0">
                   {/* Search Bar */}
                   <div className="relative flex-1 min-w-0">
-                    <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400" />
+                    <img 
+                      src="/uit3.GIF" 
+                      alt="Search" 
+                      className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-10x w-10 sm:h-4 sm:w-4 object-contain pointer-events-none"
+                      style={{ width: '30px', height: '100px' }}
+                    />
+                    
                     <input
                       type="text"
-                      placeholder="Search in PDF..."
+                      placeholder="  Search With Kiki AI ..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-1.5 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-xs sm:text-sm"
