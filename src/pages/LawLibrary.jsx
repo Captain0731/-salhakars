@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
@@ -377,7 +378,12 @@ export default function LawLibrary() {
         <div className="max-w-7xl mx-auto">
 
           {/* Section Type Toggle Button */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 md:p-6 mb-4 sm:mb-6"
+          >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
               <label className="text-xs sm:text-sm font-medium text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
                 Select Section:
@@ -386,18 +392,28 @@ export default function LawLibrary() {
               {/* Toggle Button */}
               <div className="relative inline-flex items-center bg-gray-100 rounded-xl p-1 shadow-inner w-full sm:w-auto">
                 {/* Sliding background indicator */}
-                <div
-                  className={`absolute top-1 bottom-1 rounded-lg transition-all duration-300 ease-in-out z-0`}
-                  style={{
+                <motion.div
+                  className="absolute top-1 bottom-1 rounded-lg z-0"
+                  initial={false}
+                  animate={{
                     left: activeSection === 'central' ? '4px' : 'calc(50% + 2px)',
-                    width: 'calc(50% - 4px)',
                     backgroundColor: activeSection === 'central' ? '#1E65AD' : '#CF9B63',
+                  }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 300, 
+                    damping: 30 
+                  }}
+                  style={{
+                    width: 'calc(50% - 4px)',
                     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
                   }}
                 />
                 
-                <button
+                <motion.button
                   onClick={() => setActiveSection('central')}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 flex-1 sm:flex-none sm:min-w-[140px] md:min-w-[180px] text-xs sm:text-sm ${
                     activeSection === 'central'
                       ? 'text-white'
@@ -408,9 +424,11 @@ export default function LawLibrary() {
                   }}
                 >
                   Central Acts
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                   onClick={() => setActiveSection('state')}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 flex-1 sm:flex-none sm:min-w-[140px] md:min-w-[180px] text-xs sm:text-sm ${
                     activeSection === 'state'
                       ? 'text-white'
@@ -421,19 +439,26 @@ export default function LawLibrary() {
                   }}
                 >
                   State Acts
-                </button>
+                </motion.button>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Enhanced Search and Filter Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 md:mb-8 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+            className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 md:mb-8"
+          >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
               <h2 className="text-lg sm:text-xl md:text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                 Search {sectionLabel}
               </h2>
-              <button
+              <motion.button
                 onClick={() => setShowFilters(!showFilters)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors font-medium text-sm sm:text-base w-full sm:w-auto"
                 style={{ fontFamily: 'Roboto, sans-serif' }}
               >
@@ -446,7 +471,7 @@ export default function LawLibrary() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                 </svg>
                 <span>Filters</span>
-              </button>
+              </motion.button>
             </div>
             
             {/* Search Bar */}
@@ -491,8 +516,15 @@ export default function LawLibrary() {
             </div>
 
             {/* Dynamic Filters - Hidden by default, shown when showFilters is true */}
-            {showFilters && (
-              <div className="border-t border-gray-200 pt-4 sm:pt-6 mt-4 sm:mt-6 animate-fade-in-up">
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  className="border-t border-gray-200 pt-4 sm:pt-6 mt-4 sm:mt-6 overflow-hidden"
+                >
                 <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   Filter Options
                 </h3>
@@ -663,9 +695,11 @@ export default function LawLibrary() {
 
                 {/* Filter Actions */}
                 <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-4 border-t border-gray-200">
-                  <button
+                  <motion.button
                     onClick={applyFilters}
                     disabled={loading}
+                    whileHover={{ scale: loading ? 1 : 1.02 }}
+                    whileTap={{ scale: loading ? 1 : 0.98 }}
                     className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   >
@@ -685,11 +719,13 @@ export default function LawLibrary() {
                         Apply Filters
                       </>
                     )}
-                  </button>
+                  </motion.button>
                   
-                  <button
+                  <motion.button
                     onClick={clearFilters}
                     disabled={loading}
+                    whileHover={{ scale: loading ? 1 : 1.02 }}
+                    whileTap={{ scale: loading ? 1 : 0.98 }}
                     className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 active:bg-gray-700 transition-all font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   >
@@ -697,7 +733,7 @@ export default function LawLibrary() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                     Clear Filters
-                  </button>
+                  </motion.button>
                 </div>
 
                 {/* Active Filters Display */}
@@ -707,7 +743,12 @@ export default function LawLibrary() {
                   if (typeof val === 'number') return val !== 0;
                   return val !== '';
                 }) && (
-                  <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg"
+                  >
                     <h3 className="text-sm font-medium text-blue-800 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       Active Filters:
                     </h3>
@@ -732,14 +773,20 @@ export default function LawLibrary() {
                         );
                       })}
                     </div>
-                  </div>
+                  </motion.div>
                 )}
-              </div>
-            )}
-          </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
 
           {/* Enhanced Results Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8 animate-fade-in-up" style={{ animationDelay: '1s' }}>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1 }}
+            className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8"
+          >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
               <div className="flex-1">
                 <h2 className="text-lg sm:text-xl md:text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
@@ -777,8 +824,15 @@ export default function LawLibrary() {
               </div>
             </div>
 
-            {error && (
-              <div className="mb-6 p-5 bg-red-50 border-l-4 border-red-400 rounded-lg shadow-sm">
+            <AnimatePresence>
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                  className="mb-6 p-5 bg-red-50 border-l-4 border-red-400 rounded-lg shadow-sm"
+                >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start flex-1">
                     <svg className="w-6 h-6 text-red-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -808,13 +862,19 @@ export default function LawLibrary() {
                     Retry
                   </button>
                 </div>
-              </div>
-            )}
+              </motion.div>
+              )}
+            </AnimatePresence>
 
             {loading && acts.length === 0 ? (
               <SkeletonGrid count={3} />
             ) : acts.length === 0 && !error ? (
-              <div className="text-center py-16">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="text-center py-16"
+              >
                 <div className="w-20 h-20 mx-auto mb-6 bg-blue-50 rounded-full flex items-center justify-center">
                   <svg className="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -847,15 +907,32 @@ export default function LawLibrary() {
                     Clear All Filters
                   </button>
                 )}
-              </div>
+              </motion.div>
             ) : (
               <div className="space-y-4">
-                {acts.map((act, index) => (
-                  <SmoothTransitionWrapper key={act.id || act.act_id || `act-${index}`} delay={index * 50}>
-                    <div 
-                      onClick={() => viewActDetails(act)}
-                      className="border border-gray-200 rounded-lg p-3 sm:p-4 md:p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-300 bg-white group cursor-pointer"
+                <AnimatePresence mode="popLayout">
+                  {acts.map((act, index) => (
+                    <motion.div
+                      key={act.id || act.act_id || `act-${index}`}
+                      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                      transition={{ 
+                        duration: 0.4, 
+                        delay: index * 0.05,
+                        ease: [0.4, 0, 0.2, 1]
+                      }}
+                      whileHover={{ 
+                        y: -4, 
+                        scale: 1.01,
+                        transition: { duration: 0.2 }
+                      }}
+                      whileTap={{ scale: 0.98 }}
                     >
+                      <div 
+                        onClick={() => viewActDetails(act)}
+                        className="border border-gray-200 rounded-lg p-3 sm:p-4 md:p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-300 bg-white group cursor-pointer"
+                      >
                       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 sm:gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start gap-2 sm:gap-3 mb-2 sm:mb-3">
@@ -917,21 +994,24 @@ export default function LawLibrary() {
                         </div>
 
                         <div className="flex-shrink-0 flex flex-col gap-2 w-full sm:w-auto">
-                          <button
+                          <motion.button
                             onClick={(e) => {
                               e.stopPropagation();
                               viewActDetails(act);
                             }}
+                            whileHover={{ scale: 1.05, y: -2 }}
+                            whileTap={{ scale: 0.95 }}
                             className="px-4 sm:px-6 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium shadow-sm hover:shadow-md text-sm sm:text-base"
                             style={{ fontFamily: 'Roboto, sans-serif' }}
                           >
                             View Details
-                          </button>
+                          </motion.button>
                         </div>
                       </div>
                     </div>
-                  </SmoothTransitionWrapper>
-                ))}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
               </div>
             )}
             
@@ -946,7 +1026,7 @@ export default function LawLibrary() {
                 />
               </div>
             )}
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

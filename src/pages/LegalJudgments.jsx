@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
 import useSmoothInfiniteScroll from "../hooks/useSmoothInfiniteScroll";
@@ -44,12 +45,42 @@ const customStyles = `
     }
   }
   
+  @keyframes scaleIn {
+    from { 
+      opacity: 0; 
+      transform: scale(0.9); 
+    }
+    to { 
+      opacity: 1; 
+      transform: scale(1); 
+    }
+  }
+  
+  @keyframes slideInFromRight {
+    from { 
+      opacity: 0; 
+      transform: translateX(30px); 
+    }
+    to { 
+      opacity: 1; 
+      transform: translateX(0); 
+    }
+  }
+  
   .animate-fade-in-up {
     animation: fadeInUp 0.6s ease-out forwards;
   }
   
   .animate-slide-in-bottom {
     animation: slideInFromBottom 0.8s ease-out forwards;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn 0.5s ease-out forwards;
+  }
+  
+  .animate-slide-in-right {
+    animation: slideInFromRight 0.6s ease-out forwards;
   }
 `;
 
@@ -528,7 +559,12 @@ export default function LegalJudgments() {
         <div className="max-w-7xl mx-auto">
 
           {/* Court Type Toggle Button */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6"
+          >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
               <label className="text-xs sm:text-sm font-medium text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
                 Select Court Type:
@@ -537,18 +573,28 @@ export default function LegalJudgments() {
               {/* Toggle Button */}
               <div className="relative inline-flex items-center bg-gray-100 rounded-xl p-1 shadow-inner w-full sm:w-auto">
                 {/* Sliding background indicator */}
-                <div
-                  className={`absolute top-1 bottom-1 rounded-lg transition-all duration-300 ease-in-out z-0`}
-                  style={{
+                <motion.div
+                  className="absolute top-1 bottom-1 rounded-lg z-0"
+                  initial={false}
+                  animate={{
                     left: courtType === 'highcourt' ? '4px' : 'calc(50% + 2px)',
-                    width: 'calc(50% - 4px)',
                     backgroundColor: courtType === 'highcourt' ? '#1E65AD' : '#CF9B63',
+                  }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 300, 
+                    damping: 30 
+                  }}
+                  style={{
+                    width: 'calc(50% - 4px)',
                     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
                   }}
                 />
                 
-                <button
+                <motion.button
                   onClick={() => setCourtType('highcourt')}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 flex-1 sm:flex-none sm:min-w-[140px] md:min-w-[180px] text-xs sm:text-sm md:text-base ${
                     courtType === 'highcourt'
                       ? 'text-white'
@@ -559,9 +605,11 @@ export default function LegalJudgments() {
                   }}
                 >
                   High Court
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                   onClick={() => setCourtType('supremecourt')}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 flex-1 sm:flex-none sm:min-w-[140px] md:min-w-[180px] text-xs sm:text-sm md:text-base ${
                     courtType === 'supremecourt'
                       ? 'text-white'
@@ -572,19 +620,26 @@ export default function LegalJudgments() {
                   }}
                 >
                   Supreme Court
-                </button>
+                </motion.button>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Enhanced Search and Filter Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 md:mb-8 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+            className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 md:mb-8"
+          >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
               <h2 className="text-lg sm:text-xl md:text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                 Search {courtTypeLabel} Judgments
               </h2>
-              <button
+              <motion.button
                 onClick={() => setShowFilters(!showFilters)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors font-medium text-sm sm:text-base"
                 style={{ fontFamily: 'Roboto, sans-serif' }}
               >
@@ -597,7 +652,7 @@ export default function LegalJudgments() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                 </svg>
                 <span>Filters</span>
-              </button>
+              </motion.button>
             </div>
             
             {/* Search Bar */}
@@ -642,8 +697,15 @@ export default function LegalJudgments() {
             </div>
 
             {/* Dynamic Filters Based on Court Type - Hidden by default, shown when showFilters is true */}
-            {showFilters && (
-              <div className="border-t border-gray-200 pt-4 sm:pt-6 mt-4 sm:mt-6 animate-fade-in-up">
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  className="border-t border-gray-200 pt-4 sm:pt-6 mt-4 sm:mt-6 overflow-hidden"
+                >
                 <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   Filter Options
                 </h3>
@@ -789,12 +851,14 @@ export default function LegalJudgments() {
 
             {/* Filter Actions */}
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-4 border-t border-gray-200">
-              <button
+              <motion.button
                 onClick={() => {
                   console.log('Apply Filters clicked. Current filters:', filters);
                   applyFilters();
                 }}
                 disabled={loading || isFetchingRef.current}
+                whileHover={{ scale: loading || isFetchingRef.current ? 1 : 1.02 }}
+                whileTap={{ scale: loading || isFetchingRef.current ? 1 : 0.98 }}
                 className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
                 style={{ fontFamily: 'Roboto, sans-serif' }}
               >
@@ -814,14 +878,16 @@ export default function LegalJudgments() {
                     Apply Filters
                   </>
                 )}
-              </button>
+              </motion.button>
               
-              <button
+              <motion.button
                 onClick={() => {
                   console.log('Clear Filters clicked');
                   clearFilters();
                 }}
                 disabled={loading || isFetchingRef.current}
+                whileHover={{ scale: loading || isFetchingRef.current ? 1 : 1.02 }}
+                whileTap={{ scale: loading || isFetchingRef.current ? 1 : 0.98 }}
                 className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 active:bg-gray-700 transition-all font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
                 style={{ fontFamily: 'Roboto, sans-serif' }}
               >
@@ -829,7 +895,7 @@ export default function LegalJudgments() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
                 Clear Filters
-              </button>
+              </motion.button>
             </div>
 
                 {/* Active Filters Display */}
@@ -852,12 +918,18 @@ export default function LegalJudgments() {
                     </div>
                   </div>
                 )}
-              </div>
-            )}
-          </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
 
           {/* Enhanced Results Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8 animate-fade-in-up" style={{ animationDelay: '1s' }}>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1 }}
+            className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8"
+          >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
               <div className="flex-1">
                 <h2 className="text-lg sm:text-xl md:text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
@@ -885,8 +957,15 @@ export default function LegalJudgments() {
               </div>
             </div>
 
-            {error && (
-              <div className="mb-4 sm:mb-6 p-4 sm:p-5 bg-red-50 border-l-4 border-red-400 rounded-lg shadow-sm">
+            <AnimatePresence>
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                  className="mb-4 sm:mb-6 p-4 sm:p-5 bg-red-50 border-l-4 border-red-400 rounded-lg shadow-sm"
+                >
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-0">
                   <div className="flex items-start flex-1">
                     <svg className="w-5 h-5 sm:w-6 sm:h-6 text-red-500 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -916,13 +995,19 @@ export default function LegalJudgments() {
                     Retry
                   </button>
                 </div>
-              </div>
-            )}
+              </motion.div>
+              )}
+            </AnimatePresence>
 
             {loading && judgments.length === 0 ? (
               <SkeletonGrid count={3} />
             ) : judgments.length === 0 && !error ? (
-              <div className="text-center py-8 sm:py-12 md:py-16 px-4">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="text-center py-8 sm:py-12 md:py-16 px-4"
+              >
                 <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 bg-blue-50 rounded-full flex items-center justify-center">
                   <svg className="w-8 h-8 sm:w-10 sm:h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -945,15 +1030,32 @@ export default function LegalJudgments() {
                     Clear All Filters
                   </button>
                 )}
-              </div>
+              </motion.div>
             ) : (
               <div className="space-y-4">
-                {judgments.map((judgment, index) => (
-                  <SmoothTransitionWrapper key={judgment.cnr || judgment.id || `${courtType}-${index}`} delay={index * 50}>
-                    <div 
-                      onClick={() => viewJudgment(judgment)}
-                      className="border border-gray-200 rounded-lg p-4 sm:p-5 md:p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-300 bg-white group cursor-pointer"
+                <AnimatePresence mode="popLayout">
+                  {judgments.map((judgment, index) => (
+                    <motion.div
+                      key={judgment.cnr || judgment.id || `${courtType}-${index}`}
+                      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                      transition={{ 
+                        duration: 0.4, 
+                        delay: index * 0.05,
+                        ease: [0.4, 0, 0.2, 1]
+                      }}
+                      whileHover={{ 
+                        y: -4, 
+                        scale: 1.01,
+                        transition: { duration: 0.2 }
+                      }}
+                      whileTap={{ scale: 0.98 }}
                     >
+                      <div 
+                        onClick={() => viewJudgment(judgment)}
+                        className="border border-gray-200 rounded-lg p-4 sm:p-5 md:p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-300 bg-white group cursor-pointer"
+                      >
                       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 sm:gap-4">
                         <div className="flex-1">
                           <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-3 mb-3">
@@ -1013,12 +1115,14 @@ export default function LegalJudgments() {
                         </div>
 
                         <div className="flex-shrink-0 flex flex-col gap-3 w-full lg:w-48">
-                          <button
+                          <motion.button
                             onClick={(e) => {
                               e.stopPropagation();
                               viewJudgment(judgment);
                             }}
-                            className="w-full px-4 sm:px-6 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                            whileHover={{ scale: 1.05, y: -2 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="w-full px-4 sm:px-6 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                             style={{ fontFamily: 'Roboto, sans-serif' }}
                           >
                             <span className="flex items-center justify-center gap-2">
@@ -1027,12 +1131,13 @@ export default function LegalJudgments() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                               </svg>
                             </span>
-                          </button>
+                          </motion.button>
                         </div>
                       </div>
                     </div>
-                  </SmoothTransitionWrapper>
-                ))}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
                 
                 {/* Enhanced Infinite Scroll Loader */}
                 <div ref={loadingRef}>
@@ -1047,7 +1152,7 @@ export default function LegalJudgments() {
                 </div>
               </div>
             )}
-          </div>
+          </motion.div>
 
         </div>
       </div>
