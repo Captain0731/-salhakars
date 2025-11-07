@@ -3,13 +3,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import PDFTranslator from "../components/PDFTranslator";
 import BookmarkButton from "../components/BookmarkButton";
-import { useAuth } from "../contexts/AuthContext";
 import { FileText, StickyNote, Share2 } from "lucide-react";
 
 export default function ViewPDF() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
   const [pdfUrl, setPdfUrl] = useState("");
   const [translatedPdfUrl, setTranslatedPdfUrl] = useState("");
   const [isTranslating, setIsTranslating] = useState(false);
@@ -24,12 +22,28 @@ export default function ViewPDF() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showNotesPopup, setShowNotesPopup] = useState(false);
   const [notesContent, setNotesContent] = useState("");
+  const [notesFolders, setNotesFolders] = useState([{ id: 'default', name: 'Default', content: '' }]);
+  const [activeFolderId, setActiveFolderId] = useState('default');
+  const [showNewFolderInput, setShowNewFolderInput] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
   const [popupPosition, setPopupPosition] = useState({ x: 100, y: 100 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [popupSize, setPopupSize] = useState({ width: 500, height: 400 });
   const [isResizing, setIsResizing] = useState(false);
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile view
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     // Get act or judgment data from location state
@@ -75,6 +89,26 @@ export default function ViewPDF() {
       }
     }
   }, [location.state, navigate]);
+
+  // Load saved notes from localStorage when judgment/act changes
+  useEffect(() => {
+    if (judgmentInfo) {
+      const notesKey = `notes_${judgmentInfo?.id || judgmentInfo?.act_id || 'default'}`;
+      const savedNotes = localStorage.getItem(notesKey);
+      if (savedNotes) {
+        try {
+          const parsedFolders = JSON.parse(savedNotes);
+          if (parsedFolders && Array.isArray(parsedFolders) && parsedFolders.length > 0) {
+            setNotesFolders(parsedFolders);
+            setActiveFolderId(parsedFolders[0].id);
+            setNotesContent(parsedFolders[0].content || '');
+          }
+        } catch (error) {
+          console.error('Error loading saved notes:', error);
+        }
+      }
+    }
+  }, [judgmentInfo?.id, judgmentInfo?.act_id]);
 
   // Stable callback for PDF translation changes
   const handleTranslatedUrlChange = useCallback((url) => {
@@ -191,17 +225,17 @@ export default function ViewPDF() {
       {/* Responsive Layout: Stacked on mobile, side-by-side on desktop */}
       <div className="flex-1 p-2 sm:p-3 md:p-4 lg:p-6" style={{ minHeight: 'calc(100vh - 80px)' }}>
         <div className="max-w-7xl mx-auto h-full">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 h-full">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4 lg:gap-6 h-full">
             {/* Details - Left Side */}
-            <div className="lg:col-span-1 order-1 lg:order-1">
-              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-3 sm:p-4 md:p-6 h-auto lg:h-full max-h-[45vh] sm:max-h-96 lg:max-h-none overflow-y-auto">
-                <div className="mb-4 sm:mb-6">
-                  <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <div className="lg:col-span-1 order-1 lg:order-1 pt-3">
+              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-2 sm:p-2 md:p-6 h-auto lg:h-full max-h-[10S0vh] sm:max-h-[60vh] md:max-h-96 lg:max-h-none overflow-hidden">
+                <div className="mb-3 sm:mb-4 md:mb-6">
+                  <div className="flex flex-col grid grid-cols-2  sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-2 sm:mb-3">
                     <h3 className="text-base sm:text-lg md:text-xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                       {location.state?.act ? 'Act Details' : 'Judgment Details'}
                     </h3>
-                    {isAuthenticated && !location.state?.act && judgmentInfo && (
-                      <div className="flex items-center gap-2">
+                    {judgmentInfo && (
+                      <div className="flex items-center gap-2 justify-end self-start sm:self-auto">
                         <button
                           onClick={() => {
                             const url = window.location.href;
@@ -228,7 +262,7 @@ export default function ViewPDF() {
                         </button>
                         <BookmarkButton
                           item={judgmentInfo}
-                          type="judgement"
+                          type={location.state?.act ? "act" : "judgement"}
                           size="small"
                           showText={false}
                         />
@@ -238,13 +272,13 @@ export default function ViewPDF() {
                   <div className="w-10 sm:w-12 h-0.5 sm:h-1 bg-gradient-to-r" style={{ background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)' }}></div>
                 </div>
 
-                <div className="space-y-3 sm:space-y-4 md:space-y-6">
+                <div className="space-y-2.5 sm:space-y-3 md:space-y-4 lg:space-y-6">
                   {/* Title */}
                   <div>
-                    <h4 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <h4 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       {location.state?.act ? 'Act Title' : 'Case Title'}
                     </h4>
-                    <p className="text-xs sm:text-sm text-gray-600 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <p className="text-xs sm:text-sm text-gray-600 leading-relaxed break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       {judgmentInfo?.title || judgmentInfo?.short_title || judgmentInfo?.long_title}
                     </p>
                   </div>
@@ -389,8 +423,29 @@ export default function ViewPDF() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="mt-4 sm:mt-6 md:mt-8 pt-3 sm:pt-4 md:pt-6 border-t border-gray-200">
-                  <div className="space-y-2 sm:space-y-3">
+                <div className="mt-3 sm:mt-4 md:mt-6 lg:mt-8 pt-2.5 sm:pt-3 md:pt-4 lg:pt-6 border-t border-gray-200">
+                  <div className="space-y-2">
+                    {/* View PDF Button - Mobile Only */}
+                    {isMobile && (
+                      <button
+                        onClick={() => {
+                          navigate('/mobile-pdf', {
+                            state: {
+                              pdfUrl: translatedPdfUrl || pdfUrl,
+                              judgment: judgmentInfo,
+                              act: location.state?.act ? judgmentInfo : null
+                            }
+                          });
+                        }}
+                        className="w-full px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 bg-blue-600 text-white rounded-lg sm:rounded-xl hover:bg-blue-700 active:bg-blue-800 transition-all duration-200 font-medium shadow-sm hover:shadow-md flex items-center justify-center gap-2 text-xs sm:text-sm"
+                        style={{ fontFamily: 'Roboto, sans-serif' }}
+                      >
+                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        View PDF
+                      </button>
+                    )}
                     <button
                       onClick={() => navigate(-1)}
                       className="w-full px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 border-2 border-gray-300 text-gray-700 rounded-lg sm:rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium shadow-sm hover:shadow-md flex items-center justify-center gap-2 text-xs sm:text-sm"
@@ -407,25 +462,26 @@ export default function ViewPDF() {
             </div>
 
             {/* PDF Viewer - Right Side */}
-            <div className="lg:col-span-2 order-2 lg:order-2">
-              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 overflow-hidden h-[calc(100vh-350px)] sm:h-[500px] md:h-[600px] lg:h-full min-h-[450px] sm:min-h-[500px] flex flex-col">
+            <div className="lg:col-span-2 order-2 lg:order-2 hidden lg:block">
+              {/* Desktop View: Show PDF Viewer */}
+              {!isMobile && (
+              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 overflow-hidden h-[calc(100vh-280px)] sm:h-[calc(100vh-320px)] md:h-[500px] lg:h-full min-h-[400px] sm:min-h-[450px] md:min-h-[500px] flex flex-col">
                 {/* PDF Toolbar - Search, Summary, Notes */}
-                <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 md:gap-3 p-2 sm:p-2.5 md:p-3 border-b border-gray-200 bg-gray-50 flex-shrink-0">
                   {/* Search Bar */}
-                  <div className="relative flex-1 min-w-0">
+                  <div className="relative flex-1 min-w-[120px] sm:min-w-[200px]">
                     <img 
                       src="/uit3.GIF" 
                       alt="Search" 
-                      className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-10x w-10 sm:h-4 sm:w-4 object-contain pointer-events-none"
-                      style={{ width: '30px', height: '100px' }}
+                      className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 object-contain pointer-events-none z-10"
                     />
                     
                     <input
                       type="text"
-                      placeholder="  Search With Kiki AI ..."
+                      placeholder="Search With Kiki AI..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-1.5 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-xs sm:text-sm"
+                      className="w-full pl-8 sm:pl-10 pr-2 sm:pr-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-xs sm:text-sm"
                       style={{ fontFamily: 'Roboto, sans-serif' }}
                       onKeyPress={(e) => {
                         if (e.key === 'Enter' && searchQuery.trim()) {
@@ -437,74 +493,102 @@ export default function ViewPDF() {
                     />
                   </div>
                   
-                  {/* Summary Button */}
-                  <button
-                    onClick={() => {
-                      // Navigate to summary or show summary modal
-                      console.log('Summary clicked for:', judgmentInfo?.id || judgmentInfo?.title);
-                      // You can implement summary functionality here
-                    }}
-                    className="flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium text-xs sm:text-sm shadow-sm hover:shadow-md whitespace-nowrap flex-shrink-0"
-                    style={{ fontFamily: 'Roboto, sans-serif' }}
-                    title="View Summary"
-                  >
-                    <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                    <span className="hidden sm:inline">Summary</span>
-                  </button>
-                  
-                  {/* Notes Button - Only show if authenticated */}
-                  {isAuthenticated && (
+                  {/* Action Buttons Container */}
+                  <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                    {/* Summary Button */}
                     <button
                       onClick={() => {
-                        // Initialize notes content with judgment/act data
-                        const initialContent = `# ${judgmentInfo?.title || judgmentInfo?.short_title || 'Untitled Note'}\n\n${judgmentInfo?.summary || 'No summary available.'}\n\n## Details\n\n${location.state?.act ? 'Ministry' : 'Court'}: ${location.state?.act ? (judgmentInfo?.ministry || 'N/A') : (judgmentInfo?.court_name || 'N/A')}\nDate: ${judgmentInfo?.decision_date || judgmentInfo?.year || 'N/A'}`;
-                        setNotesContent(initialContent);
-                        setShowNotesPopup(true);
+                        // Navigate to summary or show summary modal
+                        console.log('Summary clicked for:', judgmentInfo?.id || judgmentInfo?.title);
+                        // You can implement summary functionality here
                       }}
-                      className="flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 text-white rounded-lg transition-all duration-200 font-medium text-xs sm:text-sm shadow-sm hover:shadow-md whitespace-nowrap flex-shrink-0"
-                      style={{ 
-                        fontFamily: 'Roboto, sans-serif',
-                        background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.background = 'linear-gradient(90deg, #1a5a9a 0%, #b88a56 100%)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.background = 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)';
-                      }}
-                      title="Add Notes"
+                      className="flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium text-xs sm:text-sm shadow-sm hover:shadow-md whitespace-nowrap"
+                      style={{ fontFamily: 'Roboto, sans-serif' }}
+                      title="View Summary"
                     >
-                      <StickyNote className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                      <span className="hidden sm:inline">Notes</span>
+                      <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Summary</span>
                     </button>
-                  )}
+                    
+                    {/* Notes Button */}
+                    <button
+                    onClick={() => {
+                      // Check if we have saved notes, if not initialize with default content
+                      const notesKey = `notes_${judgmentInfo?.id || judgmentInfo?.act_id || 'default'}`;
+                      const savedNotes = localStorage.getItem(notesKey);
+                      
+                      if (!savedNotes) {
+                        // Initialize notes content with judgment/act data for default folder
+                        const initialContent = `# ${judgmentInfo?.title || judgmentInfo?.short_title || 'Untitled Note'}\n\n${judgmentInfo?.summary || 'No summary available.'}\n\n## Details\n\n${location.state?.act ? 'Ministry' : 'Court'}: ${location.state?.act ? (judgmentInfo?.ministry || 'N/A') : (judgmentInfo?.court_name || 'N/A')}\nDate: ${judgmentInfo?.decision_date || judgmentInfo?.year || 'N/A'}`;
+                        
+                        // Initialize folders if empty
+                        if (notesFolders.length === 0 || (notesFolders.length === 1 && notesFolders[0].content === '')) {
+                          setNotesFolders([{ id: 'default', name: 'Default', content: initialContent }]);
+                          setActiveFolderId('default');
+                          setNotesContent(initialContent);
+                        }
+                      } else {
+                        // Load existing content
+                        const currentFolder = notesFolders.find(f => f.id === activeFolderId);
+                        setNotesContent(currentFolder?.content || '');
+                      }
+                      
+                      setShowNotesPopup(true);
+                    }}
+                    className="flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 text-white rounded-lg transition-all duration-200 font-medium text-xs sm:text-sm shadow-sm hover:shadow-md whitespace-nowrap"
+                    style={{ 
+                      fontFamily: 'Roboto, sans-serif',
+                      background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = 'linear-gradient(90deg, #1a5a9a 0%, #b88a56 100%)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)';
+                    }}
+                    title="Add Notes"
+                  >
+                    <StickyNote className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Notes</span>
+                  </button>
+                  </div>
                 </div>
                 
                 {/* PDF Content */}
-                <div className="flex-1 overflow-hidden relative">
+                <div className="flex-1 overflow-hidden relative" style={{ minHeight: 0 }}>
                 {pdfUrl && pdfUrl.trim() !== "" ? (
-                  <div className="relative h-full w-full" style={{ minHeight: '400px' }}>
-                    {/* PDF Embed - Try iframe first, fallback to button */}
-                    <iframe
-                      src={`${translatedPdfUrl || pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&page=${currentPage}&zoom=${zoom}`}
-                      className="w-full h-full border-0 rounded-lg"
-                      title={location.state?.act ? 'Act PDF' : 'Judgment PDF'}
-                      style={{ minHeight: '400px', width: '100%' }}
-                      onLoad={() => {
-                        setLoading(false);
-                        setIsTranslating(false);
-                        setTranslationError(false);
-                      }}
-                      onError={() => {
-                        // If iframe fails, show the button fallback
-                        setError("PDF cannot be embedded due to security restrictions");
-                        setIsTranslating(false);
-                        setTranslationError(true);
-                      }}
-                    />
-                    
-                    {/* Fallback PDF Access - Show when iframe fails */}
-                    {translationError && (
+                  <div className="relative h-full w-full" style={{ minHeight: '350px', display: 'flex', flexDirection: 'column' }}>
+                    {/* Desktop View: Show PDF in iframe */}
+                    <>
+                      {/* PDF Embed - Try iframe first, fallback to button */}
+                      <div className="w-full h-full flex-1" style={{ minHeight: 0, position: 'relative' }}>
+                        <iframe
+                          src={`${translatedPdfUrl || pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&page=${currentPage}&zoom=page-fit&view=FitH`}
+                          className="absolute inset-0 w-full h-full border-0 rounded-lg"
+                          title={location.state?.act ? 'Act PDF' : 'Judgment PDF'}
+                          style={{ 
+                            width: '100%', 
+                            height: '100%',
+                            display: 'block'
+                          }}
+                          allow="fullscreen"
+                          scrolling="auto"
+                          onLoad={() => {
+                            setLoading(false);
+                            setIsTranslating(false);
+                            setTranslationError(false);
+                          }}
+                          onError={() => {
+                            // If iframe fails, show the button fallback
+                            setError("PDF cannot be embedded due to security restrictions");
+                            setIsTranslating(false);
+                            setTranslationError(true);
+                          }}
+                        />
+                      </div>
+                        
+                        {/* Fallback PDF Access - Show when iframe fails */}
+                        {translationError && (
                       <div className="absolute inset-0 bg-white flex items-center justify-center p-3 sm:p-4 md:p-8">
                         <div className="text-center max-w-md w-full px-2">
                           <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-24 md:h-24 mx-auto mb-3 sm:mb-4 md:mb-6 rounded-full bg-gradient-to-br flex items-center justify-center" 
@@ -534,8 +618,9 @@ export default function ViewPDF() {
                         </div>
                       </div>
                     )}
-
-                    {/* Translation Status Indicator */}
+                    </>
+                    
+                    {/* Translation Status Indicator - Only show on desktop */}
                     {isTranslating && (
                       <div className="absolute top-2 right-2 sm:top-3 md:top-4 sm:right-3 md:right-4 bg-blue-100 border border-blue-300 text-blue-700 px-2 sm:px-2.5 md:px-3 py-1 sm:py-1.5 md:py-2 rounded-lg text-xs sm:text-sm font-medium shadow-lg z-10 max-w-[calc(100%-1rem)] sm:max-w-none">
                         <div className="flex items-center gap-1 sm:gap-2">
@@ -549,7 +634,7 @@ export default function ViewPDF() {
                       </div>
                     )}
 
-                    {/* Translation Error Indicator */}
+                    {/* Translation Error Indicator - Only show on desktop */}
                     {translationError && !error && (
                       <div className="absolute top-2 right-2 sm:top-3 md:top-4 sm:right-3 md:right-4 bg-yellow-100 border border-yellow-300 text-yellow-700 px-2 sm:px-2.5 md:px-3 py-1 sm:py-1.5 md:py-2 rounded-lg text-xs sm:text-sm font-medium shadow-lg z-10 max-w-[calc(100%-1rem)] sm:max-w-none">
                         <div className="flex items-center gap-1 sm:gap-2">
@@ -562,7 +647,7 @@ export default function ViewPDF() {
                       </div>
                     )}
 
-                    {/* Loading Overlay */}
+                    {/* Loading Overlay - Only show on desktop */}
                     {loading && (
                       <div className="absolute inset-0 bg-gradient-to-br from-white to-gray-50 flex items-center justify-center rounded-lg">
                         <div className="text-center p-3 sm:p-4 md:p-6">
@@ -581,25 +666,26 @@ export default function ViewPDF() {
                     )}
                   </div>
                 ) : (
-                  <div className="flex items-center justify-center h-[calc(100vh-350px)] sm:h-[500px] md:h-[600px] min-h-[450px] sm:min-h-[500px]">
-                    <div className="text-center p-3 sm:p-4 md:p-8">
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 mx-auto mb-2 sm:mb-3 md:mb-4 rounded-full bg-gradient-to-br flex items-center justify-center" 
-                           style={{ background: 'linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)' }}>
-                        <svg className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                      </div>
-                      <h3 className="text-base sm:text-lg md:text-xl font-bold mb-1 sm:mb-2 px-2" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                        PDF Not Available
-                      </h3>
-                      <p className="text-gray-600 text-xs sm:text-sm px-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                        This {location.state?.act ? 'act' : 'judgment'} does not have a PDF document available.
-                      </p>
-                    </div>
-                  </div>
-                )}
+                   <div className="flex items-center justify-center h-full min-h-[350px] sm:min-h-[400px]">
+                     <div className="text-center p-3 sm:p-4 md:p-8">
+                       <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto mb-2 sm:mb-3 md:mb-4 rounded-full bg-gradient-to-br flex items-center justify-center" 
+                            style={{ background: 'linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)' }}>
+                         <svg className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                         </svg>
+                       </div>
+                       <h3 className="text-sm sm:text-base md:text-lg font-bold mb-1 sm:mb-2 px-2" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                         PDF Not Available
+                       </h3>
+                       <p className="text-gray-600 text-xs sm:text-sm px-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                         This {location.state?.act ? 'act' : 'judgment'} does not have a PDF document available.
+                       </p>
+                     </div>
+                   </div>
+                 )}
                 </div>
               </div>
+              )}
             </div>
           </div>
         </div>
@@ -797,11 +883,129 @@ export default function ViewPDF() {
               title="Drag to resize"
             />
 
+            {/* Folder Tabs */}
+            <div className="border-b border-gray-200 bg-gray-50 flex items-center gap-1 px-2 py-1 overflow-x-auto">
+              <div className="flex items-center gap-1 flex-1 min-w-0">
+                {notesFolders.map((folder) => (
+                  <button
+                    key={folder.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Save current folder content before switching
+                      setNotesFolders(prev => prev.map(f => 
+                        f.id === activeFolderId ? { ...f, content: notesContent } : f
+                      ));
+                      // Switch to new folder
+                      setActiveFolderId(folder.id);
+                      setNotesContent(folder.content || '');
+                    }}
+                    className={`px-3 py-2 rounded-t-lg text-sm font-medium transition-all whitespace-nowrap flex items-center gap-2 ${
+                      activeFolderId === folder.id
+                        ? 'bg-white text-blue-600 border-b-2 border-blue-600'
+                        : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                    }`}
+                    style={{ fontFamily: 'Roboto, sans-serif' }}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                    </svg>
+                    <span>{folder.name}</span>
+                    {notesFolders.length > 1 && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (notesFolders.length > 1) {
+                            const newFolders = notesFolders.filter(f => f.id !== folder.id);
+                            setNotesFolders(newFolders);
+                            if (activeFolderId === folder.id) {
+                              const newActiveId = newFolders[0]?.id || 'default';
+                              setActiveFolderId(newActiveId);
+                              setNotesContent(newFolders.find(f => f.id === newActiveId)?.content || '');
+                            }
+                          }
+                        }}
+                        className="ml-1 hover:bg-gray-200 rounded p-0.5 transition-colors"
+                        title="Delete folder"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    )}
+                  </button>
+                ))}
+                
+                {/* Add New Folder Button */}
+                {showNewFolderInput ? (
+                  <div className="flex items-center gap-1 px-2">
+                    <input
+                      type="text"
+                      value={newFolderName}
+                      onChange={(e) => setNewFolderName(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && newFolderName.trim()) {
+                          const newFolder = {
+                            id: `folder-${Date.now()}`,
+                            name: newFolderName.trim(),
+                            content: ''
+                          };
+                          setNotesFolders([...notesFolders, newFolder]);
+                          setActiveFolderId(newFolder.id);
+                          setNotesContent('');
+                          setNewFolderName('');
+                          setShowNewFolderInput(false);
+                        } else if (e.key === 'Escape') {
+                          setShowNewFolderInput(false);
+                          setNewFolderName('');
+                        }
+                      }}
+                      placeholder="Folder name..."
+                      className="px-2 py-1 text-sm border border-blue-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      style={{ fontFamily: 'Roboto, sans-serif', minWidth: '120px' }}
+                      autoFocus
+                    />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowNewFolderInput(false);
+                        setNewFolderName('');
+                      }}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowNewFolderInput(true);
+                    }}
+                    className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-t-lg transition-all flex items-center gap-1"
+                    title="Add new folder"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span className="hidden sm:inline">New Folder</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
             {/* Content Area */}
             <div className="flex-1 overflow-hidden flex flex-col" style={{ cursor: 'text' }}>
               <textarea
                 value={notesContent}
-                onChange={(e) => setNotesContent(e.target.value)}
+                onChange={(e) => {
+                  setNotesContent(e.target.value);
+                  // Update folder content in real-time
+                  setNotesFolders(prev => prev.map(f => 
+                    f.id === activeFolderId ? { ...f, content: e.target.value } : f
+                  ));
+                }}
                 placeholder="Write your notes here..."
                 className="flex-1 w-full p-4 border-0 resize-none focus:outline-none focus:ring-0"
                 style={{ 
@@ -819,8 +1023,11 @@ export default function ViewPDF() {
             <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200 bg-gray-50">
               <button
                 onClick={() => {
+                  // Save current folder content before closing
+                  setNotesFolders(prev => prev.map(f => 
+                    f.id === activeFolderId ? { ...f, content: notesContent } : f
+                  ));
                   setShowNotesPopup(false);
-                  setNotesContent("");
                 }}
                 className="px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium text-sm"
                 style={{ fontFamily: 'Roboto, sans-serif', cursor: 'pointer' }}
@@ -829,10 +1036,18 @@ export default function ViewPDF() {
               </button>
               <button
                 onClick={() => {
-                  // Save notes logic here
-                  console.log('Saving notes:', notesContent);
-                  // You can implement save functionality here
-                  // For now, just close the popup
+                  // Save notes logic here - save all folders
+                  setNotesFolders(prev => prev.map(f => 
+                    f.id === activeFolderId ? { ...f, content: notesContent } : f
+                  ));
+                  console.log('Saving notes folders:', notesFolders);
+                  // You can implement save functionality here (localStorage, API, etc.)
+                  // Save to localStorage for persistence
+                  const notesKey = `notes_${judgmentInfo?.id || judgmentInfo?.act_id || 'default'}`;
+                  const updatedFolders = notesFolders.map(f => 
+                    f.id === activeFolderId ? { ...f, content: notesContent } : f
+                  );
+                  localStorage.setItem(notesKey, JSON.stringify(updatedFolders));
                   setShowNotesPopup(false);
                 }}
                 className="px-4 py-2 text-white rounded-lg transition-all font-medium text-sm shadow-sm hover:shadow-md"

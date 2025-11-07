@@ -358,14 +358,14 @@ export default function LawLibrary() {
       <Navbar />
       
       {/* Enhanced Header Section */}
-      <div className="bg-white border-b border-gray-200 pt-20 animate-slide-in-bottom">
-        <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="bg-white border-b border-gray-200 pt-16 sm:pt-20 animate-slide-in-bottom">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-12">
           <div className="text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-4 animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
               Law Library
             </h1>
-            <div className="w-20 h-1 mx-auto mb-6 animate-fade-in-up" style={{ backgroundColor: '#CF9B63', animationDelay: '0.2s' }}></div>
-            <p className="text-lg max-w-3xl mx-auto animate-fade-in-up" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif', animationDelay: '0.4s' }}>
+            <div className="w-16 sm:w-20 h-1 mx-auto mb-4 sm:mb-6 animate-fade-in-up" style={{ backgroundColor: '#CF9B63', animationDelay: '0.2s' }}></div>
+            <p className="text-sm sm:text-base md:text-lg max-w-3xl mx-auto px-2 animate-fade-in-up" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif', animationDelay: '0.4s' }}>
               Your comprehensive resource for accessing legal acts, regulations, and legislative documents from across India
             </p>
             
@@ -373,18 +373,18 @@ export default function LawLibrary() {
         </div>
       </div>
 
-      <div className="p-6">
+      <div className="p-3 sm:p-4 md:p-6">
         <div className="max-w-7xl mx-auto">
 
           {/* Section Type Toggle Button */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+              <label className="text-xs sm:text-sm font-medium text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
                 Select Section:
               </label>
               
               {/* Toggle Button */}
-              <div className="relative inline-flex items-center bg-gray-100 rounded-xl p-1 shadow-inner">
+              <div className="relative inline-flex items-center bg-gray-100 rounded-xl p-1 shadow-inner w-full sm:w-auto">
                 {/* Sliding background indicator */}
                 <div
                   className={`absolute top-1 bottom-1 rounded-lg transition-all duration-300 ease-in-out z-0`}
@@ -398,7 +398,7 @@ export default function LawLibrary() {
                 
                 <button
                   onClick={() => setActiveSection('central')}
-                  className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 min-w-[180px] ${
+                  className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 flex-1 sm:flex-none sm:min-w-[140px] md:min-w-[180px] text-xs sm:text-sm ${
                     activeSection === 'central'
                       ? 'text-white'
                       : 'text-gray-600 hover:text-gray-800'
@@ -411,7 +411,7 @@ export default function LawLibrary() {
                 </button>
                 <button
                   onClick={() => setActiveSection('state')}
-                  className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 min-w-[180px] ${
+                  className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 flex-1 sm:flex-none sm:min-w-[140px] md:min-w-[180px] text-xs sm:text-sm ${
                     activeSection === 'state'
                       ? 'text-white'
                       : 'text-gray-600 hover:text-gray-800'
@@ -427,18 +427,18 @@ export default function LawLibrary() {
           </div>
 
           {/* Enhanced Search and Filter Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 md:mb-8 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                 Search {sectionLabel}
               </h2>
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors font-medium"
+                className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors font-medium text-sm sm:text-base w-full sm:w-auto"
                 style={{ fontFamily: 'Roboto, sans-serif' }}
               >
                 <svg 
-                  className={`w-5 h-5 transition-transform duration-200 ${showFilters ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200 ${showFilters ? 'rotate-180' : ''}`}
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -450,8 +450,8 @@ export default function LawLibrary() {
             </div>
             
             {/* Search Bar */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+            <div className="mb-4 sm:mb-6">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                 Search {sectionLabel}
               </label>
               <div className="relative">
@@ -459,27 +459,27 @@ export default function LawLibrary() {
                   type="text"
                   value={filters.search}
                   onChange={(e) => handleFilterChange('search', e.target.value)}
-                  placeholder={`Search ${sectionLabel.toLowerCase()} by title, ministry, department, or any keyword...`}
+                  placeholder={`Search ${sectionLabel.toLowerCase()}...`}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !loading) {
                       e.preventDefault();
                       applyFilters();
                     }
                   }}
-                  className="w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-lg"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 pl-10 sm:pl-12 pr-10 sm:pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm sm:text-base md:text-lg"
                   style={{ fontFamily: 'Roboto, sans-serif' }}
                 />
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+                  <svg className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
                 <button
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-blue-600 transition-colors"
+                  className="absolute inset-y-0 right-0 pr-2 sm:pr-3 flex items-center text-gray-400 hover:text-blue-600 transition-colors"
                   title="Voice Search"
                 >
                   <svg 
-                    className="w-5 h-5"
+                    className="w-4 h-4 sm:w-5 sm:h-5"
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -492,14 +492,14 @@ export default function LawLibrary() {
 
             {/* Dynamic Filters - Hidden by default, shown when showFilters is true */}
             {showFilters && (
-              <div className="border-t border-gray-200 pt-6 mt-6 animate-fade-in-up">
-                <h3 className="text-lg font-semibold mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+              <div className="border-t border-gray-200 pt-4 sm:pt-6 mt-4 sm:mt-6 animate-fade-in-up">
+                <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   Filter Options
                 </h3>
                 
                 {activeSection === "central" ? (
                   /* Central Acts Filters */
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
                     {/* Act ID Filter */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
@@ -590,7 +590,7 @@ export default function LawLibrary() {
                   </div>
                 ) : (
                   /* State Acts Filters */
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
                     {/* State Filter */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
@@ -662,11 +662,11 @@ export default function LawLibrary() {
                 )}
 
                 {/* Filter Actions */}
-                <div className="flex flex-wrap gap-4 pt-4 border-t border-gray-200">
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-4 border-t border-gray-200">
                   <button
                     onClick={applyFilters}
                     disabled={loading}
-                    className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   >
                     {loading ? (
@@ -690,7 +690,7 @@ export default function LawLibrary() {
                   <button
                     onClick={clearFilters}
                     disabled={loading}
-                    className="px-6 py-2.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 active:bg-gray-700 transition-all font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 active:bg-gray-700 transition-all font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -739,10 +739,10 @@ export default function LawLibrary() {
           </div>
 
           {/* Enhanced Results Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 animate-fade-in-up" style={{ animationDelay: '1s' }}>
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8 animate-fade-in-up" style={{ animationDelay: '1s' }}>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
+              <div className="flex-1">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   {Object.values(filters).some(val => {
                     if (!val) return false;
                     if (typeof val === 'string') return val.trim() !== '';
@@ -752,7 +752,7 @@ export default function LawLibrary() {
                     ? `Search Results - ${sectionLabel}` 
                     : `Latest ${sectionLabel}`}
                 </h2>
-                <p className="text-sm text-gray-600 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                <p className="text-xs sm:text-sm text-gray-600 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   {Object.values(filters).some(val => {
                     if (!val) return false;
                     if (typeof val === 'string') return val.trim() !== '';
@@ -763,9 +763,9 @@ export default function LawLibrary() {
                     : `Showing the most recent ${sectionLabel.toLowerCase()} first`}
                 </p>
               </div>
-              <div className="text-right">
-                <div className="flex flex-col items-end gap-1">
-                  <span className="text-sm font-medium text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+              <div className="text-left sm:text-right">
+                <div className="flex flex-col items-start sm:items-end gap-1">
+                  <span className="text-xs sm:text-sm font-medium text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
                     {acts.length} {acts.length === 1 ? 'Act' : 'Acts'}
                   </span>
                   {pagination?.has_more && !loading && (
@@ -854,22 +854,22 @@ export default function LawLibrary() {
                   <SmoothTransitionWrapper key={act.id || act.act_id || `act-${index}`} delay={index * 50}>
                     <div 
                       onClick={() => viewActDetails(act)}
-                      className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-300 bg-white group cursor-pointer"
+                      className="border border-gray-200 rounded-lg p-3 sm:p-4 md:p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-300 bg-white group cursor-pointer"
                     >
-                      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-start gap-3 mb-3">
-                            <h3 className="text-xl font-semibold flex-1 group-hover:text-blue-700 transition-colors" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 sm:gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start gap-2 sm:gap-3 mb-2 sm:mb-3">
+                            <h3 className="text-base sm:text-lg md:text-xl font-semibold flex-1 group-hover:text-blue-700 transition-colors break-words" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                               {act.short_title || act.long_title || 'Untitled Act'}
                             </h3>
                             {index === 0 && !loading && (
-                              <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                              <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium flex-shrink-0">
                                 Latest
                               </span>
                             )}
                           </div>
                           
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-sm mb-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 md:gap-4 text-xs sm:text-sm mb-2 sm:mb-3">
                             {act.year && (
                               <div>
                                 <span className="font-medium text-gray-800">Year:</span>
@@ -916,13 +916,13 @@ export default function LawLibrary() {
                           )}
                         </div>
 
-                        <div className="flex-shrink-0 flex flex-col gap-2">
+                        <div className="flex-shrink-0 flex flex-col gap-2 w-full sm:w-auto">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               viewActDetails(act);
                             }}
-                            className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium shadow-sm hover:shadow-md"
+                            className="px-4 sm:px-6 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium shadow-sm hover:shadow-md text-sm sm:text-base"
                             style={{ fontFamily: 'Roboto, sans-serif' }}
                           >
                             View Details

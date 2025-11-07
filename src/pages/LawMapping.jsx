@@ -445,21 +445,21 @@ export default function LawMapping() {
       <Navbar />
       
       {/* Enhanced Header Section */}
-      <div className="bg-white border-b border-gray-200 pt-20 animate-slide-in-bottom">
-        <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="bg-white border-b border-gray-200 pt-14 sm:pt-16 md:pt-20 animate-slide-in-bottom">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 lg:py-12">
           <div className="text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-4 animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-3 md:mb-4 animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
               Law Mapping
             </h1>
-            <div className="w-20 h-1 mx-auto mb-6 animate-fade-in-up" style={{ backgroundColor: '#CF9B63', animationDelay: '0.2s' }}></div>
-            <p className="text-lg max-w-3xl mx-auto animate-fade-in-up" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif', animationDelay: '0.4s' }}>
+            <div className="w-12 sm:w-16 md:w-20 h-1 mx-auto mb-3 sm:mb-4 md:mb-6 animate-fade-in-up" style={{ backgroundColor: '#CF9B63', animationDelay: '0.2s' }}></div>
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg max-w-3xl mx-auto px-2 animate-fade-in-up" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif', animationDelay: '0.4s' }}>
               Navigate the transition from old legal codes to new ones. Map sections between IPC-BNS, IEA-BSA, and CrPC-BNSS.
             </p>
           </div>
         </div>
       </div>
 
-      <div className="p-6">
+      <div className="p-2 sm:p-3 md:p-4 lg:p-6">
         <div className="max-w-7xl mx-auto">
 
           {/* Mapping Type Selector */}
@@ -468,18 +468,18 @@ export default function LawMapping() {
           </div> */}
 
           {/* Enhanced Search and Filter Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2 sm:p-3 md:p-4 lg:p-8 mb-2 sm:mb-3 md:mb-4 lg:mb-8 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-5 md:mb-6">
+              <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                 Search {mappingTypeLabel}
               </h2>
-              <div className="flex items-center gap-4">
-                <label className="text-sm font-medium text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                <label className="text-xs sm:text-sm font-medium text-gray-700 whitespace-nowrap" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   Select Mapping Type:
                 </label>
                 
                 {/* Toggle Button - Three Options */}
-                <div className="relative inline-flex items-center bg-gray-100 rounded-xl p-1 shadow-inner">
+                <div className="relative inline-flex items-center bg-gray-100 rounded-xl p-1 shadow-inner w-full sm:w-auto">
                   {/* Sliding background indicator */}
                   <div
                     className={`absolute top-1 bottom-1 rounded-lg transition-all duration-300 ease-in-out z-0`}
@@ -493,7 +493,7 @@ export default function LawMapping() {
                   
                   <button
                     onClick={() => setMappingType('bns_ipc')}
-                    className={`px-4 py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 min-w-[160px] text-sm ${
+                    className={`px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 flex-1 sm:flex-none sm:min-w-[120px] md:min-w-[160px] text-xs sm:text-sm ${
                       mappingType === 'bns_ipc'
                         ? 'text-white'
                         : 'text-gray-600 hover:text-gray-800'
@@ -506,7 +506,7 @@ export default function LawMapping() {
                   </button>
                   <button
                     onClick={() => setMappingType('bsa_iea')}
-                    className={`px-4 py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 min-w-[160px] text-sm ${
+                    className={`px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 flex-1 sm:flex-none sm:min-w-[120px] md:min-w-[160px] text-xs sm:text-sm ${
                       mappingType === 'bsa_iea'
                         ? 'text-white'
                         : 'text-gray-600 hover:text-gray-800'
@@ -519,7 +519,7 @@ export default function LawMapping() {
                   </button>
                   <button
                     onClick={() => setMappingType('bnss_crpc')}
-                    className={`px-4 py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 min-w-[160px] text-sm ${
+                    className={`px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 flex-1 sm:flex-none sm:min-w-[120px] md:min-w-[160px] text-xs sm:text-sm ${
                       mappingType === 'bnss_crpc'
                         ? 'text-white'
                         : 'text-gray-600 hover:text-gray-800'
@@ -550,7 +550,7 @@ export default function LawMapping() {
             </div>
             
             {/* Search Bar */}
-            <div className="mb-6">
+            <div className="mb-3 sm:mb-4 md:mb-6">
               {/* <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                 Search Mappings
               </label> */}
@@ -559,27 +559,27 @@ export default function LawMapping() {
                   type="text"
                   value={filters.search}
                   onChange={(e) => handleFilterChange('search', e.target.value)}
-                  placeholder="Search by subject, section number, or any keyword..."
+                  placeholder="Search by subject, section number..."
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !loading && !isFetchingRef.current) {
                       e.preventDefault();
                       applyFilters();
                     }
                   }}
-                  className="w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-lg"
+                  className="w-full px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 md:py-3 pl-8 sm:pl-10 md:pl-12 pr-8 sm:pr-10 md:pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-xs sm:text-sm md:text-base lg:text-lg"
                   style={{ fontFamily: 'Roboto, sans-serif' }}
                 />
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+                  <svg className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
                 <button
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-blue-600 transition-colors"
+                  className="absolute inset-y-0 right-0 pr-2 sm:pr-3 flex items-center text-gray-400 hover:text-blue-600 transition-colors"
                   title="Voice Search"
                 >
                   <svg 
-                    className="w-5 h-5"
+                    className="w-4 h-4 sm:w-5 sm:h-5"
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -592,12 +592,12 @@ export default function LawMapping() {
 
             {/* Dynamic Filters - Hidden by default, shown when showFilters is true */}
             {showFilters && (
-              <div className="border-t border-gray-200 pt-6 mt-6 animate-fade-in-up">
-                <h3 className="text-lg font-semibold mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+              <div className="border-t border-gray-200 pt-3 sm:pt-4 md:pt-6 mt-3 sm:mt-4 md:mt-6 animate-fade-in-up">
+                <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2 sm:mb-3 md:mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   Filter Options
                 </h3>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4 lg:gap-6 mb-3 sm:mb-4 md:mb-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       Subject
@@ -642,11 +642,11 @@ export default function LawMapping() {
                 </div>
 
                 {/* Filter Actions */}
-                <div className="flex flex-wrap gap-4 pt-4 border-t border-gray-200">
+                <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3 md:gap-4 pt-3 sm:pt-4 border-t border-gray-200">
                   <button
                     onClick={applyFilters}
                     disabled={loading || isFetchingRef.current}
-                    className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="w-full sm:w-auto px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm md:text-base"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   >
                     {loading ? (
@@ -670,7 +670,7 @@ export default function LawMapping() {
                   <button
                     onClick={clearFilters}
                     disabled={loading || isFetchingRef.current}
-                    className="px-6 py-2.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 active:bg-gray-700 transition-all font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="w-full sm:w-auto px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-2.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 active:bg-gray-700 transition-all font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm md:text-base"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -708,23 +708,23 @@ export default function LawMapping() {
           </div>
 
           {/* Enhanced Results Section */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 animate-fade-in-up" style={{ animationDelay: '1s' }}>
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2 sm:p-3 md:p-4 lg:p-8 animate-fade-in-up" style={{ animationDelay: '1s' }}>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 sm:mb-4 md:mb-6">
+              <div className="flex-1">
+                <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   {Object.values(filters).some(val => val && (typeof val === 'string' ? val.trim() !== '' : val !== '')) 
                     ? `Search Results - ${mappingTypeLabel}` 
                     : `Latest ${mappingTypeLabel}`}
                 </h2>
-                <p className="text-sm text-gray-600 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                <p className="text-xs sm:text-sm text-gray-600 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   {Object.values(filters).some(val => val && (typeof val === 'string' ? val.trim() !== '' : val !== '')) 
                     ? `Showing mappings matching your search criteria` 
                     : `Showing the most recent mappings first`}
                 </p>
               </div>
-              <div className="text-right">
-                <div className="flex flex-col items-end gap-1">
-                  <span className="text-sm font-medium text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+              <div className="text-left sm:text-right">
+                <div className="flex flex-col items-start sm:items-end gap-1">
+                  <span className="text-xs sm:text-sm font-medium text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
                     {mappings.length} {mappings.length === 1 ? 'Mapping' : 'Mappings'}
                   </span>
                   {hasMore && !loading && (
@@ -798,7 +798,7 @@ export default function LawMapping() {
                 )}
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-2 sm:space-y-3 md:space-y-4">
                 {mappings.map((mapping, index) => {
                   // Get section numbers based on mapping type
                   const getSourceSection = () => {
@@ -854,59 +854,59 @@ export default function LawMapping() {
                     <SmoothTransitionWrapper key={mapping.id || `mapping-${index}`} delay={index * 50}>
                       <div 
                         onClick={() => viewMappingDetails(mapping)}
-                        className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-300 bg-white group cursor-pointer"
+                        className="border border-gray-200 rounded-lg p-2 sm:p-3 md:p-4 lg:p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-300 bg-white group cursor-pointer"
                       >
                         {/* Section Mapping Display */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center mb-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4 items-center mb-3 sm:mb-4">
                           {/* Source Section */}
-                          <div className={`${sourceColor.bg} p-4 rounded-lg`}>
+                          <div className={`${sourceColor.bg} p-2 sm:p-3 md:p-4 rounded-lg`}>
                             <div className="text-center">
-                              <div className="text-sm font-medium text-gray-600 mb-1">{getSourceLabel()}</div>
+                              <div className="text-xs sm:text-sm font-medium text-gray-600 mb-1">{getSourceLabel()}</div>
                               {sourceSection && (
-                                <div className={`text-2xl font-bold ${sourceColor.text} mb-2`}>{sourceSection}</div>
+                                <div className={`text-lg sm:text-xl md:text-2xl font-bold ${sourceColor.text} mb-1 sm:mb-2`}>{sourceSection}</div>
                               )}
                             </div>
                           </div>
 
                           {/* Arrow */}
                           <div className="text-center">
-                            <div className="text-3xl font-bold text-blue-600 transform rotate-90 md:rotate-0">
+                            <div className="text-2xl sm:text-3xl font-bold text-blue-600 transform rotate-90 md:rotate-0">
                               ⇄
                             </div>
                             <div className="text-xs text-gray-500 mt-1">Maps to</div>
                           </div>
 
                           {/* Target Section */}
-                          <div className={`${targetColor.bg} p-4 rounded-lg`}>
+                          <div className={`${targetColor.bg} p-2 sm:p-3 md:p-4 rounded-lg`}>
                             <div className="text-center">
-                              <div className="text-sm font-medium text-gray-600 mb-1">{getTargetLabel()}</div>
+                              <div className="text-xs sm:text-sm font-medium text-gray-600 mb-1">{getTargetLabel()}</div>
                               {targetSection && (
-                                <div className={`text-2xl font-bold ${targetColor.text} mb-2`}>{targetSection}</div>
+                                <div className={`text-lg sm:text-xl md:text-2xl font-bold ${targetColor.text} mb-1 sm:mb-2`}>{targetSection}</div>
                               )}
                             </div>
                           </div>
                         </div>
 
                         {/* Subject and Summary */}
-                        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                          <div className="flex-1">
-                            <h3 className="text-lg font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-2 sm:gap-3 md:gap-4">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-1 sm:mb-2 break-words" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                               {subject}
                             </h3>
                             {summary && (
-                              <p className="text-gray-600 text-sm leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                              <p className="text-gray-600 text-xs sm:text-sm leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
                                 {summary}
                               </p>
                             )}
                           </div>
                           
-                          <div className="flex-shrink-0 flex flex-col gap-3 w-full lg:w-48">
+                          <div className="flex-shrink-0 flex flex-col gap-2 sm:gap-3 w-full sm:w-auto lg:w-48">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 viewMappingDetails(mapping);
                               }}
-                              className="w-full px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="w-full sm:w-auto px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium text-xs sm:text-sm md:text-base shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                               style={{ fontFamily: 'Roboto, sans-serif' }}
                             >
                               <span className="flex items-center justify-center gap-2">

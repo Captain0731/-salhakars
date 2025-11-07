@@ -1,70 +1,179 @@
-# Getting Started with Create React App
+# Salhakar - Legal AI Platform
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Salhakar is an AI-powered legal research platform that provides instant access to legal judgments, acts, and legal guidance for lawyers, students, and legal professionals in India.
 
-## Available Scripts
+## 🚀 Getting Started
 
-In the project directory, you can run:
+### Prerequisites
 
-### `npm start`
+Before you begin, ensure you have the following installed on your system:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Node.js** (version 14.0 or higher)
+- **npm** (version 6.0 or higher) or **yarn**
+- **Git**
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+You can check if you have these installed by running:
+```bash
+node --version
+npm --version
+git --version
+```
 
-### `npm test`
+### Installation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Captain0731/-salhakars.git
+   cd salhakar
+   ```
 
-### `npm run build`
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+   
+   Or if you prefer using yarn:
+   ```bash
+   yarn install
+   ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+3. **Set up environment variables** (if needed)
+   Create a `.env` file in the root directory and add any required environment variables:
+   ```env
+   REACT_APP_API_URL=your_api_url_here
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 📦 Project Dependencies
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Main Dependencies
 
-### `npm run eject`
+- **react** (^19.2.0) - React library
+- **react-dom** (^19.2.0) - React DOM rendering
+- **react-router-dom** (^7.9.3) - Client-side routing
+- **react-scripts** (5.0.1) - Create React App scripts
+- **framer-motion** (^12.23.24) - Animation library
+- **lucide-react** (^0.544.0) - Icon library
+- **react-icons** (^5.5.0) - Additional icon library
+- **clsx** (^2.1.1) - Utility for constructing className strings
+- **cors** (^2.8.5) - CORS middleware
+- **express** (^5.1.0) - Web framework (if using backend)
+- **@lottiefiles/dotlottie-react** (^0.17.6) - Lottie animations
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Development Dependencies
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- **tailwindcss** (^3.4.13) - Utility-first CSS framework
+- **postcss** (^8.5.6) - CSS post-processor
+- **autoprefixer** (^10.4.21) - CSS vendor prefixer
+- **http-proxy-middleware** (^3.0.5) - HTTP proxy middleware
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 🏃 Running the Project
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Development Mode
 
-## Learn More
+Start the development server:
+```bash
+npm start
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+The application will open in your browser at [http://localhost:3000](http://localhost:3000).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+The page will automatically reload when you make changes to the code.
 
-### Code Splitting
+### Build for Production
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Create an optimized production build:
+```bash
+npm run build
+```
 
-### Analyzing the Bundle Size
+This creates a `build` folder with optimized production files ready for deployment.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Run Tests
 
-### Making a Progressive Web App
+Run the test suite:
+```bash
+npm test
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## 📁 Project Structure
 
-### Advanced Configuration
+```
+salhakar/
+├── public/                 # Static files
+├── src/
+│   ├── components/         # Reusable React components
+│   │   ├── landing/       # Landing page components
+│   │   └── dashboard/     # Dashboard components
+│   ├── pages/             # Page components
+│   ├── contexts/          # React contexts
+│   ├── services/          # API services
+│   ├── hooks/             # Custom React hooks
+│   └── App.js             # Main App component
+├── package.json           # Dependencies and scripts
+└── README.md              # This file
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## 🛠️ Available Scripts
 
-### Deployment
+- `npm start` - Runs the app in development mode
+- `npm run build` - Builds the app for production
+- `npm test` - Launches the test runner
+- `npm run eject` - Ejects from Create React App (one-way operation)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 🔧 Troubleshooting
 
-### `npm run build` fails to minify
+### Common Issues
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+1. **Port 3000 already in use**
+   ```bash
+   # Kill the process using port 3000 or use a different port
+   set PORT=3001 && npm start
+   ```
+
+2. **Node modules issues**
+   ```bash
+   # Delete node_modules and reinstall
+   rm -rf node_modules package-lock.json
+   npm install
+   ```
+
+3. **Build fails**
+   - Ensure all dependencies are installed
+   - Check for syntax errors in your code
+   - Clear the build folder and try again
+
+## 📝 Features
+
+- 🔍 Legal Judgments Search (High Court & Supreme Court)
+- 📚 Law Library (Central Acts & State Acts)
+- 🤖 AI Legal Chatbot (Kiki AI Assistant)
+- 📄 PDF Viewer with AI Search
+- 🔖 Bookmarks System
+- 📝 Notes Feature
+- 🌐 Multi-language Support
+- 📱 Responsive Design
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is private and proprietary.
+
+## 👥 Team
+
+- **Pratham Shah** - Founder & CEO
+- **Parth Chelani** - Chief Operating Officer
+
+## 📧 Contact
+
+For inquiries, please contact: info@salhakar.com
+
+---
+
+Made with ❤️ by the Salhakar Team

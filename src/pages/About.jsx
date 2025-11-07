@@ -6,9 +6,9 @@ const About = () => {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' , border: '1px solid rgba(30, 101, 173, 0.1)' }}>
       <Navbar />
-      <div className="py-5 ">
+      <div className="py-2 sm:py-3 md:py-5">
          {/* Hero Section */}
-        <section className="pt-20 pb-16 md:pt-28 md:pb-20 relative z-20 overflow-hidden border-2 border-gray-200 rounded-2xl shadow-lg"
+        <section className="pt-14 sm:pt-16 md:pt-20 lg:pt-28 pb-8 sm:pb-12 md:pb-16 lg:pb-20 relative z-20 overflow-hidden border-2 border-gray-200 rounded-xl sm:rounded-2xl shadow-lg mx-2 sm:mx-4"
           style={{
             background: 'linear-gradient(135deg, #F9FAFC 0%, #FFFFFF 100%)'
           }}
@@ -21,9 +21,9 @@ const About = () => {
               style={{ backgroundColor: '#CF9B63', filter: 'blur(100px)' }}
             ></div>
           </div>
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-7 relative z-10">
+          <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 text-center pt-4 sm:pt-6 md:pt-7 relative z-10">
             <h1
-              className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight"
+              className="text-xl sm:text-2xl md:text-3xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 leading-tight"
             style={{
               color: "#1E65AD",
               fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -33,11 +33,11 @@ const About = () => {
           >
             Experience Salhakar
           </h1>
-            <div className="w-24 h-1.5 mx-auto rounded-full mb-6"
+            <div className="w-16 sm:w-20 md:w-24 h-1 sm:h-1.5 mx-auto rounded-full mb-3 sm:mb-4 md:mb-6"
               style={{ backgroundColor: '#CF9B63' }}
             ></div>
             <p
-              className="text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed"
+              className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl max-w-3xl mx-auto leading-relaxed px-2"
             style={{
                 color: '#8C969F',
                 fontFamily: "'Roboto', sans-serif",
@@ -51,17 +51,17 @@ const About = () => {
       </section>
 
         {/* Main Content Section */}
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-20">
+        <div className="max-w-6xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 pt-8 sm:pt-12 md:pt-16 lg:pt-20 pb-8 sm:pb-12 md:pb-16 lg:pb-20">
           {/* Section 1: About Salhakar */}
-          <section className="mb-20 md:mb-24 relative">
-            <div className="bg-white rounded-2xl p-8 md:p-12 shadow-lg"
+          <section className="mb-8 sm:mb-12 md:mb-16 lg:mb-20 xl:mb-24 relative">
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 lg:p-12 shadow-lg mx-2 sm:mx-0"
               style={{
                 border: '1px solid rgba(30, 101, 173, 0.1)',
                 boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
               }}
             >
               <h2
-                className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6"
+                className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3 sm:mb-4 md:mb-6"
                 style={{
                   color: '#1E65AD',
                   fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -74,11 +74,11 @@ const About = () => {
                   fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif"
                 }}>Salhakar</span>
               </h2>
-              <div className="w-16 h-1 rounded-full mb-6"
+              <div className="w-12 sm:w-14 md:w-16 h-0.5 sm:h-1 rounded-full mb-3 sm:mb-4 md:mb-6"
                 style={{ backgroundColor: '#CF9B63' }}
               ></div>
               <p 
-                className="text-base md:text-lg leading-relaxed"
+                className="text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed break-words"
                 style={{ 
                   color: '#8C969F', 
               fontFamily: "'Roboto', sans-serif",
@@ -95,23 +95,23 @@ const About = () => {
       </section>
 
           {/* Section 2: Mission & Vision */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-20 md:mb-24">
-            <section className="bg-white rounded-2xl p-8 md:p-10 shadow-lg transition-transform duration-300 hover:scale-[1.02]"
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-12 md:mb-16 lg:mb-20 xl:mb-24 px-2 sm:px-0">
+            <section className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 lg:p-10 shadow-lg transition-transform duration-300 hover:scale-[1.02]"
               style={{
                 border: '1px solid rgba(30, 101, 173, 0.1)',
                 boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
               }}
             >
-              <div className="mb-4">
-                <div className="w-12 h-12 rounded-lg mb-4 flex items-center justify-center"
+              <div className="mb-3 sm:mb-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg mb-3 sm:mb-4 flex items-center justify-center"
                   style={{ backgroundColor: 'rgba(30, 101, 173, 0.1)' }}
                 >
-                  <svg className="w-6 h-6" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
                 <h2
-                  className="text-2xl md:text-3xl font-bold mb-4"
+                  className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-2 sm:mb-3 md:mb-4"
                   style={{
                     color: '#1E65AD',
                     fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -124,12 +124,12 @@ const About = () => {
                     fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif"
                   }}>Mission</span>
                 </h2>
-                <div className="w-12 h-1 rounded-full mb-4"
+                <div className="w-10 sm:w-12 h-0.5 sm:h-1 rounded-full mb-2 sm:mb-3 md:mb-4"
                   style={{ backgroundColor: '#CF9B63' }}
                 ></div>
               </div>
               <p
-                className="text-base md:text-lg leading-relaxed"
+                className="text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed break-words"
             style={{
                   color: '#8C969F', 
                   fontFamily: "'Roboto', sans-serif",
@@ -145,23 +145,23 @@ const About = () => {
             </section>
 
             {/* Section 3: Vision */}
-            <section className="bg-white rounded-2xl p-8 md:p-10 shadow-lg transition-transform duration-300 hover:scale-[1.02]"
+            <section className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 lg:p-10 shadow-lg transition-transform duration-300 hover:scale-[1.02]"
               style={{
                 border: '1px solid rgba(30, 101, 173, 0.1)',
                 boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
               }}
             >
-              <div className="mb-4">
-                <div className="w-12 h-12 rounded-lg mb-4 flex items-center justify-center"
+              <div className="mb-3 sm:mb-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg mb-3 sm:mb-4 flex items-center justify-center"
                   style={{ backgroundColor: 'rgba(30, 101, 173, 0.1)' }}
                 >
-                  <svg className="w-6 h-6" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
                 </div>
                 <h2
-                  className="text-2xl md:text-3xl font-bold mb-4"
+                  className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-2 sm:mb-3 md:mb-4"
                   style={{
                     color: '#1E65AD',
                     fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -174,12 +174,12 @@ const About = () => {
                     fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif"
                   }}>Vision</span>
                 </h2>
-                <div className="w-12 h-1 rounded-full mb-4"
+                <div className="w-10 sm:w-12 h-0.5 sm:h-1 rounded-full mb-2 sm:mb-3 md:mb-4"
                   style={{ backgroundColor: '#CF9B63' }}
                 ></div>
               </div>
               <p 
-                className="text-base md:text-lg leading-relaxed"
+                className="text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed break-words"
                 style={{ 
                   color: '#8C969F', 
               fontFamily: "'Roboto', sans-serif",
@@ -195,161 +195,11 @@ const About = () => {
             </section>
           </div>
 
-          {/* Section 4: Founders */}
-          <section className="mt-20 md:mt-28 mb-20 md:mb-24">
-            <div className="text-center mb-16 md:mb-20">
-              <h2
-                className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4"
-                style={{
-                  color: '#1E65AD',
-                  fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
-                  fontWeight: 700,
-                  letterSpacing: '-0.02em'
-                }}
-              >
-                Our Founders
-              </h2>
-              <div className="w-24 h-1.5 mx-auto rounded-full"
-                style={{ backgroundColor: '#CF9B63' }}
-              ></div>
-            </div>
-
-            <div className="space-y-20 md:space-y-28 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-              {/* Founder 1: Pratham Shah */}
-              <div className="flex justify-center">
-                <div className="bg-white rounded-2xl overflow-hidden p-6 shadow-lg transition-transform duration-300 hover:scale-[1.02]"
-                  style={{
-                    border: '1px solid rgba(30, 101, 173, 0.1)',
-                    boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)',
-                    maxWidth: '320px',
-                    width: '100%'
-                  }}
-                >
-                  <div className="relative w-full aspect-[3/4] mb-4 overflow-hidden rounded-xl">
-                    <img
-                      src="/founder.png"
-                      alt="Pratham Shah"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="text-center">
-                    <h3
-                      className="text-xl md:text-2xl font-bold mb-1"
-                      style={{
-                        color: '#1E65AD',
-                        fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
-                        fontWeight: 700
-                      }}
-                    >
-                      Pratham Shah
-                    </h3>
-                    <p 
-                      className="text-sm md:text-base mb-4"
-                      style={{ 
-                        color: '#8C969F', 
-                        fontFamily: "'Roboto', sans-serif", 
-                        fontWeight: 400 
-                      }}
-                    >
-                      Founder & CEO
-                    </p>
-                    <div className="flex gap-4 justify-center">
-                      <a
-                        href="https://linkedin.com/in/pratham-shah"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
-                        aria-label="LinkedIn"
-                      >
-                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                        </svg>
-                      </a>
-                      <a
-                        href="mailto:pratham@salhakar.com"
-                        className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
-                        aria-label="Email"
-                      >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Founder 2: Parth Chelani */}
-              <div className="flex justify-center">
-                <div className="bg-white rounded-2xl overflow-hidden p-6 shadow-lg transition-transform duration-300 hover:scale-[1.02]"
-                  style={{
-                    border: '1px solid rgba(30, 101, 173, 0.1)',
-                    boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)',
-                    maxWidth: '320px',
-                    width: '100%'
-                  }}
-                >
-                  <div className="relative w-full aspect-[3/4] mb-4 overflow-hidden rounded-xl">
-                    <img
-                      src="/cofounder.png"
-                      alt="Parth Chelani"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="text-center">
-                    <h3
-                      className="text-xl md:text-2xl font-bold mb-1"
-                      style={{
-                        color: '#1E65AD',
-                        fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
-                        fontWeight: 700
-                      }}
-                    >
-                      Parth Chelani
-                    </h3>
-                    <p 
-                      className="text-sm md:text-base mb-4"
-                      style={{ 
-                        color: '#8C969F', 
-                        fontFamily: "'Roboto', sans-serif",
-                        fontWeight: 400
-                      }}
-                    >
-                      Chief Operating Officer
-                    </p>
-                    <div className="flex gap-4 justify-center">
-                      <a
-                        href="https://linkedin.com/in/parth-chelani"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
-                        aria-label="LinkedIn"
-                      >
-                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                        </svg>
-                      </a>
-                      <a
-                        href="mailto:parth@salhakar.com"
-                        className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
-                        aria-label="Email"
-                      >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-        </div>
-      </section>
-
           {/* Team Section */}
-          <section className="mt-20 md:mt-28 mb-20 md:mb-24">
-           <div className="text-center mb-12 md:mb-16">
+          <section className="mt-8 sm:mt-12 md:mt-16 lg:mt-20 xl:mt-28 mb-8 sm:mb-12 md:mb-16 lg:mb-20 xl:mb-24">
+           <div className="text-center mb-6 sm:mb-8 md:mb-12 lg:mb-16 px-2">
                  <h2
-                   className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4"
+                   className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-3 md:mb-4"
                    style={{
                      color: '#1E65AD',
                      fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -359,11 +209,11 @@ const About = () => {
                  >
                    Our Team
                </h2>
-               <div className="w-24 h-1.5 mx-auto rounded-full mb-6"
+               <div className="w-16 sm:w-20 md:w-24 h-1 sm:h-1.5 mx-auto rounded-full mb-3 sm:mb-4 md:mb-6"
                  style={{ backgroundColor: '#CF9B63' }}
                ></div>
                  <p
-                   className="text-lg md:text-xl max-w-3xl mx-auto"
+                   className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl max-w-3xl mx-auto px-2"
                    style={{
                      color: '#8C969F',
                      fontFamily: "'Roboto', sans-serif",
@@ -377,29 +227,29 @@ const About = () => {
 
 
               {/* Bottom Row - 2 Cards Centered */}
-              <div className="flex justify-center">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 max-w-4xl">
+              <div className="flex justify-center px-2 sm:px-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 lg:gap-12 max-w-4xl w-full">
                 {/* Team Member 4 */}
-                <div className="bg-white rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-[1.02]"
+                <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-[1.02]"
                   style={{
                     border: '1px solid rgba(30, 101, 173, 0.1)',
                     boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
                   }}
                 >
-                  <div className="h-64 flex items-center justify-center"
+                  <div className="h-48 sm:h-56 md:h-64 flex items-center justify-center"
                     style={{
                       background: 'linear-gradient(135deg, rgba(30, 101, 173, 0.1) 0%, rgba(207, 155, 99, 0.1) 100%)'
                     }}
                   >
-                    <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center">
-                      <span className="text-4xl font-bold" style={{ color: '#1E65AD' }}>
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-white rounded-full flex items-center justify-center">
+                      <span className="text-2xl sm:text-3xl md:text-4xl font-bold" style={{ color: '#1E65AD' }}>
                       PS
                       </span>
                     </div>
                   </div>
-                  <div className="p-6 text-center">
+                  <div className="p-4 sm:p-5 md:p-6 text-center">
                     <h3
-                      className="text-xl font-bold mb-2"
+                      className="text-lg sm:text-xl font-bold mb-1 sm:mb-2"
                       style={{
                         color: '#1E65AD',
                         fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -409,7 +259,7 @@ const About = () => {
                       Pratham Shah
                     </h3>
                     <p
-                      className="text-base mb-4"
+                      className="text-sm sm:text-base mb-2 sm:mb-3 md:mb-4"
                       style={{
                         color: '#8C969F',
                         fontFamily: "'Roboto', sans-serif",
@@ -419,7 +269,7 @@ const About = () => {
                       Chief  Executive Officer
                     </p>
                     <p
-                      className="text-sm mb-4 leading-relaxed"
+                      className="text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed break-words"
                       style={{
                         color: '#8C969F',
                         fontFamily: "'Roboto', sans-serif",
@@ -429,7 +279,7 @@ const About = () => {
                     >
                       Legal research specialist with deep knowledge of case law and legal precedents. Expert in legal document analysis and research methodologies.
                     </p>
-                    <div className="flex justify-center gap-4">
+                    <div className="flex justify-center gap-3 sm:gap-4">
                       <a
                         href="https://linkedin.com/in/amit-patel"
                         target="_blank"
@@ -437,7 +287,7 @@ const About = () => {
                         className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
                         aria-label="LinkedIn"
                       >
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                         </svg>
                       </a>
@@ -446,7 +296,7 @@ const About = () => {
                         className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
                         aria-label="Email"
                       >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                       </a>
@@ -455,26 +305,26 @@ const About = () => {
                 </div>
 
                 {/* Team Member 5 */}
-                <div className="bg-white rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-[1.02]"
+                <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-[1.02]"
                   style={{
                     border: '1px solid rgba(30, 101, 173, 0.1)',
                     boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
                   }}
                 >
-                  <div className="h-64 flex items-center justify-center"
+                  <div className="h-48 sm:h-56 md:h-64 flex items-center justify-center"
                     style={{
                       background: 'linear-gradient(135deg, rgba(30, 101, 173, 0.1) 0%, rgba(207, 155, 99, 0.1) 100%)'
                     }}
                   >
-                    <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center">
-                      <span className="text-4xl font-bold" style={{ color: '#1E65AD' }}>
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-white rounded-full flex items-center justify-center">
+                      <span className="text-2xl sm:text-3xl md:text-4xl font-bold" style={{ color: '#1E65AD' }}>
                         PC
                       </span>
                     </div>
                   </div>
-                  <div className="p-6 text-center">
+                  <div className="p-4 sm:p-5 md:p-6 text-center">
                     <h3
-                      className="text-xl font-bold mb-2"
+                      className="text-lg sm:text-xl font-bold mb-1 sm:mb-2"
                       style={{
                         color: '#1E65AD',
                         fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -484,7 +334,7 @@ const About = () => {
                       Parth Chelani
                     </h3>
                     <p
-                      className="text-base mb-4"
+                      className="text-sm sm:text-base mb-2 sm:mb-3 md:mb-4"
                       style={{
                         color: '#8C969F',
                         fontFamily: "'Roboto', sans-serif",
@@ -494,7 +344,7 @@ const About = () => {
                       Chief Operating Officer
                     </p>
                     <p
-                      className="text-sm mb-4 leading-relaxed"
+                      className="text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed break-words"
                       style={{
                         color: '#8C969F',
                         fontFamily: "'Roboto', sans-serif",
@@ -504,7 +354,7 @@ const About = () => {
                     >
                       Operations expert with experience in scaling legal tech startups. Focused on process optimization and team coordination.
                     </p>
-                    <div className="flex justify-center gap-4">
+                    <div className="flex justify-center gap-3 sm:gap-4">
                       <a
                         href="https://linkedin.com/in/sneha-reddy"
                         target="_blank"
@@ -512,7 +362,7 @@ const About = () => {
                         className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
                         aria-label="LinkedIn"
                       >
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                         </svg>
                       </a>
@@ -521,7 +371,7 @@ const About = () => {
                         className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
                         aria-label="Email"
                       >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                       </a>
@@ -532,28 +382,28 @@ const About = () => {
             </div>
 
             {/* Top Row - 3 Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 max-w-6xl mx-auto mb-8 md:mb-12 pt-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 lg:gap-12 max-w-6xl mx-auto mb-4 sm:mb-6 md:mb-8 lg:mb-12 pt-4 sm:pt-6 md:pt-10 px-2 sm:px-0">
               {/* Team Member 1 */}
-              <div className="bg-white rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-[1.02]"
+              <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-[1.02]"
                 style={{
                   border: '1px solid rgba(30, 101, 173, 0.1)',
                   boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
                 }}
               >
-                <div className="h-64 flex items-center justify-center"
+                <div className="h-48 sm:h-56 md:h-64 flex items-center justify-center"
                   style={{
                     background: 'linear-gradient(135deg, rgba(30, 101, 173, 0.1) 0%, rgba(207, 155, 99, 0.1) 100%)'
                   }}
                 >
-                  <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center">
-                    <span className="text-4xl font-bold" style={{ color: '#1E65AD' }}>
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-white rounded-full flex items-center justify-center">
+                    <span className="text-2xl sm:text-3xl md:text-4xl font-bold" style={{ color: '#1E65AD' }}>
                       AB
                     </span>
                   </div>
                 </div>
-                <div className="p-6 text-center">
+                <div className="p-4 sm:p-5 md:p-6 text-center">
                   <h3
-                    className="text-xl font-bold mb-2"
+                    className="text-lg sm:text-xl font-bold mb-1 sm:mb-2"
                     style={{
                       color: '#1E65AD',
                       fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -563,7 +413,7 @@ const About = () => {
                    Aditya Barasiya
                   </h3>
                   <p
-                    className="text-base mb-4"
+                    className="text-sm sm:text-base mb-2 sm:mb-3 md:mb-4"
                     style={{
                       color: '#8C969F',
                       fontFamily: "'Roboto', sans-serif",
@@ -573,7 +423,7 @@ const About = () => {
                     Technical Lead
                   </p>
                   <p
-                    className="text-sm mb-4 leading-relaxed"
+                    className="text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed break-words"
                     style={{
                       color: '#8C969F',
                       fontFamily: "'Roboto', sans-serif",
@@ -583,7 +433,7 @@ const About = () => {
                   >
                     Senior legal counsel with expertise in Indian law and regulatory compliance. Former Supreme Court advocate with 12+ years of experience.
                   </p>
-                  <div className="flex justify-center gap-4">
+                  <div className="flex justify-center gap-3 sm:gap-4">
                     <a
                       href="https://linkedin.com/in/anjali-mehta"
                       target="_blank"
@@ -591,7 +441,7 @@ const About = () => {
                       className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
                       aria-label="LinkedIn"
                     >
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                       </svg>
                     </a>
@@ -600,7 +450,7 @@ const About = () => {
                       className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
                       aria-label="Email"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
                     </a>
@@ -609,26 +459,26 @@ const About = () => {
               </div>
 
               {/* Team Member 2 */}
-              <div className="bg-white rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-[1.02]"
+              <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-[1.02]"
                 style={{
                   border: '1px solid rgba(30, 101, 173, 0.1)',
                   boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
                 }}
               >
-                <div className="h-64 flex items-center justify-center"
+                <div className="h-48 sm:h-56 md:h-64 flex items-center justify-center"
                   style={{
                     background: 'linear-gradient(135deg, rgba(30, 101, 173, 0.1) 0%, rgba(207, 155, 99, 0.1) 100%)'
                   }}
                 >
-                  <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center">
-                    <span className="text-4xl font-bold" style={{ color: '#1E65AD' }}>
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-white rounded-full flex items-center justify-center">
+                    <span className="text-2xl sm:text-3xl md:text-4xl font-bold" style={{ color: '#1E65AD' }}>
                       HG
                     </span>
                   </div>
                 </div>
-                <div className="p-6 text-center">
+                <div className="p-4 sm:p-5 md:p-6 text-center">
                   <h3
-                    className="text-xl font-bold mb-2"
+                    className="text-lg sm:text-xl font-bold mb-1 sm:mb-2"
                     style={{
                       color: '#1E65AD',
                       fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -638,7 +488,7 @@ const About = () => {
                     Harshil Gajjar
                   </h3>
                   <p
-                    className="text-base mb-4"
+                    className="text-sm sm:text-base mb-2 sm:mb-3 md:mb-4"
                     style={{
                       color: '#8C969F',
                       fontFamily: "'Roboto', sans-serif",
@@ -648,7 +498,7 @@ const About = () => {
                     Full Stack Developer
                   </p>
                   <p
-                    className="text-sm mb-4 leading-relaxed"
+                    className="text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed break-words"
             style={{
                       color: '#8C969F',
                       fontFamily: "'Roboto', sans-serif",
@@ -658,7 +508,7 @@ const About = () => {
                   >
                     Full-stack developer and AI specialist with expertise in natural language processing and legal document analysis.
                   </p>
-                  <div className="flex justify-center gap-4">
+                  <div className="flex justify-center gap-3 sm:gap-4">
                     <a
                       href="https://linkedin.com/in/rajesh-kumar"
                       target="_blank"
@@ -666,7 +516,7 @@ const About = () => {
                       className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
                       aria-label="LinkedIn"
                     >
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                       </svg>
                     </a>
@@ -675,7 +525,7 @@ const About = () => {
                       className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
                       aria-label="Email"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
                     </a>
@@ -684,26 +534,26 @@ const About = () => {
               </div>
 
                   {/* Team Member 3 */}
-              <div className="bg-white rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-[1.02]"
+              <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-[1.02]"
                 style={{
                   border: '1px solid rgba(30, 101, 173, 0.1)',
                   boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
                 }}
               >
-                <div className="h-64 flex items-center justify-center"
+                <div className="h-48 sm:h-56 md:h-64 flex items-center justify-center"
                   style={{
                     background: 'linear-gradient(135deg, rgba(30, 101, 173, 0.1) 0%, rgba(207, 155, 99, 0.1) 100%)'
                   }}
                 >
-                  <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center">
-                    <span className="text-4xl font-bold" style={{ color: '#1E65AD' }}>
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-white rounded-full flex items-center justify-center">
+                    <span className="text-2xl sm:text-3xl md:text-4xl font-bold" style={{ color: '#1E65AD' }}>
                       PS
                     </span>
                   </div>
                 </div>
-                <div className="p-6 text-center">
+                <div className="p-4 sm:p-5 md:p-6 text-center">
                   <h3
-                    className="text-xl font-bold mb-2"
+                    className="text-lg sm:text-xl font-bold mb-1 sm:mb-2"
                     style={{
                       color: '#1E65AD',
                       fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -713,7 +563,7 @@ const About = () => {
                     Khushi Kothadia
                   </h3>
                   <p
-                    className="text-base mb-4"
+                    className="text-sm sm:text-base mb-2 sm:mb-3 md:mb-4"
                     style={{
                       color: '#8C969F',
               fontFamily: "'Roboto', sans-serif",
@@ -723,7 +573,7 @@ const About = () => {
                     App Developer
                   </p>
                   <p
-                    className="text-sm mb-4 leading-relaxed"
+                    className="text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed break-words"
                     style={{
                       color: '#8C969F',
                       fontFamily: "'Roboto', sans-serif",
@@ -733,7 +583,7 @@ const About = () => {
                   >
                     Product strategist with a background in legal tech and user experience design. Focused on creating intuitive legal solutions.
                   </p>
-                  <div className="flex justify-center gap-4">
+                  <div className="flex justify-center gap-3 sm:gap-4">
                     <a
                       href="https://linkedin.com/in/priya-sharma"
                       target="_blank"
@@ -741,7 +591,7 @@ const About = () => {
                       className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
                       aria-label="LinkedIn"
                     >
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                       </svg>
                     </a>
@@ -750,7 +600,7 @@ const About = () => {
                       className="text-[#1E65AD] hover:text-[#CF9B63] transition-colors duration-200"
                       aria-label="Email"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
                     </a>
@@ -763,11 +613,11 @@ const About = () => {
           </section>
 
           {/* Career Section */}
-          <section className="mt-20 md:mt-28 mb-20 md:mb-24">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-12 md:mb-16">
+          <section className="mt-8 sm:mt-12 md:mt-16 lg:mt-20 xl:mt-28 mb-8 sm:mb-12 md:mb-16 lg:mb-20 xl:mb-24">
+            <div className="max-w-6xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8">
+              <div className="text-center mb-6 sm:mb-8 md:mb-12 lg:mb-16">
                 <h2
-                  className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4"
+                  className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-3 md:mb-4"
                   style={{
                     color: '#1E65AD',
                     fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -777,11 +627,11 @@ const About = () => {
                 >
                   Join Our Team
               </h2>
-              <div className="w-24 h-1.5 mx-auto rounded-full mb-6"
+              <div className="w-16 sm:w-20 md:w-24 h-1 sm:h-1.5 mx-auto rounded-full mb-3 sm:mb-4 md:mb-6"
                 style={{ backgroundColor: '#CF9B63' }}
               ></div>
               <p 
-                  className="text-lg md:text-xl max-w-3xl mx-auto"
+                  className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl max-w-3xl mx-auto px-2"
                   style={{
                     color: '#8C969F',
                     fontFamily: "'Roboto', sans-serif",
@@ -794,16 +644,16 @@ const About = () => {
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl p-8 md:p-12 shadow-lg"
+              <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 lg:p-12 shadow-lg mx-2 sm:mx-0"
                 style={{
                   border: '1px solid rgba(30, 101, 173, 0.1)',
                   boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
                 }}
               >
-                <div className="grid md:grid-cols-2 gap-8 md:gap-12">
+                <div className="grid md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 lg:gap-12">
                   <div>
                     <h3
-                      className="text-2xl font-bold mb-6"
+                      className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-5 md:mb-6"
                       style={{
                         color: '#1E65AD',
                         fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -812,13 +662,13 @@ const About = () => {
                     >
                       Why Join Salhakar?
                     </h3>
-                    <ul className="space-y-4">
+                    <ul className="space-y-3 sm:space-y-4">
                 <li className="flex items-start">
-                        <svg className="w-6 h-6 text-[#1E65AD] mr-3 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[#1E65AD] mr-2 sm:mr-3 flex-shrink-0 mt-0.5 sm:mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <p
-                          className="text-base"
+                          className="text-xs sm:text-sm md:text-base break-words"
                           style={{
                             color: '#8C969F',
                             fontFamily: "'Roboto', sans-serif",
@@ -830,11 +680,11 @@ const About = () => {
                         </p>
                 </li>
                 <li className="flex items-start">
-                        <svg className="w-6 h-6 text-[#1E65AD] mr-3 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[#1E65AD] mr-2 sm:mr-3 flex-shrink-0 mt-0.5 sm:mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <p
-                          className="text-base"
+                          className="text-xs sm:text-sm md:text-base break-words"
                           style={{
                             color: '#8C969F',
                             fontFamily: "'Roboto', sans-serif",
@@ -846,11 +696,11 @@ const About = () => {
                         </p>
                 </li>
                 <li className="flex items-start">
-                        <svg className="w-6 h-6 text-[#1E65AD] mr-3 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[#1E65AD] mr-2 sm:mr-3 flex-shrink-0 mt-0.5 sm:mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <p
-                          className="text-base"
+                          className="text-xs sm:text-sm md:text-base break-words"
                           style={{
                             color: '#8C969F',
                             fontFamily: "'Roboto', sans-serif",
@@ -862,11 +712,11 @@ const About = () => {
                         </p>
                 </li>
                 <li className="flex items-start">
-                        <svg className="w-6 h-6 text-[#1E65AD] mr-3 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[#1E65AD] mr-2 sm:mr-3 flex-shrink-0 mt-0.5 sm:mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <p
-                          className="text-base"
+                          className="text-xs sm:text-sm md:text-base break-words"
                           style={{
                             color: '#8C969F',
                             fontFamily: "'Roboto', sans-serif",
@@ -882,7 +732,7 @@ const About = () => {
 
                   <div>
                     <h3
-                      className="text-2xl font-bold mb-6"
+                      className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-5 md:mb-6"
                       style={{
                         color: '#1E65AD',
                         fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -891,17 +741,17 @@ const About = () => {
                     >
                       Open Positions
                     </h3>
-                    <div className="space-y-4 mb-8">
-                      <div className="p-5 rounded-xl transition-all duration-300 hover:shadow-md"
+                    <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6 md:mb-8">
+                      <div className="p-3 sm:p-4 md:p-5 rounded-lg sm:rounded-xl transition-all duration-300 hover:shadow-md"
                         style={{
                           backgroundColor: '#F9FAFC',
                           border: '1px solid rgba(30, 101, 173, 0.1)'
                         }}
                       >
 
-                        <div className="flex justify-between items-center">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 mb-2">
                         <h4
-                          className="text-lg font-semibold mb-2"
+                          className="text-base sm:text-lg font-semibold"
                           style={{
                             color: '#1E65AD',
                             fontFamily: "'Heebo', sans-serif",
@@ -909,13 +759,10 @@ const About = () => {
                           }}
                         >
                           Software Engineer
-
-
-                          
                         </h4>
                         <a
                           href="mailto:careers@salhakar.com?subject=Application for Software Engineer Position"
-                          className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-200"
+                          className="inline-flex items-center justify-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors duration-200 w-full sm:w-auto"
                           style={{
                             backgroundColor: '#1E65AD',
                             color: '#FFFFFF'
@@ -928,7 +775,7 @@ const About = () => {
                         </div>
                         
                         <p
-                          className="text-sm mb-2"
+                          className="text-xs sm:text-sm mb-1 sm:mb-2 break-words"
                           style={{
                             color: '#8C969F',
                             fontFamily: "'Roboto', sans-serif",
@@ -938,7 +785,7 @@ const About = () => {
                           Full-time • Remote/On-site
                         </p>
                         <p
-                          className="text-sm mb-4"
+                          className="text-xs sm:text-sm mb-2 sm:mb-4 break-words"
                           style={{
                             color: '#8C969F',
                             fontFamily: "'Roboto', sans-serif",
@@ -949,15 +796,15 @@ const About = () => {
                         </p>
                        
                       </div>
-                      <div className="p-5 rounded-xl transition-all duration-300 hover:shadow-md"
+                      <div className="p-3 sm:p-4 md:p-5 rounded-lg sm:rounded-xl transition-all duration-300 hover:shadow-md"
                         style={{
                           backgroundColor: '#F9FAFC',
                           border: '1px solid rgba(30, 101, 173, 0.1)'
                         }}
                       >
-                        <div className="flex justify-between items-center">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 mb-2">
                         <h4
-                          className="text-lg font-semibold mb-2"
+                          className="text-base sm:text-lg font-semibold"
                           style={{
                             color: '#1E65AD',
                             fontFamily: "'Heebo', sans-serif",
@@ -969,7 +816,7 @@ const About = () => {
                         
                         <a
                           href="mailto:careers@salhakar.com?subject=Application for Legal Researcher Position"
-                          className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-200"
+                          className="inline-flex items-center justify-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors duration-200 w-full sm:w-auto"
                           style={{
                             backgroundColor: '#1E65AD',
                             color: '#FFFFFF'
@@ -981,7 +828,7 @@ const About = () => {
                         </a>
                         </div>  
                         <p
-                          className="text-sm mb-2"
+                          className="text-xs sm:text-sm mb-1 sm:mb-2 break-words"
                           style={{
                             color: '#8C969F',
                             fontFamily: "'Roboto', sans-serif",
@@ -991,7 +838,7 @@ const About = () => {
                           Full-time • Remote/On-site
                         </p>
                         <p
-                          className="text-sm mb-4"
+                          className="text-xs sm:text-sm mb-2 sm:mb-4 break-words"
                           style={{
                             color: '#8C969F',
                             fontFamily: "'Roboto', sans-serif",

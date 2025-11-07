@@ -17,11 +17,6 @@ export default function EarnRewards() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login', { state: { from: { pathname: '/referral/rewards' } } });
-      return;
-    }
-    
     // Load rewards data from API
     const loadRewardsData = async () => {
       try {
@@ -30,19 +25,20 @@ export default function EarnRewards() {
         // const milestonesResponse = await apiService.getMilestones();
         
         // For now, initialize with default reward structure and empty data
+        // Show reward structure to all users, but only load user-specific data if authenticated
         setRewards({
           referralBonus: 200,
           transactionBonus: 50,
           milestoneBonus: 1000,
-          totalEarned: 0,
-          pendingAmount: 0
+          totalEarned: isAuthenticated && user?.id ? 0 : 0, // Load from API if authenticated
+          pendingAmount: isAuthenticated && user?.id ? 0 : 0 // Load from API if authenticated
         });
         
         setMilestones([
-          { id: 1, target: 5, current: 0, reward: 500, achieved: false, title: 'First 5 Referrals' },
-          { id: 2, target: 10, current: 0, reward: 1000, achieved: false, title: '10 Referrals Milestone' },
-          { id: 3, target: 25, current: 0, reward: 2500, achieved: false, title: '25 Referrals Milestone' },
-          { id: 4, target: 50, current: 0, reward: 5000, achieved: false, title: '50 Referrals Milestone' }
+          { id: 1, target: 5, current: isAuthenticated && user?.id ? 0 : 0, reward: 500, achieved: false, title: 'First 5 Referrals' },
+          { id: 2, target: 10, current: isAuthenticated && user?.id ? 0 : 0, reward: 1000, achieved: false, title: '10 Referrals Milestone' },
+          { id: 3, target: 25, current: isAuthenticated && user?.id ? 0 : 0, reward: 2500, achieved: false, title: '25 Referrals Milestone' },
+          { id: 4, target: 50, current: isAuthenticated && user?.id ? 0 : 0, reward: 5000, achieved: false, title: '50 Referrals Milestone' }
         ]);
       } catch (error) {
         console.error('Error loading rewards data:', error);
@@ -61,7 +57,7 @@ export default function EarnRewards() {
     };
 
     loadRewardsData();
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user]);
 
   if (loading) {
     return (

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import LanguageSelector from "../LanguageSelector";
+import { Menu, X } from "lucide-react";
 
 const navItems = [
   {
@@ -209,24 +210,24 @@ const Navbar = () => {
           />
         </div>
 
-        {/* Hamburger Button */}
-        <div
-          className="md:hidden flex flex-col gap-1.2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-all duration-900"
+        {/* Menu Button - Mobile */}
+        <button
+          className="md:hidden p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-all duration-300 touch-manipulation flex items-center justify-center"
           onClick={() => setMenuOpen(!menuOpen)}
+          style={{ 
+            minWidth: '44px', 
+            minHeight: '44px',
+            color: '#1E65AD'
+          }}
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={menuOpen}
         >
-          <span
-            className={`h-0.5 w-6 rounded-full transition-all ease-out ${menuOpen ? "rotate-45 translate-y-2.5" : ""}`}
-            style={{ backgroundColor: '#1E65AD' }}
-          ></span>
-          <span
-            className={`h-0.5 w-6 rounded-full transition-all duration-900 ease-out ${menuOpen ? "opacity-0 scale-0" : "opacity-100 scale-100"}`}
-            style={{ backgroundColor: '#1E65AD' }}
-          ></span>
-          <span
-            className={`h-0.5 w-6 rounded-full transition-all duration-900 ease-out ${menuOpen ? "-rotate-45 -translate-y-2.5" : ""}`}
-            style={{ backgroundColor: '#1E65AD' }}
-          ></span>
-        </div>
+          {menuOpen ? (
+            <X className="w-6 h-6" strokeWidth={2.5} />
+          ) : (
+            <Menu className="w-6 h-6" strokeWidth={2.5} />
+          )}
+        </button>
 
         {/* Nav Links */}
         <ul
@@ -316,8 +317,8 @@ const Navbar = () => {
                 {/* Main Dropdown - uses smooth animation class */}
                 {item.links && item.links.length > 0 && (
                   <ul
-                    className={`w-full md:absolute md:left-0 md:top-full backdrop-blur-md shadow-2xl rounded-2xl py-3 mt-3 md:min-w-[300px] border ${
-                      isScrolled ? 'bg-white/80' : 'bg-white/95'
+                    className={`w-full md:absolute md:left-0 md:top-full backdrop-blur-md shadow-2xl rounded-lg sm:rounded-xl md:rounded-2xl py-2 sm:py-3 mt-2 sm:mt-3 md:min-w-[300px] border ${
+                      isScrolled ? 'bg-white/95' : 'bg-white/95'
                     } ${
                       dropdownOpen === idx ? "block opacity-100" : "hidden opacity-0"
                     } ${animatedDropdownClass(dropdownOpen === idx)}`}
@@ -325,11 +326,7 @@ const Navbar = () => {
                     borderColor: '#E5E7EB',
                     zIndex: 9999,
                     backgroundColor: 'white',
-                    color: '#1f2937',
-                    position: 'absolute',
-                    top: '100%',
-                    left: '0',
-                    minWidth: '300px'
+                    color: '#1f2937'
                   }}
                   onMouseEnter={() => {
                     if (window.innerWidth >= 768) {
@@ -356,7 +353,7 @@ const Navbar = () => {
                   {item.links.map((link, i) => (
                     <li 
                       key={i} 
-                      className="relative"
+                      className="relative w-full"
                       style={{
                         position: 'relative',
                         transition: 'opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
@@ -395,7 +392,7 @@ const Navbar = () => {
                               handleNavClick(link.path, link.filter);
                             }
                           }}
-                          className="flex items-center justify-between w-full text-left px-4 py-3 text-sm sm:text-base touch-manipulation rounded-lg mx-2 group"
+                          className="flex items-center justify-between w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm md:text-base touch-manipulation rounded-lg mx-1 sm:mx-2 group"
                           style={{ 
                             color: '#1f2937', 
                             fontFamily: 'Roboto, sans-serif',
@@ -439,21 +436,16 @@ const Navbar = () => {
                         {link.subLinks && link.subLinks.length > 0 && (
                           <ul
                             // On md+: absolute flyout; on mobile: static block below parent
-                            className={`w-full backdrop-blur-md shadow-2xl rounded-2xl py-3 ml-0 md:ml-2 md:min-w-[220px] border ${
-                              isScrolled ? 'bg-white/80' : 'bg-white/95'
+                            className={`w-full backdrop-blur-md shadow-lg rounded-lg sm:rounded-xl md:rounded-2xl py-2 sm:py-3 mt-2 sm:mt-2.5 md:mt-0 ml-0 md:ml-2 md:absolute md:left-full md:top-0 md:min-w-[220px] border ${
+                              isScrolled ? 'bg-white/95' : 'bg-white/95'
                             } 
-                              ${window.innerWidth >= 768 ? "md:absolute md:left-full md:top-0" : "static"} 
                               ${(subDropdownOpen.main === idx && subDropdownOpen.sub === i) ? "block opacity-100" : "hidden opacity-0"}
                               ${animatedSubDropdownClass(subDropdownOpen.main === idx && subDropdownOpen.sub === i)}`}
                           style={{ 
                             borderColor: '#E5E7EB',
                             zIndex: 10000,
                             backgroundColor: 'white',
-                            color: '#1f2937',
-                            position: 'absolute',
-                            top: '0',
-                            left: '100%',
-                            minWidth: '220px'
+                            color: '#1f2937'
                           }}
                           onMouseEnter={() => {
                             if (window.innerWidth >= 768) {
@@ -486,7 +478,7 @@ const Navbar = () => {
                             >
                               <button
                                 onClick={() => handleNavClick(subLink.path, subLink.filter)}
-                                className="block w-full text-left px-4 py-3 text-sm sm:text-base touch-manipulation rounded-lg mx-2 group"
+                                className="block w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm md:text-base touch-manipulation rounded-lg mx-1 sm:mx-2 group"
                                 style={{ 
                                   color: '#1f2937', 
                                   fontFamily: 'Roboto, sans-serif',

@@ -301,10 +301,10 @@ function PricingPage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="pt-30 pb-12 md:pt-28 md:pb-16 bg-white relative z-20 border-2 border-gray-200  shadow-lg p-10 md:p-14 ">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-7">
+      <section className="pt-14 sm:pt-16 md:pt-20 lg:pt-28 pb-6 sm:pb-8 md:pb-12 lg:pb-16 bg-white relative z-20 border-2 border-gray-200 shadow-lg p-4 sm:p-6 md:p-10 lg:p-14 mx-2 sm:mx-4">
+        <div className="max-w-4xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 text-center pt-4 sm:pt-6 md:pt-7">
           <h1
-            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight"
+            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 leading-tight"
             style={{
               color: "#1E65AD",
               fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -313,15 +313,15 @@ function PricingPage() {
           >
             Pricing Plans
           </h1>
-          <div className="w-20 h-1 bg-[#CF9B63] mx-auto rounded-full"></div>
+          <div className="w-16 sm:w-18 md:w-20 h-0.5 sm:h-1 bg-[#CF9B63] mx-auto rounded-full mb-2 sm:mb-3 md:mb-4"></div>
           <p
-            className="text-lg md:text-xl text-[#8C969F] max-w-2xl mx-auto mb-6 leading-relaxed pt-4"
+            className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-[#8C969F] max-w-2xl mx-auto mb-3 sm:mb-4 md:mb-6 leading-relaxed pt-2 sm:pt-3 md:pt-4 px-2"
             style={{
               fontFamily: "'Roboto', sans-serif",
               fontWeight: 400
             }}
           >
-            Discover India’s most user-friendly AI legal research tool with straightforward pricing and no hidden fees.
+            Discover India's most user-friendly AI legal research tool with straightforward pricing and no hidden fees.
           </p>
         </div>
       </section>
@@ -329,19 +329,19 @@ function PricingPage() {
 
 
       {/* Category Toggle Section */}
-      <section className="py-10 md:py-12 bg-[#F9FAFC]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-4 sm:py-6 md:py-8 lg:py-10 xl:py-12 bg-[#F9FAFC]">
+        <div className="max-w-7xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8">
 
 
           {/* Category Toggle */}
-          <div className="flex justify-center mb-8">
-            <div className="relative inline-flex items-center bg-gray-100 rounded-xl p-1 shadow-inner">
+          <div className="flex justify-center mb-4 sm:mb-6 md:mb-8">
+            <div className="relative inline-flex items-center bg-gray-100 rounded-lg sm:rounded-xl p-0.5 sm:p-1 shadow-inner w-full sm:w-auto max-w-full">
               {/* Sliding background indicator */}
               <div
-                className={`absolute top-1 bottom-1 rounded-lg transition-all duration-300 ease-in-out z-0`}
+                className={`absolute top-0.5 sm:top-1 bottom-0.5 sm:bottom-1 rounded-md sm:rounded-lg transition-all duration-300 ease-in-out z-0`}
                 style={{
-                  left: activeCategory === 'student' ? '4px' : activeCategory === 'professional' ? 'calc(33.33% + 2px)' : 'calc(66.66% + 2px)',
-                  width: 'calc(33.33% - 4px)',
+                  left: activeCategory === 'student' ? '2px' : activeCategory === 'professional' ? 'calc(33.33% + 1px)' : 'calc(66.66% + 1px)',
+                  width: 'calc(33.33% - 2px)',
                   backgroundColor: activeCategory === 'student' ? '#1E65AD' : activeCategory === 'professional' ? '#CF9B63' : '#1E65AD',
                   boxShadow: activeCategory === 'student'
                     ? '0 2px 8px rgba(30, 101, 173, 0.3)'
@@ -355,7 +355,7 @@ function PricingPage() {
                 <button
                   key={category}
                   onClick={() => setActiveCategory(category)}
-                  className={`px-6 md:px-8 py-2.5 md:py-3 rounded-lg font-semibold text-sm md:text-base capitalize transition-all duration-300 relative z-10 min-w-[120px] md:min-w-[160px] ${activeCategory === category
+                  className={`px-2 sm:px-4 md:px-6 lg:px-8 py-1.5 sm:py-2 md:py-2.5 lg:py-3 rounded-md sm:rounded-lg font-semibold text-xs sm:text-sm md:text-base capitalize transition-all duration-300 relative z-10 flex-1 sm:flex-none min-w-0 sm:min-w-[100px] md:min-w-[120px] lg:min-w-[160px] ${activeCategory === category
                       ? "text-white"
                       : "text-[#8C969F] hover:text-[#1E65AD]"
                     }`}
@@ -371,10 +371,10 @@ function PricingPage() {
           </div>
 
           {activeCategory === "student" && (
-            <div className="flex justify-center items-center gap-4 mb-2">
-              <span className=" md:text-base font-semibold transition-colors duration-300 text-[#8C969F] text-center">
+            <div className="flex justify-center items-center gap-2 sm:gap-4 mb-2 sm:mb-3 md:mb-4 px-2">
+              <span className="text-xs sm:text-sm md:text-base font-semibold transition-colors duration-300 text-[#8C969F] text-center">
                 <p
-                  className="text-lg md:text-xl text-[#8C969F] max-w-2xl mx-auto mb-6 leading-relaxed pt-1"
+                  className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-[#8C969F] max-w-2xl mx-auto mb-3 sm:mb-4 md:mb-6 leading-relaxed pt-1 break-words"
                   style={{
                     fontFamily: "'Roboto', sans-serif",
                     fontWeight: 400
@@ -388,10 +388,10 @@ function PricingPage() {
           )}
 
           {activeCategory === "professional" && (
-            <div className="flex justify-center items-center gap-4 mb-2">
-              <span className="text-sm md:text-base font-semibold transition-colors duration-300 text-[#8C969F] text-center">
+            <div className="flex justify-center items-center gap-2 sm:gap-4 mb-2 sm:mb-3 md:mb-4 px-2">
+              <span className="text-xs sm:text-sm md:text-base font-semibold transition-colors duration-300 text-[#8C969F] text-center">
                 <p
-                  className="text-lg md:text-xl text-[#8C969F] max-w-2xl mx-auto mb-6 leading-relaxed pt-1"
+                  className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-[#8C969F] max-w-2xl mx-auto mb-3 sm:mb-4 md:mb-6 leading-relaxed pt-1 break-words"
                   style={{
                     fontFamily: "'Roboto', sans-serif",
                     fontWeight: 400
@@ -405,10 +405,10 @@ function PricingPage() {
           )}
 
           {activeCategory === "corporate" && (
-            <div className="flex justify-center items-center gap-4 mb-2">
-              <span className="text-sm md:text-base font-semibold transition-colors duration-300 text-[#8C969F] text-center">
+            <div className="flex justify-center items-center gap-2 sm:gap-4 mb-2 sm:mb-3 md:mb-4 px-2">
+              <span className="text-xs sm:text-sm md:text-base font-semibold transition-colors duration-300 text-[#8C969F] text-center">
                 <p
-                  className="text-lg md:text-xl text-[#8C969F] max-w-2xl mx-auto mb-6 leading-relaxed pt-1"
+                  className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-[#8C969F] max-w-2xl mx-auto mb-3 sm:mb-4 md:mb-6 leading-relaxed pt-1 break-words"
                   style={{
                     fontFamily: "'Roboto', sans-serif",
                     fontWeight: 400
@@ -424,9 +424,9 @@ function PricingPage() {
 
 
           {/* Billing Cycle Toggle Switch */}
-          <div className="flex justify-center items-center gap-4 mb-8">
+          <div className="flex justify-center items-center gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6 md:mb-8 px-2">
             <span
-              className={`text-sm md:text-base font-semibold transition-colors duration-300 ${billingCycle === "m" ? "text-[#1E65AD]" : "text-[#8C969F]"
+              className={`text-xs sm:text-sm md:text-base font-semibold transition-colors duration-300 ${billingCycle === "monthly" ? "text-[#1E65AD]" : "text-[#8C969F]"
                 }`}
               style={{ fontFamily: "'Roboto', sans-serif" }}
             >
@@ -442,11 +442,11 @@ function PricingPage() {
               <div
                 className="relative overflow-hidden"
                 style={{
-                  width: "60px",
-                  height: "30px",
+                  width: "50px",
+                  height: "26px",
                   backgroundColor: billingCycle === "yearly" ? "#1E65AD" : "#d3d3d3",
                   borderRadius: "20px",
-                  border: "4px solid transparent",
+                  border: "3px solid transparent",
                   transition: "0.3s",
                   boxShadow: "0 0 10px 0 rgba(0, 0, 0, 0.25) inset",
                   cursor: "pointer"
@@ -456,17 +456,19 @@ function PricingPage() {
                   className="absolute top-0 left-0 rounded-full transition-transform duration-300"
                   style={{
                     backgroundColor: "#fff",
-                    transform: billingCycle === "yearly" ? "translateX(30px)" : "translateX(-30px)",
+                    transform: billingCycle === "yearly" ? "translateX(24px)" : "translateX(0px)",
                     borderRadius: "20px",
                     boxShadow: "0 0 10px 3px rgba(0, 0, 0, 0.25)",
-                    width: "100%",
-                    height: "100%"
+                    width: "20px",
+                    height: "20px",
+                    top: "3px",
+                    left: "3px"
                   }}
                 />
               </div>
             </label>
             <span
-              className={`text-sm md:text-base font-semibold transition-colors duration-300 ${billingCycle === "yearly" ? "text-[#1E65AD]" : "text-[#8C969F]"
+              className={`text-xs sm:text-sm md:text-base font-semibold transition-colors duration-300 ${billingCycle === "yearly" ? "text-[#1E65AD]" : "text-[#8C969F]"
                 }`}
               style={{ fontFamily: "'Roboto', sans-serif" }}
             >
@@ -491,28 +493,28 @@ function PricingPage() {
             
             return (
               <div className={useFlex 
-                ? `flex flex-col md:flex-row justify-center items-center gap-6 md:gap-8 mb-20` 
-                : `grid grid-cols-1 ${gridCols} gap-6 md:gap-8 mb-20`
+                ? `flex flex-col md:flex-row justify-center items-center gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-12 md:mb-16 lg:mb-20 px-2 sm:px-0` 
+                : `grid grid-cols-1 ${gridCols} gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-12 md:mb-16 lg:mb-20 px-2 sm:px-0`
               }>
                 {filteredPlans.map((plan, index) => (
               <div
                 key={plan.title}
-                className={`bg-white rounded-2xl shadow-lg p-6 md:p-8 relative hover:shadow-xl transition-shadow duration-300${plan.popular ? "border-2 border-[#1E65AD]" : "border border-gray-200"
+                className={`bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-5 md:p-6 lg:p-8 relative hover:shadow-xl transition-shadow duration-300 w-full${plan.popular ? "border-2 border-[#1E65AD]" : "border border-gray-200"
                   }`}
               >
                 {/* Most Popular Badge */}
                 {plan.popular && (
                   <div
-                    className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-[#1E65AD] text-white px-4 py-1.5 rounded-full text-xs font-semibold"
+                    className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2 bg-[#1E65AD] text-white px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-semibold"
                     style={{ fontFamily: "'Roboto', sans-serif" }}
                   >
                     Most Popular
                   </div>
                 )}
 
-                <div className="mb-8 text-center" style={{ marginTop: plan.popular ? "1rem" : "0" }}>
+                <div className="mb-4 sm:mb-6 md:mb-8 text-center" style={{ marginTop: plan.popular ? "0.5rem sm:1rem" : "0" }}>
                   <h3
-                    className="text-2xl md:text-3xl font-bold mb-3"
+                    className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-2 sm:mb-3"
                     style={{
                       color: "#1E65AD",
                       fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -523,7 +525,7 @@ function PricingPage() {
                     {plan.title}
                   </h3>
                   <p
-                    className="text-sm md:text-base text-[#8C969F] mb-6 leading-relaxed"
+                    className="text-xs sm:text-sm md:text-base text-[#8C969F] mb-3 sm:mb-4 md:mb-6 leading-relaxed break-words"
                     style={{
                       fontFamily: "'Roboto', sans-serif",
                       fontWeight: 400
@@ -531,7 +533,7 @@ function PricingPage() {
                   >
                     {plan.subtitle}
                   </p>
-                  <div className="flex items-baseline justify-center gap-1 mb-6">
+                  <div className="flex items-baseline justify-center gap-1 mb-4 sm:mb-5 md:mb-6">
                     {(() => {
                       const isFree = !plan.price || plan.price === "₹/mo" || plan.price === "₹0/mo" || plan.price.toLowerCase().includes("free");
                       const isCustom = plan.price === "Custom";
@@ -540,7 +542,7 @@ function PricingPage() {
                       return (
                         <>
                           <span
-                            className="text-4xl md:text-5xl font-bold"
+                            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold"
                             style={{
                               color: "#1E65AD",
                               fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -552,7 +554,7 @@ function PricingPage() {
                           </span>
                           {!isFree && !isCustom && (
                             <span
-                              className="text-lg md:text-xl font-normal text-[#1E65AD]"
+                              className="text-sm sm:text-base md:text-lg lg:text-xl font-normal text-[#1E65AD]"
                               style={{
                                 fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
                                 fontWeight: 400
@@ -563,7 +565,7 @@ function PricingPage() {
                           )}
                           {!isFree && !isCustom && billingCycle === "yearly" && (
                             <span
-                              className="ml-2 text-xs text-red-500 font-semibold"
+                              className="ml-1 sm:ml-2 text-xs text-red-500 font-semibold"
                               style={{ fontFamily: "'Roboto', sans-serif" }}
                             >
                               (Save 20%)
@@ -577,7 +579,7 @@ function PricingPage() {
 
                 <button
                   onClick={() => handleButtonClick(plan.button)}
-                  className={`w-full py-3.5 md:py-4 rounded-xl font-semibold text-sm md:text-base transition-all duration-200 ${plan.popular
+                  className={`w-full py-2.5 sm:py-3 md:py-3.5 lg:py-4 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm md:text-base transition-all duration-200 ${plan.popular
                       ? "bg-[#1E65AD] text-white hover:bg-[#185a9a] hover:shadow-lg"
                       : "bg-white text-[#1E65AD] border-2 border-[#1E65AD] hover:bg-[#F9FAFC]"
                     }`}
@@ -589,12 +591,12 @@ function PricingPage() {
                   {plan.button}
                 </button>
 
-                <ul className="mb-8 space-y-4 mt-10">
+                <ul className="mb-4 sm:mb-6 md:mb-8 space-y-2 sm:space-y-3 md:space-y-4 mt-6 sm:mt-8 md:mt-10">
                   {plan.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start gap-3">
+                    <li key={idx} className="flex items-start gap-2 sm:gap-3">
                       {feature.included ? (
                         <svg
-                          className="w-5 h-5 text-[#1E65AD] mt-0.5 flex-shrink-0"
+                          className="w-4 h-4 sm:w-5 sm:h-5 text-[#1E65AD] mt-0.5 flex-shrink-0"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -608,7 +610,7 @@ function PricingPage() {
                         </svg>
                       ) : (
                         <svg
-                          className="w-5 h-5 text-[#8C969F] mt-0.5 flex-shrink-0 opacity-40"
+                          className="w-4 h-4 sm:w-5 sm:h-5 text-[#8C969F] mt-0.5 flex-shrink-0 opacity-40"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -622,7 +624,7 @@ function PricingPage() {
                         </svg>
                       )}
                       <span
-                        className={`text-sm md:text-base leading-relaxed ${feature.included ? "text-[#8C969F]" : "text-[#8C969F] line-through opacity-40"
+                        className={`text-xs sm:text-sm md:text-base leading-relaxed break-words ${feature.included ? "text-[#8C969F]" : "text-[#8C969F] line-through opacity-40"
                           }`}
                         style={{
                           fontFamily: "'Roboto', sans-serif",
@@ -647,14 +649,14 @@ function PricingPage() {
    
 
       {/* Let's Work Together Contact Form Section */}
-      <section className="py-12 md:py-16 bg-[#F9FAFC]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-6 sm:py-8 md:py-12 lg:py-16 bg-[#F9FAFC]">
+        <div className="max-w-7xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8">
           <div className="bg-[#F9FAFC]">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 p-8 md:p-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-12 lg:gap-16 p-4 sm:p-6 md:p-8 lg:p-12">
               {/* Left Side - Contact Info */}
               <div>
                 <h2
-                  className="text-3xl md:text-4xl lg:text-5xl font-bold mb-8 leading-tight"
+                  className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 sm:mb-6 md:mb-8 leading-tight"
               style={{ 
                     color: "#1E65AD",
                 fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -665,10 +667,10 @@ function PricingPage() {
                   Need Customized Solution?
             </h2>
                 
-                <div className="space-y-6 mb-8">
+                <div className="space-y-4 sm:space-y-5 md:space-y-6 mb-4 sm:mb-6 md:mb-8">
                   <div>
             <p
-                      className="text-base md:text-lg text-[#8C969F] leading-relaxed"
+                      className="text-xs sm:text-sm md:text-base lg:text-lg text-[#8C969F] leading-relaxed break-words"
               style={{ 
                 fontFamily: "'Roboto', sans-serif",
                 fontWeight: 400
@@ -680,7 +682,7 @@ function PricingPage() {
                   
                   <div>
                     <p
-                      className="text-base md:text-lg text-[#8C969F] leading-relaxed"
+                      className="text-xs sm:text-sm md:text-base lg:text-lg text-[#8C969F] leading-relaxed break-words"
                       style={{
                         fontFamily: "'Roboto', sans-serif",
                         fontWeight: 400
@@ -692,7 +694,7 @@ function PricingPage() {
                   
                   <div>
                     <p
-                      className="text-base md:text-lg text-[#8C969F] leading-relaxed"
+                      className="text-xs sm:text-sm md:text-base lg:text-lg text-[#8C969F] leading-relaxed break-words"
                       style={{
                         fontFamily: "'Roboto', sans-serif",
                         fontWeight: 400
@@ -704,31 +706,31 @@ function PricingPage() {
                 </div>
 
                 {/* Social Media Icons */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
                   <a
                     href="#"
-                    className="w-10 h-10 rounded-full bg-[#1E65AD] flex items-center justify-center hover:bg-[#185a9a] transition-colors duration-200"
+                    className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-[#1E65AD] flex items-center justify-center hover:bg-[#185a9a] transition-colors duration-200"
                     aria-label="LinkedIn"
                   >
-                    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
                     </svg>
                   </a>
                   <a
                     href="#"
-                    className="w-10 h-10 rounded-full bg-[#1E65AD] flex items-center justify-center hover:bg-[#185a9a] transition-colors duration-200"
+                    className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-[#1E65AD] flex items-center justify-center hover:bg-[#185a9a] transition-colors duration-200"
                     aria-label="Facebook"
                   >
-                    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                     </svg>
                   </a>
                   <a
                     href="#"
-                    className="w-10 h-10 rounded-full bg-[#1E65AD] flex items-center justify-center hover:bg-[#185a9a] transition-colors duration-200"
+                    className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-[#1E65AD] flex items-center justify-center hover:bg-[#185a9a] transition-colors duration-200"
                     aria-label="Twitter"
                   >
-                    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
                     </svg>
                   </a>
@@ -737,13 +739,13 @@ function PricingPage() {
 
               {/* Right Side - Contact Form */}
               <div>
-                <form className="space-y-6">
+                <form className="space-y-4 sm:space-y-5 md:space-y-6">
                   {/* First Name and Last Name - Side by Side */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
                     <div>
                       <label
                         htmlFor="firstName"
-                        className="block text-sm font-semibold mb-2.5"
+                        className="block text-xs sm:text-sm font-semibold mb-2 sm:mb-2.5"
                         style={{
                           color: "#1E65AD",
                           fontFamily: "'Roboto', sans-serif",
@@ -757,7 +759,7 @@ function PricingPage() {
                         id="firstName"
                         name="firstName"
                         required
-                        className="w-full px-0 py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 bg-transparent"
+                        className="w-full px-0 py-2 sm:py-2.5 md:py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 bg-transparent text-xs sm:text-sm md:text-base"
                         style={{
                           fontFamily: "'Roboto', sans-serif"
                         }}
@@ -767,7 +769,7 @@ function PricingPage() {
                     <div>
                       <label
                         htmlFor="lastName"
-                        className="block text-sm font-semibold mb-2.5"
+                        className="block text-xs sm:text-sm font-semibold mb-2 sm:mb-2.5"
                         style={{
                           color: "#1E65AD",
                           fontFamily: "'Roboto', sans-serif",
@@ -781,7 +783,7 @@ function PricingPage() {
                         id="lastName"
                         name="lastName"
                         required
-                        className="w-full px-0 py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 bg-transparent"
+                        className="w-full px-0 py-2 sm:py-2.5 md:py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 bg-transparent text-xs sm:text-sm md:text-base"
                         style={{
                           fontFamily: "'Roboto', sans-serif"
                         }}
@@ -793,7 +795,7 @@ function PricingPage() {
                   <div>
                     <label
                       htmlFor="phone"
-                      className="block text-sm font-semibold mb-2.5"
+                      className="block text-xs sm:text-sm font-semibold mb-2 sm:mb-2.5"
                       style={{
                         color: "#1E65AD",
                         fontFamily: "'Roboto', sans-serif",
@@ -807,7 +809,7 @@ function PricingPage() {
                       id="phone"
                       name="phone"
                       required
-                      className="w-full px-0 py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 bg-transparent"
+                      className="w-full px-0 py-2 sm:py-2.5 md:py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 bg-transparent text-xs sm:text-sm md:text-base"
                       style={{
                         fontFamily: "'Roboto', sans-serif"
                       }}
@@ -819,7 +821,7 @@ function PricingPage() {
                   <div>
                     <label
                       htmlFor="email"
-                      className="block text-sm font-semibold mb-2.5"
+                      className="block text-xs sm:text-sm font-semibold mb-2 sm:mb-2.5"
                       style={{
                         color: "#1E65AD",
                         fontFamily: "'Roboto', sans-serif",
@@ -833,7 +835,7 @@ function PricingPage() {
                       id="email"
                       name="email"
                       required
-                      className="w-full px-0 py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 bg-transparent"
+                      className="w-full px-0 py-2 sm:py-2.5 md:py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 bg-transparent text-xs sm:text-sm md:text-base"
                       style={{
                         fontFamily: "'Roboto', sans-serif"
                       }}
@@ -844,7 +846,7 @@ function PricingPage() {
                   <div>
                     <label
                       htmlFor="message"
-                      className="block text-sm font-semibold mb-2.5"
+                      className="block text-xs sm:text-sm font-semibold mb-2 sm:mb-2.5"
                       style={{
                         color: "#1E65AD",
                         fontFamily: "'Roboto', sans-serif",
@@ -856,8 +858,8 @@ function PricingPage() {
                     <textarea
                       id="message"
                       name="message"
-                      rows="6"
-                      className="w-full px-0 py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 resize-none bg-transparent"
+                      rows="4"
+                      className="w-full px-0 py-2 sm:py-2.5 md:py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 resize-none bg-transparent text-xs sm:text-sm md:text-base"
                       style={{
                         fontFamily: "'Roboto', sans-serif"
                       }}
@@ -865,10 +867,10 @@ function PricingPage() {
                   </div>
 
                   {/* Submit Button - Bottom Right */}
-                  <div className="flex justify-end mt-6">
+                  <div className="flex justify-end mt-4 sm:mt-5 md:mt-6">
             <button
                       type="submit"
-                      className="px-8 py-3 rounded-lg font-semibold text-base text-white transition-all duration-200 hover:shadow-md"
+                      className="px-6 sm:px-7 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-lg font-semibold text-xs sm:text-sm md:text-base text-white transition-all duration-200 hover:shadow-md"
               style={{
                         background: 'linear-gradient(to right, #b794f6, #9775fa)',
                 fontFamily: "'Roboto', sans-serif",
@@ -893,10 +895,10 @@ function PricingPage() {
 
       
          {/* FAQ Section */}
-         <section className="py-10 md:py-20 bg-[#F9FAFC]">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-14 xl:px-18">
+         <section className="py-6 sm:py-8 md:py-10 lg:py-16 xl:py-20 bg-[#F9FAFC]">
+        <div className="max-w-7xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 2xl:px-14">
           <h2
-            className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-12 "
+            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-center mb-6 sm:mb-8 md:mb-10 lg:mb-12"
             style={{
               color: "#1E65AD",
               fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -907,7 +909,7 @@ function PricingPage() {
             FAQ
           </h2>
           
-          <div className="space-y-0 grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-4">
+          <div className="space-y-0 grid grid-cols-1 md:grid-cols-2 gap-x-4 sm:gap-x-6 md:gap-x-8 lg:gap-x-12 xl:gap-x-16 gap-y-3 sm:gap-y-4">
             {faqData.map((item, index) => (
               <div
                 key={item.id}
@@ -915,10 +917,10 @@ function PricingPage() {
               >
                 <button
                   onClick={() => toggleFaq(item.id)}
-                  className="w-full py-5 md:py-6 px-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200 group"
+                  className="w-full py-3 sm:py-4 md:py-5 lg:py-6 px-3 sm:px-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200 group"
                 >
                   <span
-                    className="text-base md:text-lg font-semibold flex-1 pr-4"
+                    className="text-xs sm:text-sm md:text-base lg:text-lg font-semibold flex-1 pr-2 sm:pr-3 md:pr-4 break-words"
                     style={{
                       color: "#1E65AD",
                       fontFamily: "'Roboto', sans-serif",
@@ -929,7 +931,7 @@ function PricingPage() {
                   </span>
                   <div className="flex-shrink-0">
                     <svg
-                      className={`w-5 h-5 transition-transform duration-300 ${
+                      className={`w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 transition-transform duration-300 ${
                         openFaqs.includes(item.id) ? "rotate-180" : ""
                       }`}
                       style={{
@@ -963,9 +965,9 @@ function PricingPage() {
                     openFaqs.includes(item.id) ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
                   }`}
                 >
-                  <div className="px-4 pb-5 md:pb-6">
+                  <div className="px-3 sm:px-4 pb-3 sm:pb-4 md:pb-5 lg:pb-6">
                     <p
-                      className="text-sm md:text-base leading-relaxed"
+                      className="text-xs sm:text-sm md:text-base leading-relaxed break-words"
                       style={{
                         color: "#8C969F",
                         fontFamily: "'Roboto', sans-serif",

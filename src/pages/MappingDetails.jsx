@@ -3,25 +3,41 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
 import BookmarkButton from "../components/BookmarkButton";
-import { useAuth } from "../contexts/AuthContext";
-import { FileText, StickyNote, Share2 } from "lucide-react";
+import { FileText, StickyNote, Share2, X } from "lucide-react";
 
 export default function MappingDetails() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
   const [mapping, setMapping] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showNotesPopup, setShowNotesPopup] = useState(false);
   const [notesContent, setNotesContent] = useState("");
+  const [notesFolders, setNotesFolders] = useState([{ id: 'default', name: 'Default', content: '' }]);
+  const [activeFolderId, setActiveFolderId] = useState('default');
+  const [showNewFolderInput, setShowNewFolderInput] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
   const [popupPosition, setPopupPosition] = useState({ x: 100, y: 100 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [popupSize, setPopupSize] = useState({ width: 500, height: 400 });
   const [isResizing, setIsResizing] = useState(false);
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const [isMobile, setIsMobile] = useState(false);
+  const [saveButtonText, setSaveButtonText] = useState('Save Notes');
+  const [saveButtonColor, setSaveButtonColor] = useState('');
+
+  // Detect mobile view
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     // Get mapping data from location state
@@ -33,6 +49,26 @@ export default function MappingDetails() {
       navigate('/law-mapping');
     }
   }, [location.state, navigate]);
+
+  // Load saved notes from localStorage when mapping changes
+  useEffect(() => {
+    if (mapping && mapping.id) {
+      const notesKey = `notes_mapping_${mapping.id}`;
+      const savedNotes = localStorage.getItem(notesKey);
+      if (savedNotes) {
+        try {
+          const parsedFolders = JSON.parse(savedNotes);
+          if (parsedFolders && Array.isArray(parsedFolders) && parsedFolders.length > 0) {
+            setNotesFolders(parsedFolders);
+            setActiveFolderId(parsedFolders[0].id);
+            setNotesContent(parsedFolders[0].content || '');
+          }
+        } catch (error) {
+          console.error('Error loading saved notes:', error);
+        }
+      }
+    }
+  }, [mapping?.id]);
 
   // Handle window resize to keep popup within bounds
   useEffect(() => {
@@ -202,21 +238,21 @@ export default function MappingDetails() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
-      <div className="pt-20">
-        <div className="flex-1 p-3 sm:p-4 lg:p-6" style={{ minHeight: 'calc(100vh - 80px)' }}>
+      <div className="pt-16 sm:pt-20">
+        <div className="flex-1 p-2 sm:p-3 md:p-4 lg:p-6" style={{ minHeight: 'calc(100vh - 80px)' }}>
           <div className="max-w-7xl mx-auto h-full">
-            <div className="space-y-6">
+            <div className="space-y-2 sm:space-y-3 md:space-y-4 lg:space-y-6">
               
               {/* Header Section */}
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h1 className="text-3xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-2 sm:p-3 md:p-4 lg:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                      <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold break-words" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                         {mappingInfo.title}
                       </h1>
-                      {isAuthenticated && mapping && (
-                        <div className="flex items-center gap-2">
+                      {mapping && (
+                        <div className="flex items-center gap-2 flex-shrink-0">
                           <button
                             onClick={() => {
                               const url = window.location.href;
@@ -255,14 +291,14 @@ export default function MappingDetails() {
                         </div>
                       )}
                     </div>
-                    <div className="w-16 h-1 bg-gradient-to-r" style={{ background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)' }}></div>
+                    <div className="w-12 sm:w-16 h-1 bg-gradient-to-r mt-2 sm:mt-3" style={{ background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)' }}></div>
                   </div>
                   <button
                     onClick={goBack}
-                    className="px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium shadow-sm hover:shadow-md flex items-center justify-center gap-2"
+                    className="px-3 sm:px-4 py-1.5 sm:py-2 border-2 border-gray-300 text-gray-700 rounded-lg sm:rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium text-xs sm:text-sm md:text-base shadow-sm hover:shadow-md flex items-center justify-center gap-1.5 sm:gap-2 w-full sm:w-auto"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                     Back
@@ -271,22 +307,21 @@ export default function MappingDetails() {
               </div>
 
               {/* Toolbar - Search, Summary, Notes */}
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-3 sm:p-4">
-                <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-2 sm:p-2.5 md:p-3 lg:p-4">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 md:gap-3">
                   {/* Search Bar */}
-                  <div className="relative flex-1 min-w-[200px]">
+                  <div className="relative flex-1 min-w-[120px] sm:min-w-[200px]">
                     <img 
                       src="/uit3.GIF" 
                       alt="Search" 
-                      className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-10 w-10 sm:h-4 sm:w-4 object-contain pointer-events-none"
-                      style={{ width: '30px', height: '30px' }}
+                      className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 object-contain pointer-events-none z-10"
                     />
                     <input
                       type="text"
-                      placeholder="  Search With Kiki AI ..."
+                      placeholder="Search With Kiki AI..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                      className="w-full pl-8 sm:pl-10 pr-2 sm:pr-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-xs sm:text-sm"
                       style={{ fontFamily: 'Roboto, sans-serif' }}
                       onKeyPress={(e) => {
                         if (e.key === 'Enter' && searchQuery.trim()) {
@@ -296,29 +331,47 @@ export default function MappingDetails() {
                     />
                   </div>
                   
-                  {/* Summary Button */}
-                  <button
-                    onClick={() => {
-                      console.log('Summary clicked for mapping:', mapping?.id || mapping?.subject);
-                    }}
-                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md whitespace-nowrap flex-shrink-0"
-                    style={{ fontFamily: 'Roboto, sans-serif' }}
-                    title="View Summary"
-                  >
-                    <FileText className="h-4 w-4" />
-                    <span className="hidden sm:inline">Summary</span>
-                  </button>
-                  
-                  {/* Notes Button - Only show if authenticated */}
-                  {isAuthenticated && (
+                  {/* Action Buttons Container */}
+                  <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                    {/* Summary Button */}
                     <button
                       onClick={() => {
-                        // Initialize notes content with mapping data
-                        const initialContent = `# ${mapping?.subject || mapping?.title || 'Untitled Mapping Note'}\n\n${mapping?.summary || mapping?.description || 'No summary available.'}\n\n## Mapping Details\n\nSource: ${sourceSection || 'N/A'}\nTarget: ${targetSection || 'N/A'}\nType: ${mappingInfo.title}`;
-                        setNotesContent(initialContent);
+                        console.log('Summary clicked for mapping:', mapping?.id || mapping?.subject);
+                      }}
+                      className="flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium text-xs sm:text-sm shadow-sm hover:shadow-md whitespace-nowrap"
+                      style={{ fontFamily: 'Roboto, sans-serif' }}
+                      title="View Summary"
+                    >
+                      <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Summary</span>
+                    </button>
+                    
+                    {/* Notes Button */}
+                    <button
+                      onClick={() => {
+                        // Check if we have saved notes, if not initialize with default content
+                        const notesKey = `notes_mapping_${mapping?.id || 'default'}`;
+                        const savedNotes = localStorage.getItem(notesKey);
+                        
+                        if (!savedNotes) {
+                          // Initialize notes content with mapping data for default folder
+                          const initialContent = `# ${mapping?.subject || mapping?.title || 'Untitled Mapping Note'}\n\n${mapping?.summary || mapping?.description || 'No summary available.'}\n\n## Mapping Details\n\nSource: ${sourceSection || 'N/A'}\nTarget: ${targetSection || 'N/A'}\nType: ${mappingInfo.title}`;
+                          
+                          // Initialize folders if empty
+                          if (notesFolders.length === 0 || (notesFolders.length === 1 && notesFolders[0].content === '')) {
+                            setNotesFolders([{ id: 'default', name: 'Default', content: initialContent }]);
+                            setActiveFolderId('default');
+                            setNotesContent(initialContent);
+                          }
+                        } else {
+                          // Load existing content
+                          const currentFolder = notesFolders.find(f => f.id === activeFolderId);
+                          setNotesContent(currentFolder?.content || '');
+                        }
+                        
                         setShowNotesPopup(true);
                       }}
-                      className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-white rounded-lg transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md whitespace-nowrap flex-shrink-0"
+                      className="flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 text-white rounded-lg transition-all duration-200 font-medium text-xs sm:text-sm shadow-sm hover:shadow-md whitespace-nowrap"
                       style={{ 
                         fontFamily: 'Roboto, sans-serif',
                         background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)'
@@ -331,53 +384,53 @@ export default function MappingDetails() {
                       }}
                       title="Add Notes"
                     >
-                      <StickyNote className="h-4 w-4" />
+                      <StickyNote className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       <span className="hidden sm:inline">Notes</span>
                     </button>
-                  )}
+                  </div>
                 </div>
               </div>
 
               {/* Main Content - Two Column Layout */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
                 
                 {/* Source Section Card */}
-                <div className={`${mappingInfo.sourceColor.bg} rounded-xl shadow-lg border-2 ${mappingInfo.sourceColor.border} p-6`}>
-                  <div className="text-center mb-6">
-                    <h3 className="text-lg font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                <div className={`${mappingInfo.sourceColor.bg} rounded-lg sm:rounded-xl shadow-lg border-2 ${mappingInfo.sourceColor.border} p-3 sm:p-4 md:p-5 lg:p-6`}>
+                  <div className="text-center mb-4 sm:mb-5 md:mb-6">
+                    <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                       {mappingInfo.sourceLabel}
                     </h3>
                     {sourceSection && (
-                      <div className={`text-5xl font-bold ${mappingInfo.sourceColor.text} mb-4`}>
+                      <div className={`text-3xl sm:text-4xl md:text-5xl font-bold ${mappingInfo.sourceColor.text} mb-3 sm:mb-4`}>
                         {sourceSection}
                       </div>
                     )}
-                    <div className="text-sm text-gray-700 font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="text-xs sm:text-sm text-gray-700 font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       {mappingInfo.sourceAct}
                     </div>
                   </div>
                   
                   {/* Source Section Details */}
                   {mapping.ipc_description && (
-                    <div className="mt-4 pt-4 border-t border-gray-300">
-                      <h4 className="text-sm font-semibold mb-2 text-gray-800">Section Description</h4>
-                      <p className="text-sm text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-300">
+                      <h4 className="text-xs sm:text-sm font-semibold mb-1.5 sm:mb-2 text-gray-800">Section Description</h4>
+                      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         {mapping.ipc_description}
                       </p>
                     </div>
                   )}
                   {mapping.iea_description && (
-                    <div className="mt-4 pt-4 border-t border-gray-300">
-                      <h4 className="text-sm font-semibold mb-2 text-gray-800">Section Description</h4>
-                      <p className="text-sm text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-300">
+                      <h4 className="text-xs sm:text-sm font-semibold mb-1.5 sm:mb-2 text-gray-800">Section Description</h4>
+                      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         {mapping.iea_description}
                       </p>
                     </div>
                   )}
                   {mapping.crpc_description && (
-                    <div className="mt-4 pt-4 border-t border-gray-300">
-                      <h4 className="text-sm font-semibold mb-2 text-gray-800">Section Description</h4>
-                      <p className="text-sm text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-300">
+                      <h4 className="text-xs sm:text-sm font-semibold mb-1.5 sm:mb-2 text-gray-800">Section Description</h4>
+                      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         {mapping.crpc_description}
                       </p>
                     </div>
@@ -385,42 +438,42 @@ export default function MappingDetails() {
                 </div>
 
                 {/* Target Section Card */}
-                <div className={`${mappingInfo.targetColor.bg} rounded-xl shadow-lg border-2 ${mappingInfo.targetColor.border} p-6`}>
-                  <div className="text-center mb-6">
-                    <h3 className="text-lg font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                <div className={`${mappingInfo.targetColor.bg} rounded-lg sm:rounded-xl shadow-lg border-2 ${mappingInfo.targetColor.border} p-3 sm:p-4 md:p-5 lg:p-6`}>
+                  <div className="text-center mb-4 sm:mb-5 md:mb-6">
+                    <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                       {mappingInfo.targetLabel}
                     </h3>
                     {targetSection && (
-                      <div className={`text-5xl font-bold ${mappingInfo.targetColor.text} mb-4`}>
+                      <div className={`text-3xl sm:text-4xl md:text-5xl font-bold ${mappingInfo.targetColor.text} mb-3 sm:mb-4`}>
                         {targetSection}
                       </div>
                     )}
-                    <div className="text-sm text-gray-700 font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="text-xs sm:text-sm text-gray-700 font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       {mappingInfo.targetAct}
                     </div>
                   </div>
                   
                   {/* Target Section Details */}
                   {mapping.bns_description && (
-                    <div className="mt-4 pt-4 border-t border-gray-300">
-                      <h4 className="text-sm font-semibold mb-2 text-gray-800">Section Description</h4>
-                      <p className="text-sm text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-300">
+                      <h4 className="text-xs sm:text-sm font-semibold mb-1.5 sm:mb-2 text-gray-800">Section Description</h4>
+                      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         {mapping.bns_description}
                       </p>
                     </div>
                   )}
                   {mapping.bsa_description && (
-                    <div className="mt-4 pt-4 border-t border-gray-300">
-                      <h4 className="text-sm font-semibold mb-2 text-gray-800">Section Description</h4>
-                      <p className="text-sm text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-300">
+                      <h4 className="text-xs sm:text-sm font-semibold mb-1.5 sm:mb-2 text-gray-800">Section Description</h4>
+                      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         {mapping.bsa_description}
                       </p>
                     </div>
                   )}
                   {mapping.bnss_description && (
-                    <div className="mt-4 pt-4 border-t border-gray-300">
-                      <h4 className="text-sm font-semibold mb-2 text-gray-800">Section Description</h4>
-                      <p className="text-sm text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-300">
+                      <h4 className="text-xs sm:text-sm font-semibold mb-1.5 sm:mb-2 text-gray-800">Section Description</h4>
+                      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         {mapping.bnss_description}
                       </p>
                     </div>
@@ -429,16 +482,16 @@ export default function MappingDetails() {
               </div>
 
               {/* Subject and Summary Section */}
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-                <h3 className="text-xl font-bold mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-3 sm:p-4 md:p-5 lg:p-6">
+                <h3 className="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4 break-words" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   Subject: {subject}
                 </h3>
                 {summary && (
-                  <div className="mt-4">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  <div className="mt-3 sm:mt-4">
+                    <h4 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       Description
                     </h4>
-                    <p className="text-sm text-gray-600 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <p className="text-xs sm:text-sm text-gray-600 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       {summary}
                     </p>
                   </div>
@@ -446,8 +499,8 @@ export default function MappingDetails() {
               </div>
 
               {/* All Mapping Data Section - Shows all fields from API */}
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-                <h3 className="text-xl font-bold mb-6" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-3 sm:p-4 md:p-5 lg:p-6">
+                <h3 className="text-base sm:text-lg md:text-xl font-bold mb-4 sm:mb-5 md:mb-6" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   Complete Mapping Information
                 </h3>
                 
@@ -584,7 +637,7 @@ export default function MappingDetails() {
                   {/* <h4 className="text-lg font-semibold text-gray-800 mb-4" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                     Additional Information
                   </h4> */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     {/* {mapping.id && (
                       <div>
                         <h5 className="text-sm font-semibold text-gray-700 mb-1">Mapping ID</h5>
@@ -593,50 +646,50 @@ export default function MappingDetails() {
                     )} */}
                     {mapping.mapping_type && (
                       <div>
-                        <h5 className="text-sm font-semibold text-gray-700 mb-1">Mapping Type</h5>
-                        <p className="text-sm text-gray-600">{mapping.mapping_type}</p>
+                        <h5 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1">Mapping Type</h5>
+                        <p className="text-xs sm:text-sm text-gray-600">{mapping.mapping_type}</p>
                       </div>
                     )}
                     {mapping.title && mapping.title !== subject && (
                       <div>
-                        <h5 className="text-sm font-semibold text-gray-700 mb-1">Title</h5>
-                        <p className="text-sm text-gray-600">{mapping.title}</p>
+                        <h5 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1">Title</h5>
+                        <p className="text-xs sm:text-sm text-gray-600 break-words">{mapping.title}</p>
                       </div>
                     )}
                     {mapping.description && mapping.description !== summary && (
                       <div>
-                        <h5 className="text-sm font-semibold text-gray-700 mb-1">Description</h5>
-                        <p className="text-sm text-gray-600">{mapping.description}</p>
+                        <h5 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1">Description</h5>
+                        <p className="text-xs sm:text-sm text-gray-600 break-words">{mapping.description}</p>
                       </div>
                     )}
                     {mapping.notes && (
-                      <div className="md:col-span-2">
-                        <h5 className="text-sm font-semibold text-gray-700 mb-1">Notes</h5>
-                        <p className="text-sm text-gray-600 leading-relaxed">{mapping.notes}</p>
+                      <div className="sm:col-span-2">
+                        <h5 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1">Notes</h5>
+                        <p className="text-xs sm:text-sm text-gray-600 leading-relaxed break-words">{mapping.notes}</p>
                       </div>
                     )}
                     {mapping.comments && (
-                      <div className="md:col-span-2">
-                        <h5 className="text-sm font-semibold text-gray-700 mb-1">Comments</h5>
-                        <p className="text-sm text-gray-600 leading-relaxed">{mapping.comments}</p>
+                      <div className="sm:col-span-2">
+                        <h5 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1">Comments</h5>
+                        <p className="text-xs sm:text-sm text-gray-600 leading-relaxed break-words">{mapping.comments}</p>
                       </div>
                     )}
                     {mapping.remarks && (
-                      <div className="md:col-span-2">
-                        <h5 className="text-sm font-semibold text-gray-700 mb-1">Remarks</h5>
-                        <p className="text-sm text-gray-600 leading-relaxed">{mapping.remarks}</p>
+                      <div className="sm:col-span-2">
+                        <h5 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1">Remarks</h5>
+                        <p className="text-xs sm:text-sm text-gray-600 leading-relaxed break-words">{mapping.remarks}</p>
                       </div>
                     )}
                     {mapping.created_at && (
                       <div>
-                        <h5 className="text-sm font-semibold text-gray-700 mb-1">Created At</h5>
-                        <p className="text-sm text-gray-600">{new Date(mapping.created_at).toLocaleString()}</p>
+                        <h5 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1">Created At</h5>
+                        <p className="text-xs sm:text-sm text-gray-600">{new Date(mapping.created_at).toLocaleString()}</p>
                       </div>
                     )}
                     {mapping.updated_at && (
                       <div>
-                        <h5 className="text-sm font-semibold text-gray-700 mb-1">Updated At</h5>
-                        <p className="text-sm text-gray-600">{new Date(mapping.updated_at).toLocaleString()}</p>
+                        <h5 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1">Updated At</h5>
+                        <p className="text-xs sm:text-sm text-gray-600">{new Date(mapping.updated_at).toLocaleString()}</p>
                       </div>
                     )}
                   </div>
@@ -666,10 +719,10 @@ export default function MappingDetails() {
                           )
                           .map(key => (
                             <div key={key}>
-                              <h5 className="text-sm font-semibold text-gray-700 mb-1 capitalize">
+                              <h5 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1 capitalize">
                                 {key.replace(/_/g, ' ')}
                               </h5>
-                              <p className="text-sm text-gray-600">
+                              <p className="text-xs sm:text-sm text-gray-600 break-words">
                                 {typeof mapping[key] === 'object' ? JSON.stringify(mapping[key], null, 2) : String(mapping[key])}
                               </p>
                             </div>
@@ -682,14 +735,14 @@ export default function MappingDetails() {
               </div>
 
               {/* Action Buttons */}
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-                <div className="flex flex-col sm:flex-row gap-3">
+              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-3 sm:p-4 md:p-5 lg:p-6">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                   <button
                     onClick={goBack}
-                    className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium shadow-sm hover:shadow-md flex items-center justify-center gap-2"
+                    className="flex-1 px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 border-2 border-gray-300 text-gray-700 rounded-lg sm:rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium text-xs sm:text-sm md:text-base shadow-sm hover:shadow-md flex items-center justify-center gap-1.5 sm:gap-2"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                     Back to Mappings
@@ -702,19 +755,30 @@ export default function MappingDetails() {
         </div>
       </div>
 
-      {/* Draggable Notes Popup */}
+      {/* Notes Popup - Mobile Optimized */}
       {showNotesPopup && (
         <>
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 bg-black bg-opacity-30 z-40"
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 backdrop-blur-sm"
             onClick={() => setShowNotesPopup(false)}
           />
           
-          {/* Draggable Popup */}
+          {/* Popup - Mobile: Bottom Sheet, Desktop: Draggable */}
           <div
-            className="fixed bg-white rounded-lg shadow-2xl z-50 flex flex-col"
-            style={{
+            className={`fixed bg-white shadow-2xl z-50 flex flex-col ${
+              isMobile ? 'rounded-t-2xl sm:rounded-lg' : 'rounded-lg'
+            }`}
+            style={isMobile ? {
+              left: '0',
+              right: '0',
+              bottom: '0',
+              top: '10%',
+              maxHeight: '90vh',
+              minHeight: '400px',
+              fontFamily: 'Roboto, sans-serif',
+              boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.15)'
+            } : {
               left: `${popupPosition.x}px`,
               top: `${popupPosition.y}px`,
               width: `${popupSize.width}px`,
@@ -726,7 +790,8 @@ export default function MappingDetails() {
               fontFamily: 'Roboto, sans-serif',
               userSelect: isDragging || isResizing ? 'none' : 'auto'
             }}
-            onMouseDown={(e) => {
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={!isMobile ? (e) => {
               // Only start dragging if clicking on the header
               if (e.target.closest('.notes-popup-header')) {
                 setIsDragging(true);
@@ -736,8 +801,8 @@ export default function MappingDetails() {
                   y: e.clientY - rect.top
                 });
               }
-            }}
-            onMouseMove={(e) => {
+            } : undefined}
+            onMouseMove={!isMobile ? (e) => {
               if (isDragging) {
                 const newX = e.clientX - dragOffset.x;
                 const newY = e.clientY - dragOffset.y;
@@ -770,181 +835,324 @@ export default function MappingDetails() {
                   y: Math.min(prev.y, maxY)
                 }));
               }
-            }}
-            onMouseUp={() => {
+            } : undefined}
+            onMouseUp={!isMobile ? () => {
               setIsDragging(false);
               setIsResizing(false);
-            }}
-            onMouseLeave={() => {
+            } : undefined}
+            onMouseLeave={!isMobile ? () => {
               setIsDragging(false);
               setIsResizing(false);
-            }}
+            } : undefined}
           >
-            {/* Header - Draggable Area */}
+            {/* Header */}
             <div 
-              className="notes-popup-header flex items-center justify-between p-4 border-b border-gray-200"
+              className={`notes-popup-header flex items-center justify-between p-3 sm:p-4 border-b ${
+                isMobile ? 'border-white border-opacity-20' : 'border-gray-200'
+              }`}
               style={{ 
-                borderTopLeftRadius: '0.5rem', 
-                borderTopRightRadius: '0.5rem',
-                cursor: isDragging ? 'grabbing' : 'move',
+                borderTopLeftRadius: isMobile ? '1rem' : '0.5rem', 
+                borderTopRightRadius: isMobile ? '1rem' : '0.5rem',
+                cursor: !isMobile && (isDragging ? 'grabbing' : 'move'),
                 userSelect: 'none',
                 background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)'
               }}
-              onMouseEnter={(e) => {
+              onMouseEnter={!isMobile ? (e) => {
                 if (!isDragging) {
                   e.currentTarget.style.cursor = 'move';
                 }
-              }}
+              } : undefined}
             >
-              <div className="flex items-center gap-2">
-                <StickyNote className="h-5 w-5 text-white" />
-                <h3 className="text-lg font-bold text-white" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+              <div className="flex items-center gap-2 sm:gap-2.5">
+                <StickyNote className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-white" />
+                <h3 className="text-sm sm:text-base md:text-lg font-bold text-white" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   Notes
                 </h3>
               </div>
-              <div className="flex items-center gap-2">
-                {/* Size Control Buttons */}
-                <div className="flex items-center gap-1 border-r border-white border-opacity-30 pr-2 mr-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setPopupSize(prev => ({
-                        width: Math.max(400, prev.width - 50),
-                        height: Math.max(300, prev.height - 50)
-                      }));
-                    }}
-                    className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20"
-                    style={{ 
-                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                      borderRadius: '0.25rem',
-                      cursor: 'pointer'
-                    }}
-                    title="Make Smaller"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setPopupSize(prev => ({
-                        width: Math.min(window.innerWidth * 0.9, prev.width + 50),
-                        height: Math.min(window.innerHeight * 0.9, prev.height + 50)
-                      }));
-                    }}
-                    className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20"
-                    style={{ 
-                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                      borderRadius: '0.25rem',
-                      cursor: 'pointer'
-                    }}
-                    title="Make Bigger"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                  </button>
-                </div>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                {/* Size Control Buttons - Desktop Only */}
+                {!isMobile && (
+                  <div className="flex items-center gap-1 border-r border-white border-opacity-30 pr-2 mr-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPopupSize(prev => ({
+                          width: Math.max(400, prev.width - 50),
+                          height: Math.max(300, prev.height - 50)
+                        }));
+                      }}
+                      className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20"
+                      style={{ 
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: '0.25rem',
+                        cursor: 'pointer'
+                      }}
+                      title="Make Smaller"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPopupSize(prev => ({
+                          width: Math.min(window.innerWidth * 0.9, prev.width + 50),
+                          height: Math.min(window.innerHeight * 0.9, prev.height + 50)
+                        }));
+                      }}
+                      className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20"
+                      style={{ 
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: '0.25rem',
+                        cursor: 'pointer'
+                      }}
+                      title="Make Bigger"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
                 
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowNotesPopup(false);
                   }}
-                  className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20 flex-shrink-0"
+                  className={`text-white hover:text-gray-200 active:text-gray-300 transition-colors flex-shrink-0 ${
+                    isMobile ? 'p-1.5 rounded-full hover:bg-white hover:bg-opacity-20 active:bg-opacity-30' : 'p-1 rounded hover:bg-opacity-20'
+                  }`}
                   style={{ 
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: '0.25rem',
+                    backgroundColor: isMobile ? 'transparent' : 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: isMobile ? '50%' : '0.25rem',
                     cursor: 'pointer'
                   }}
                   title="Close"
+                  aria-label="Close"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <X className={isMobile ? 'h-5 w-5 sm:h-6 sm:w-6' : 'w-5 h-5'} />
                 </button>
               </div>
             </div>
             
-            {/* Resize Handle - Bottom Right Corner */}
-            <div
-              className="absolute bottom-0 right-0 w-6 h-6"
-              style={{
-                background: 'linear-gradient(135deg, transparent 0%, transparent 50%, rgba(30, 101, 173, 0.3) 50%, rgba(30, 101, 173, 0.3) 100%)',
-                borderBottomRightRadius: '0.5rem',
-                cursor: 'nwse-resize'
-              }}
-              onMouseDown={(e) => {
-                e.stopPropagation();
-                setIsResizing(true);
-                setResizeStart({
-                  x: e.clientX,
-                  y: e.clientY,
-                  width: popupSize.width,
-                  height: popupSize.height
-                });
-              }}
-              onMouseEnter={(e) => {
-                if (!isResizing) {
-                  e.currentTarget.style.cursor = 'nwse-resize';
-                }
-              }}
-              title="Drag to resize"
-            />
+            {/* Resize Handle - Desktop Only */}
+            {!isMobile && (
+              <div
+                className="absolute bottom-0 right-0 w-6 h-6"
+                style={{
+                  background: 'linear-gradient(135deg, transparent 0%, transparent 50%, rgba(30, 101, 173, 0.3) 50%, rgba(30, 101, 173, 0.3) 100%)',
+                  borderBottomRightRadius: '0.5rem',
+                  cursor: 'nwse-resize'
+                }}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  setIsResizing(true);
+                  setResizeStart({
+                    x: e.clientX,
+                    y: e.clientY,
+                    width: popupSize.width,
+                    height: popupSize.height
+                  });
+                }}
+                onMouseEnter={(e) => {
+                  if (!isResizing) {
+                    e.currentTarget.style.cursor = 'nwse-resize';
+                  }
+                }}
+                title="Drag to resize"
+              />
+            )}
+
+            {/* Folder Tabs */}
+            <div className="border-b border-gray-200 bg-gray-50" style={{ position: 'relative', zIndex: 1 }}>
+              <div className="flex items-center gap-2 p-3 overflow-x-auto" style={{ scrollbarWidth: 'thin' }}>
+                {/* Folder Tabs */}
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  {notesFolders.map((folder) => (
+                    <button
+                      key={folder.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Save current folder content before switching
+                        setNotesFolders(prev => prev.map(f => 
+                          f.id === activeFolderId ? { ...f, content: notesContent } : f
+                        ));
+                        // Switch to new folder
+                        setActiveFolderId(folder.id);
+                        setNotesContent(folder.content || '');
+                      }}
+                      className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap transition-all duration-200 flex-shrink-0 ${
+                        activeFolderId === folder.id
+                          ? 'bg-blue-600 text-white shadow-md scale-105'
+                          : 'bg-white text-gray-700 hover:bg-gray-100 active:bg-gray-200 border border-gray-200'
+                      }`}
+                      style={{ fontFamily: 'Roboto, sans-serif' }}
+                    >
+                      {folder.name}
+                    </button>
+                  ))}
+                </div>
+                
+                {/* Action Buttons Container */}
+                <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                  {showNewFolderInput ? (
+                    <div className="flex items-center gap-1.5 bg-white rounded-lg p-1 border border-gray-200 shadow-sm">
+                      <input
+                        type="text"
+                        value={newFolderName}
+                        onChange={(e) => setNewFolderName(e.target.value)}
+                        placeholder="Folder name"
+                        className="px-2.5 py-1.5 border-2 border-blue-500 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+                        style={{ 
+                          fontFamily: 'Roboto, sans-serif',
+                          minWidth: '120px',
+                          maxWidth: '150px'
+                        }}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && newFolderName.trim()) {
+                            const newFolder = {
+                              id: Date.now().toString(),
+                              name: newFolderName.trim(),
+                              content: ''
+                            };
+                            setNotesFolders([...notesFolders, newFolder]);
+                            setActiveFolderId(newFolder.id);
+                            setNotesContent('');
+                            setNewFolderName('');
+                            setShowNewFolderInput(false);
+                          }
+                        }}
+                        onBlur={() => {
+                          // Don't close on blur, let user click Add or Cancel
+                        }}
+                        autoFocus
+                      />
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (newFolderName.trim()) {
+                            const newFolder = {
+                              id: Date.now().toString(),
+                              name: newFolderName.trim(),
+                              content: ''
+                            };
+                            setNotesFolders([...notesFolders, newFolder]);
+                            setActiveFolderId(newFolder.id);
+                            setNotesContent('');
+                            setNewFolderName('');
+                          }
+                          setShowNewFolderInput(false);
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors shadow-sm whitespace-nowrap ${
+                          newFolderName.trim()
+                            ? 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 cursor-pointer'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                        style={{ fontFamily: 'Roboto, sans-serif' }}
+                        disabled={!newFolderName.trim()}
+                      >
+                        Add
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowNewFolderInput(false);
+                          setNewFolderName('');
+                        }}
+                        className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded-lg text-xs font-semibold hover:bg-gray-300 active:bg-gray-400 transition-colors whitespace-nowrap"
+                        style={{ fontFamily: 'Roboto, sans-serif' }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowNewFolderInput(true);
+                        }}
+                        className="px-3 py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-sm"
+                        style={{ fontFamily: 'Roboto, sans-serif' }}
+                      >
+                        + New
+                      </button>
+                      {notesFolders.length > 1 && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (notesFolders.length > 1 && window.confirm('Delete this folder?')) {
+                              const newFolders = notesFolders.filter(f => f.id !== activeFolderId);
+                              setNotesFolders(newFolders);
+                              setActiveFolderId(newFolders[0].id);
+                              setNotesContent(newFolders[0].content || '');
+                            }
+                          }}
+                          className="px-3 py-2 bg-red-500 text-white rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap hover:bg-red-600 active:bg-red-700 transition-colors shadow-sm"
+                          style={{ fontFamily: 'Roboto, sans-serif' }}
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
 
             {/* Content Area */}
-            <div className="flex-1 overflow-hidden flex flex-col" style={{ cursor: 'text' }}>
+            <div className="flex-1 overflow-hidden flex flex-col p-3 sm:p-4 bg-gray-50" style={{ cursor: 'text' }}>
               <textarea
                 value={notesContent}
-                onChange={(e) => setNotesContent(e.target.value)}
-                placeholder="Write your notes here..."
-                className="flex-1 w-full p-4 border-0 resize-none focus:outline-none focus:ring-0"
+                onChange={(e) => {
+                  setNotesContent(e.target.value);
+                  // Update folder content in real-time
+                  setNotesFolders(prev => prev.map(f => 
+                    f.id === activeFolderId ? { ...f, content: e.target.value } : f
+                  ));
+                }}
+                className="flex-1 w-full p-3 sm:p-4 border-2 border-gray-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-xs sm:text-sm md:text-base bg-white shadow-inner"
                 style={{ 
                   fontFamily: 'Roboto, sans-serif',
-                  minHeight: '300px',
-                  fontSize: '14px',
                   lineHeight: '1.6',
+                  minHeight: '200px',
                   color: '#1E65AD',
                   cursor: 'text'
                 }}
+                placeholder="Write your notes here...&#10;&#10;You can use markdown formatting:&#10;# Heading&#10;## Subheading&#10;**Bold text**&#10;*Italic text*"
               />
-            </div>
 
-            {/* Footer */}
-            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200 bg-gray-50">
+              {/* Save Button */}
               <button
                 onClick={() => {
-                  setShowNotesPopup(false);
-                  setNotesContent("");
+                  // Save notes logic here - save all folders
+                  setNotesFolders(prev => prev.map(f => 
+                    f.id === activeFolderId ? { ...f, content: notesContent } : f
+                  ));
+                  // Save to localStorage for persistence
+                  const notesKey = `notes_mapping_${mapping?.id || 'default'}`;
+                  const updatedFolders = notesFolders.map(f => 
+                    f.id === activeFolderId ? { ...f, content: notesContent } : f
+                  );
+                  localStorage.setItem(notesKey, JSON.stringify(updatedFolders));
+                  
+                  // Visual feedback
+                  setSaveButtonText('✓ Saved!');
+                  setSaveButtonColor('#10b981');
+                  setTimeout(() => {
+                    setSaveButtonText('Save Notes');
+                    setSaveButtonColor('');
+                  }, 2000);
                 }}
-                className="px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium text-sm"
-                style={{ fontFamily: 'Roboto, sans-serif', cursor: 'pointer' }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  // Save notes logic here
-                  console.log('Saving notes:', notesContent);
-                  // You can implement save functionality here
-                  // For now, just close the popup
-                  setShowNotesPopup(false);
-                }}
-                className="px-4 py-2 text-white rounded-lg transition-all font-medium text-sm shadow-sm hover:shadow-md"
-                style={{ 
+                className="mt-3 w-full px-4 py-3 text-white rounded-xl hover:bg-opacity-90 active:bg-opacity-80 transition-all duration-200 font-semibold text-xs sm:text-sm md:text-base shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
+                style={{
                   fontFamily: 'Roboto, sans-serif',
-                  background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)',
-                  cursor: 'pointer'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.background = 'linear-gradient(90deg, #1a5a9a 0%, #b88a56 100%)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.background = 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)';
+                  backgroundColor: saveButtonColor || '#2563eb'
                 }}
               >
-                Save Notes
+                {saveButtonText}
               </button>
             </div>
           </div>

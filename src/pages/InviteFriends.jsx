@@ -16,11 +16,6 @@ export default function InviteFriends() {
   const [sentInvites, setSentInvites] = useState([]);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login', { state: { from: { pathname: '/referral/invite' } } });
-      return;
-    }
-    
     // Load sent invites from API
     const loadSentInvites = async () => {
       try {
@@ -28,8 +23,14 @@ export default function InviteFriends() {
         // const response = await apiService.getSentInvites();
         // setSentInvites(response.data);
         
-        // For now, initialize with empty array
-        setSentInvites([]);
+        // For now, initialize with empty array (or load from API if authenticated)
+        if (isAuthenticated && user?.id) {
+          // Load user-specific invites
+          setSentInvites([]);
+        } else {
+          // Show empty for non-authenticated users
+          setSentInvites([]);
+        }
       } catch (error) {
         console.error('Error loading sent invites:', error);
         setSentInvites([]);
@@ -37,9 +38,12 @@ export default function InviteFriends() {
     };
 
     loadSentInvites();
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user]);
 
-  const referralCode = user?.id ? `SALHAKAR${user.id.toString().slice(-6).toUpperCase()}` : 'SALHAKAR123456';
+  // Generate referral code - use user ID if authenticated, otherwise use a default/temporary code
+  const referralCode = isAuthenticated && user?.id 
+    ? `SALHAKAR${user.id.toString().slice(-6).toUpperCase()}` 
+    : 'SALHAKAR000000';
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

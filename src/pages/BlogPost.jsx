@@ -231,9 +231,9 @@ const BlogPost = () => {
     return (
       <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
         <Navbar />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+        <div className="max-w-4xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 py-10 sm:py-12 md:py-16 lg:py-20 text-center">
           <h1
-            className="text-3xl md:text-4xl font-bold mb-4"
+            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 break-words"
             style={{
               color: '#1E65AD',
               fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif"
@@ -242,7 +242,7 @@ const BlogPost = () => {
             Post Not Found
           </h1>
           <p
-            className="text-lg mb-8"
+            className="text-sm sm:text-base md:text-lg mb-6 sm:mb-8 break-words"
             style={{
               color: '#8C969F',
               fontFamily: "'Roboto', sans-serif"
@@ -252,7 +252,7 @@ const BlogPost = () => {
           </p>
           <button
             onClick={() => navigate('/blog')}
-            className="px-6 py-3 rounded-xl font-semibold text-white transition-all duration-200"
+            className="px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm md:text-base text-white transition-all duration-200"
             style={{
               backgroundColor: '#1E65AD',
               fontFamily: "'Roboto', sans-serif"
@@ -304,10 +304,10 @@ const BlogPost = () => {
       <Navbar />
       
       {/* Back Button */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <div className="max-w-4xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 pt-4 sm:pt-6 md:pt-8">
         <button
           onClick={() => navigate('/blog')}
-          className="flex items-center gap-2 font-semibold transition-all duration-200 mb-8"
+          className="flex items-center gap-1.5 sm:gap-2 font-semibold transition-all duration-200 mb-4 sm:mb-6 md:mb-8 text-xs sm:text-sm md:text-base"
           style={{
             color: '#1E65AD',
             fontFamily: "'Roboto', sans-serif"
@@ -319,15 +319,16 @@ const BlogPost = () => {
             e.target.style.color = '#1E65AD';
           }}
         >
-          <ArrowLeft className="h-5 w-5" />
-          Back to Blog
+          <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+          <span className="hidden sm:inline">Back to Blog</span>
+          <span className="sm:hidden">Back</span>
         </button>
       </div>
 
       {/* Article Header */}
-      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+      <article className="max-w-4xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 pb-8 sm:pb-12 md:pb-16 lg:pb-20">
         {/* Featured Image */}
-        <div className="relative h-64 md:h-96 rounded-2xl overflow-hidden mb-8"
+        <div className="relative h-40 sm:h-48 md:h-64 lg:h-80 xl:h-96 rounded-xl sm:rounded-2xl overflow-hidden mb-4 sm:mb-6 md:mb-8 mx-2 sm:mx-0"
           style={{ backgroundColor: '#F9FAFC' }}
         >
           <img
@@ -339,8 +340,8 @@ const BlogPost = () => {
               e.target.parentElement.style.background = 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)';
             }}
           />
-          <div className="absolute top-4 left-4">
-            <span className="px-4 py-2 rounded-full text-sm font-semibold text-white"
+          <div className="absolute top-2 sm:top-3 md:top-4 left-2 sm:left-3 md:left-4">
+            <span className="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-full text-xs sm:text-sm font-semibold text-white"
               style={{
                 backgroundColor: '#CF9B63',
                 fontFamily: "'Roboto', sans-serif"
@@ -352,9 +353,9 @@ const BlogPost = () => {
         </div>
 
         {/* Article Header */}
-        <header className="mb-8">
+        <header className="mb-4 sm:mb-6 md:mb-8 px-2 sm:px-0">
           <h1
-            className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight"
+            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3 sm:mb-4 md:mb-6 leading-tight break-words"
             style={{
               color: '#1E65AD',
               fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -366,29 +367,29 @@ const BlogPost = () => {
           </h1>
 
           {/* Meta Information */}
-          <div className="flex flex-wrap items-center gap-6 mb-6"
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 md:gap-6 mb-3 sm:mb-4 md:mb-6 text-xs sm:text-sm"
             style={{ color: '#8C969F', fontFamily: "'Roboto', sans-serif" }}
           >
-            <div className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              <span className="font-medium">{post.author}</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <User className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+              <span className="font-medium break-words">{post.author}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              <span>{formatDate(post.date)}</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+              <span className="break-words">{formatDate(post.date)}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
               <span>{post.readTime}</span>
             </div>
           </div>
 
           {/* Tags */}
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4 md:mb-6">
             {post.tags.map((tag, index) => (
               <span
                 key={index}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium"
+                className="px-2 sm:px-2.5 md:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium"
                 style={{
                   backgroundColor: 'rgba(30, 101, 173, 0.1)',
                   color: '#1E65AD',
@@ -401,11 +402,11 @@ const BlogPost = () => {
           </div>
 
           {/* Share Buttons */}
-          <div className="flex items-center gap-4 pt-4 border-t"
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-4 pt-3 sm:pt-4 border-t"
             style={{ borderColor: 'rgba(30, 101, 173, 0.1)' }}
           >
             <span
-              className="text-sm font-medium"
+              className="text-xs sm:text-sm font-medium"
               style={{
                 color: '#8C969F',
                 fontFamily: "'Roboto', sans-serif"
@@ -415,40 +416,40 @@ const BlogPost = () => {
             </span>
             <button
               onClick={() => handleShare('facebook')}
-              className="p-2 rounded-lg transition-all duration-200 hover:scale-110"
+              className="p-1.5 sm:p-2 rounded-lg transition-all duration-200 hover:scale-110"
               style={{
                 backgroundColor: 'rgba(30, 101, 173, 0.1)',
                 color: '#1E65AD'
               }}
             >
-              <Facebook className="h-5 w-5" />
+              <Facebook className="h-4 w-4 sm:h-4.5 sm:w-4.5 md:h-5 md:w-5" />
             </button>
             <button
               onClick={() => handleShare('twitter')}
-              className="p-2 rounded-lg transition-all duration-200 hover:scale-110"
+              className="p-1.5 sm:p-2 rounded-lg transition-all duration-200 hover:scale-110"
               style={{
                 backgroundColor: 'rgba(30, 101, 173, 0.1)',
                 color: '#1E65AD'
               }}
             >
-              <Twitter className="h-5 w-5" />
+              <Twitter className="h-4 w-4 sm:h-4.5 sm:w-4.5 md:h-5 md:w-5" />
             </button>
             <button
               onClick={() => handleShare('linkedin')}
-              className="p-2 rounded-lg transition-all duration-200 hover:scale-110"
+              className="p-1.5 sm:p-2 rounded-lg transition-all duration-200 hover:scale-110"
               style={{
                 backgroundColor: 'rgba(30, 101, 173, 0.1)',
                 color: '#1E65AD'
               }}
             >
-              <Linkedin className="h-5 w-5" />
+              <Linkedin className="h-4 w-4 sm:h-4.5 sm:w-4.5 md:h-5 md:w-5" />
             </button>
           </div>
         </header>
 
         {/* Article Content */}
         <div
-          className="prose prose-lg max-w-none bg-white rounded-2xl p-8 md:p-12 shadow-lg"
+          className="prose prose-lg max-w-none bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 lg:p-8 xl:p-12 shadow-lg mx-2 sm:mx-0"
           style={{
             border: '1px solid rgba(30, 101, 173, 0.1)',
             boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
@@ -460,16 +461,16 @@ const BlogPost = () => {
               color: '#4B5563',
               fontFamily: "'Roboto', sans-serif",
               lineHeight: '1.8',
-              fontSize: '18px'
+              fontSize: '14px'
             }}
             className="blog-content"
           />
         </div>
 
         {/* Related Posts Section */}
-        <div className="mt-16">
+        <div className="mt-8 sm:mt-10 md:mt-12 lg:mt-16 px-2 sm:px-0">
           <h2
-            className="text-2xl md:text-3xl font-bold mb-8"
+            className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6 md:mb-8"
             style={{
               color: '#1E65AD',
               fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif"
@@ -477,7 +478,7 @@ const BlogPost = () => {
           >
             Related Posts
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
             {Object.values(blogPosts)
               .filter(p => p.id !== post.id && p.category === post.category)
               .slice(0, 2)
@@ -485,14 +486,14 @@ const BlogPost = () => {
                 <div
                   key={relatedPost.id}
                   onClick={() => navigate(`/blog/${relatedPost.id}`)}
-                  className="bg-white rounded-xl p-6 shadow-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+                  className="bg-white rounded-xl p-4 sm:p-5 md:p-6 shadow-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
                   style={{
                     border: '1px solid rgba(30, 101, 173, 0.1)',
                     boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
                   }}
                 >
                   <h3
-                    className="text-xl font-bold mb-3"
+                    className="text-base sm:text-lg md:text-xl font-bold mb-2 sm:mb-2.5 md:mb-3 break-words"
                     style={{
                       color: '#1E65AD',
                       fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif"
@@ -501,7 +502,7 @@ const BlogPost = () => {
                     {relatedPost.title}
                   </h3>
                   <p
-                    className="text-sm mb-4"
+                    className="text-xs sm:text-sm mb-3 sm:mb-3.5 md:mb-4 break-words"
                     style={{
                       color: '#8C969F',
                       fontFamily: "'Roboto', sans-serif"
@@ -509,10 +510,10 @@ const BlogPost = () => {
                   >
                     {relatedPost.excerpt}
                   </p>
-                  <div className="flex items-center gap-4 text-xs"
+                  <div className="flex items-center gap-3 sm:gap-4 text-xs"
                     style={{ color: '#8C969F', fontFamily: "'Roboto', sans-serif" }}
                   >
-                    <span>{formatDate(relatedPost.date)}</span>
+                    <span className="break-words">{formatDate(relatedPost.date)}</span>
                     <span>•</span>
                     <span>{relatedPost.readTime}</span>
                   </div>
@@ -528,21 +529,70 @@ const BlogPost = () => {
           color: #1E65AD;
           font-family: 'Heebo', 'Helvetica Hebrew Bold', sans-serif;
           font-weight: 700;
-          font-size: 1.875rem;
-          margin-top: 2rem;
-          margin-bottom: 1rem;
+          font-size: 1.25rem;
+          margin-top: 1.5rem;
+          margin-bottom: 0.75rem;
+        }
+        @media (min-width: 640px) {
+          .blog-content h2 {
+            font-size: 1.5rem;
+            margin-top: 1.75rem;
+            margin-bottom: 0.875rem;
+          }
+        }
+        @media (min-width: 768px) {
+          .blog-content h2 {
+            font-size: 1.875rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+          }
         }
         .blog-content p {
-          margin-bottom: 1.5rem;
+          margin-bottom: 1rem;
           line-height: 1.8;
+          font-size: 14px;
+        }
+        @media (min-width: 640px) {
+          .blog-content p {
+            margin-bottom: 1.25rem;
+            font-size: 16px;
+          }
+        }
+        @media (min-width: 768px) {
+          .blog-content p {
+            margin-bottom: 1.5rem;
+            font-size: 18px;
+          }
         }
         .blog-content ul {
-          margin-bottom: 1.5rem;
-          padding-left: 1.5rem;
+          margin-bottom: 1rem;
+          padding-left: 1.25rem;
+        }
+        @media (min-width: 640px) {
+          .blog-content ul {
+            margin-bottom: 1.25rem;
+            padding-left: 1.5rem;
+          }
+        }
+        @media (min-width: 768px) {
+          .blog-content ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+          }
         }
         .blog-content li {
-          margin-bottom: 0.75rem;
+          margin-bottom: 0.5rem;
           line-height: 1.8;
+        }
+        @media (min-width: 640px) {
+          .blog-content li {
+            margin-bottom: 0.625rem;
+          }
+        }
+        @media (min-width: 768px) {
+          .blog-content li {
+            margin-bottom: 0.75rem;
+          }
         }
         .blog-content strong {
           color: #1E65AD;

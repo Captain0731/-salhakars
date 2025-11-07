@@ -97,7 +97,7 @@ const Blog = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="pt-24 pb-16 md:pt-32 md:pb-20 relative z-20 overflow-hidden"
+      <section className="pt-14 sm:pt-16 md:pt-20 lg:pt-24 xl:pt-32 pb-8 sm:pb-12 md:pb-16 lg:pb-20 relative z-20 overflow-hidden"
         style={{
           background: 'linear-gradient(135deg, #F9FAFC 0%, #FFFFFF 100%)'
         }}
@@ -111,9 +111,9 @@ const Blog = () => {
           ></div>
         </div>
         
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-7 relative z-10">
+        <div className="max-w-4xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 text-center pt-4 sm:pt-6 md:pt-7 relative z-10">
           <h1
-            className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight"
+            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 leading-tight"
             style={{
               color: "#1E65AD",
               fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -123,11 +123,11 @@ const Blog = () => {
           >
             Salhakar Blog
           </h1>
-          <div className="w-24 h-1.5 mx-auto rounded-full mb-6"
+          <div className="w-16 sm:w-20 md:w-24 h-1 sm:h-1.5 mx-auto rounded-full mb-3 sm:mb-4 md:mb-6"
             style={{ backgroundColor: '#CF9B63' }}
           ></div>
           <p
-            className="text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed"
+            className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl max-w-3xl mx-auto leading-relaxed px-2"
             style={{
               color: '#8C969F',
               fontFamily: "'Roboto', sans-serif",
@@ -141,18 +141,18 @@ const Blog = () => {
       </section>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+      <div className="max-w-7xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 pb-8 sm:pb-12 md:pb-16 lg:pb-20">
         {/* Search and Filter Section */}
-        <div className="mb-12">
-          <div className="bg-white rounded-2xl p-6 shadow-lg"
+        <div className="mb-6 sm:mb-8 md:mb-10 lg:mb-12">
+          <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-5 lg:p-6 shadow-lg mx-2 sm:mx-0"
             style={{
               border: '1px solid rgba(30, 101, 173, 0.1)',
               boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
             }}
           >
             {/* Search Bar */}
-            <div className="relative mb-6">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5"
+            <div className="relative mb-4 sm:mb-5 md:mb-6">
+              <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5"
                 style={{ color: '#8C969F' }}
               />
               <input
@@ -160,7 +160,7 @@ const Blog = () => {
                 placeholder="Search blog posts..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                className="w-full pl-9 sm:pl-10 md:pl-12 pr-3 sm:pr-4 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl border focus:outline-none focus:ring-2 transition-all text-xs sm:text-sm md:text-base"
                 style={{
                   borderColor: 'rgba(30, 101, 173, 0.2)',
                   fontFamily: "'Roboto', sans-serif",
@@ -178,12 +178,12 @@ const Blog = () => {
             </div>
 
             {/* Category Filters */}
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
               {categories.map((category) => (
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className="px-4 py-2 rounded-lg font-medium transition-all duration-200"
+                  className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-all duration-200 text-xs sm:text-sm md:text-base"
                   style={{
                     backgroundColor: selectedCategory === category ? '#1E65AD' : 'transparent',
                     color: selectedCategory === category ? '#FFFFFF' : '#8C969F',
@@ -212,11 +212,11 @@ const Blog = () => {
         </div>
 
         {/* Blog Posts Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 lg:gap-8">
           {filteredPosts.map((post) => (
             <article
               key={post.id}
-              className="bg-white rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl cursor-pointer"
+              className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl cursor-pointer"
               style={{
                 border: '1px solid rgba(30, 101, 173, 0.1)',
                 boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
@@ -224,7 +224,7 @@ const Blog = () => {
               onClick={() => navigate(`/blog/${post.id}`)}
             >
               {/* Post Image */}
-              <div className="relative h-48 overflow-hidden"
+              <div className="relative h-40 sm:h-44 md:h-48 overflow-hidden"
                 style={{ backgroundColor: '#F9FAFC' }}
               >
                 <img
@@ -236,8 +236,8 @@ const Blog = () => {
                     e.target.parentElement.style.background = 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)';
                   }}
                 />
-                <div className="absolute top-4 left-4">
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold text-white"
+                <div className="absolute top-2 sm:top-3 md:top-4 left-2 sm:left-3 md:left-4">
+                  <span className="px-2 sm:px-2.5 md:px-3 py-0.5 sm:py-1 rounded-full text-xs font-semibold text-white"
                     style={{
                       backgroundColor: '#CF9B63',
                       fontFamily: "'Roboto', sans-serif"
@@ -249,9 +249,9 @@ const Blog = () => {
               </div>
 
               {/* Post Content */}
-              <div className="p-6">
+              <div className="p-3 sm:p-4 md:p-5 lg:p-6">
                 <h3
-                  className="text-xl md:text-2xl font-bold mb-3 leading-tight"
+                  className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold mb-2 sm:mb-2.5 md:mb-3 leading-tight break-words"
                   style={{
                     color: '#1E65AD',
                     fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -261,7 +261,7 @@ const Blog = () => {
                   {post.title}
                 </h3>
                 <p
-                  className="text-sm md:text-base mb-4 leading-relaxed"
+                  className="text-xs sm:text-sm md:text-base mb-3 sm:mb-3.5 md:mb-4 leading-relaxed break-words"
                   style={{
                     color: '#8C969F',
                     fontFamily: "'Roboto', sans-serif",
@@ -272,31 +272,31 @@ const Blog = () => {
                 </p>
 
                 {/* Post Meta */}
-                <div className="flex items-center justify-between text-xs md:text-sm mb-4"
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 text-xs sm:text-sm mb-3 sm:mb-3.5 md:mb-4"
                   style={{ color: '#8C969F', fontFamily: "'Roboto', sans-serif" }}
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
                     <div className="flex items-center gap-1">
-                      <User className="h-4 w-4" />
-                      <span>{post.author}</span>
+                      <User className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="break-words">{post.author}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      <span>{formatDate(post.date)}</span>
+                      <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="break-words">{formatDate(post.date)}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
+                    <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
                     <span>{post.readTime}</span>
                   </div>
                 </div>
 
                 {/* Tags */}
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-3.5 md:mb-4">
                   {post.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="px-2 py-1 rounded text-xs"
+                      className="px-2 py-0.5 sm:py-1 rounded text-xs"
                       style={{
                         backgroundColor: 'rgba(30, 101, 173, 0.1)',
                         color: '#1E65AD',
@@ -310,7 +310,7 @@ const Blog = () => {
 
                 {/* Read More */}
                 <button
-                  className="flex items-center gap-2 font-semibold transition-all duration-200 group"
+                  className="flex items-center gap-1.5 sm:gap-2 font-semibold transition-all duration-200 group text-xs sm:text-sm md:text-base"
                   style={{
                     color: '#1E65AD',
                     fontFamily: "'Roboto', sans-serif"
@@ -323,7 +323,7 @@ const Blog = () => {
                   }}
                 >
                   Read More
-                  <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+                  <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </button>
               </div>
             </article>
@@ -332,9 +332,9 @@ const Blog = () => {
 
         {/* Empty State */}
         {filteredPosts.length === 0 && (
-          <div className="text-center py-20">
+          <div className="text-center py-10 sm:py-12 md:py-16 lg:py-20 px-2">
             <p
-              className="text-xl md:text-2xl font-semibold"
+              className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold break-words"
               style={{
                 color: '#8C969F',
                 fontFamily: "'Roboto', sans-serif"

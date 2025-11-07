@@ -12,11 +12,6 @@ export default function TrackReferrals() {
   const [timeRange, setTimeRange] = useState('all');
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login', { state: { from: { pathname: '/referral/track' } } });
-      return;
-    }
-    
     // Load referrals data from API
     const loadReferralsData = async () => {
       try {
@@ -24,8 +19,14 @@ export default function TrackReferrals() {
         // const response = await apiService.getReferrals();
         // setReferrals(response.data);
         
-        // For now, initialize with empty array
-        setReferrals([]);
+        // For now, initialize with empty array (or load from API if authenticated)
+        if (isAuthenticated && user?.id) {
+          // Load user-specific referrals
+          setReferrals([]);
+        } else {
+          // Show empty for non-authenticated users
+          setReferrals([]);
+        }
       } catch (error) {
         console.error('Error loading referrals data:', error);
         setReferrals([]);
@@ -35,7 +36,7 @@ export default function TrackReferrals() {
     };
 
     loadReferralsData();
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user]);
 
   const getStatusColor = (status) => {
     switch (status) {
