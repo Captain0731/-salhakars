@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
@@ -918,16 +918,20 @@ export default function ViewPDF() {
                                   backgroundColor: '#ffffff',
                                   fontSize: '0.95em'
                                 }} {...props} />,
-                                img: ({node, ...props}) => <img style={{
-                                  maxWidth: '100%',
-                                  height: 'auto',
-                                  borderRadius: '0.625rem',
-                                  margin: '2rem 0',
-                                  boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                                  display: 'block',
-                                  marginLeft: 'auto',
-                                  marginRight: 'auto'
-                                }} {...props} />,
+                                img: ({node, ...props}) => <img 
+                                  alt={props.alt || 'Markdown content image'}
+                                  style={{
+                                    maxWidth: '100%',
+                                    height: 'auto',
+                                    borderRadius: '0.625rem',
+                                    margin: '2rem 0',
+                                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                                    display: 'block',
+                                    marginLeft: 'auto',
+                                    marginRight: 'auto'
+                                  }} 
+                                  {...props} 
+                                />,
                               }}
                             >
                               {markdownContent}
