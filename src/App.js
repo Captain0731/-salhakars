@@ -6,8 +6,13 @@ import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import LegalJudgments from "./pages/LegalJudgments";
+import JudgmentByName from "./pages/JudgmentByName";
 import ViewPDF from "./pages/ViewPDF";
 import MobilePDFViewer from "./pages/MobilePDFViewer";
+import ViewDOCX from "./pages/ViewDOCX";
+import ReactPDFViewerDemo from "./pages/ReactPDFViewerDemo";
+import JudgmentDetails from "./pages/JudgmentDetails";
+import JudgmentSearch from "./pages/JudgmentSearch";
 import BrowseActs from "./pages/BrowseActs";
 import LawLibrary from "./pages/LawLibrary";
 import ActDetails from "./pages/ActDetails";
@@ -47,6 +52,8 @@ function AppLayout() {
     '/signup',
     '/view-pdf',
     '/mobile-pdf',
+    '/view-docx',
+    '/react-pdf-viewer',
     '/act-details',
     '/mapping-details'
   ];
@@ -79,6 +86,8 @@ function AppLayout() {
         {/* Public Routes - No Authentication Required */}
         <Route path="/view-pdf" element={<ViewPDF />} />
         <Route path="/mobile-pdf" element={<MobilePDFViewer />} />
+        <Route path="/view-docx" element={<ViewDOCX />} />
+        <Route path="/react-pdf-viewer" element={<ReactPDFViewerDemo />} />
         <Route path="/law-library" element={<LawLibrary />} />
         <Route path="/browse-acts" element={<BrowseActs />} />
         <Route path="/act-details" element={<ActDetails />} />
@@ -91,6 +100,9 @@ function AppLayout() {
         
         {/* Additional Routes for Navigation */}
         <Route path="/judgment-access" element={<LegalJudgments />} />
+        <Route path="/judgment-by-name" element={<JudgmentByName />} />
+        <Route path="/judgment-details" element={<JudgmentSearch />} />
+        <Route path="/judgment-details/:id" element={<JudgmentDetails />} />
         <Route path="/bookmarks" element={<Bookmarks />} />
         <Route path="/invite-friends" element={<InviteFriends />} />
         <Route path="/earn-rewards" element={<EarnRewards />} />

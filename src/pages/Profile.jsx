@@ -363,75 +363,75 @@ export default function Profile() {
         </div>
 
       <Navbar />
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+      <div className="max-w-5xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 relative z-10">
         {/* Header */}
-        <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden relative hover-lift">
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-100 overflow-hidden relative hover-lift">
           {/* Decorative Elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-transparent to-blue-50 rounded-bl-full"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-transparent to-orange-50 rounded-tr-full"></div>
+          <div className="absolute top-0 right-0 w-16 sm:w-24 md:w-32 h-16 sm:h-24 md:h-32 bg-gradient-to-br from-transparent to-blue-50 rounded-bl-full"></div>
+          <div className="absolute bottom-0 left-0 w-12 sm:w-16 md:w-24 h-12 sm:h-16 md:h-24 bg-gradient-to-tr from-transparent to-orange-50 rounded-tr-full"></div>
           
           {/* Profile Header */}
-          <div className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 px-8 py-12 text-white overflow-hidden">
+          <div className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-12 text-white overflow-hidden">
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-4 left-4 w-8 h-8 border-2 border-white rounded-full"></div>
-              <div className="absolute top-8 right-8 w-6 h-6 border-2 border-white rounded-full"></div>
-              <div className="absolute bottom-8 left-8 w-4 h-4 border-2 border-white rounded-full"></div>
-              <div className="absolute bottom-4 right-4 w-10 h-10 border-2 border-white rounded-full"></div>
+              <div className="absolute top-2 sm:top-4 left-2 sm:left-4 w-4 sm:w-6 md:w-8 h-4 sm:h-6 md:h-8 border-2 border-white rounded-full"></div>
+              <div className="absolute top-4 sm:top-8 right-4 sm:right-8 w-3 sm:w-4 md:w-6 h-3 sm:h-4 md:h-6 border-2 border-white rounded-full"></div>
+              <div className="absolute bottom-4 sm:bottom-8 left-4 sm:left-8 w-2 sm:w-3 md:w-4 h-2 sm:h-3 md:h-4 border-2 border-white rounded-full"></div>
+              <div className="absolute bottom-2 sm:bottom-4 right-2 sm:right-4 w-5 sm:w-7 md:w-10 h-5 sm:h-7 md:h-10 border-2 border-white rounded-full"></div>
             </div>
             
-            <div className="flex flex-col sm:flex-row items-center gap-8 relative z-10">
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 md:gap-8 relative z-10">
               <div className="relative">
-                <div className="w-32 h-32 bg-gradient-to-br from-white/30 to-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-5xl font-bold shadow-2xl border-4 border-white/20 animate-shimmer">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 bg-gradient-to-br from-white/30 to-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-3xl sm:text-4xl md:text-5xl font-bold shadow-2xl border-2 sm:border-4 border-white/20 animate-shimmer">
                   {(user.name || 'U').charAt(0).toUpperCase()}
                 </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-white text-sm">✓</span>
+                <div className="absolute -top-1 sm:-top-2 -right-1 sm:-right-2 w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-white text-xs sm:text-sm">✓</span>
                 </div>
               </div>
-              <div className="flex-1 text-center sm:text-left">
-                <h1 className="text-4xl font-bold mb-3 text-white" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+              <div className="flex-1 text-center sm:text-left w-full sm:w-auto">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 text-white" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   {user.name || 'User'}
                 </h1>
-                <p className="text-blue-100 text-xl mb-3" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                <p className="text-blue-100 text-sm sm:text-base md:text-xl mb-2 sm:mb-3 break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   {user.email || user.phone || 'No contact info'}
                 </p>
                 {user.profession && (
-                  <span className="inline-block px-6 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-full text-sm font-semibold shadow-lg">
+                  <span className="inline-block px-4 sm:px-6 py-1.5 sm:py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-full text-xs sm:text-sm font-semibold shadow-lg">
                     {user.profession}
                   </span>
                 )}
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
                 {!isEditing ? (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="px-8 py-4 bg-gradient-to-r from-white/20 to-white/10 backdrop-blur-sm text-white rounded-2xl font-semibold hover:from-white/30 hover:to-white/20 transition-all duration-300 transform hover:scale-105 shadow-xl border border-white/20"
+                    className="px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-gradient-to-r from-white/20 to-white/10 backdrop-blur-sm text-white rounded-xl sm:rounded-2xl font-semibold hover:from-white/30 hover:to-white/20 transition-all duration-300 transform hover:scale-105 shadow-xl border border-white/20 text-sm sm:text-base w-full sm:w-auto"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   >
-                    <span className="flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                       Edit Profile
                     </span>
                   </button>
                 ) : (
-                  <div className="flex gap-3">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
                       <button
                         onClick={handleSave}
                         disabled={loading}
-                        className="px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 shadow-xl disabled:cursor-not-allowed"
+                        className="px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl sm:rounded-2xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 shadow-xl disabled:cursor-not-allowed text-sm sm:text-base w-full sm:w-auto"
                         style={{ fontFamily: 'Roboto, sans-serif' }}
                       >
-                        <span className="flex items-center gap-2">
+                        <span className="flex items-center justify-center gap-2">
                           {loading ? (
-                            <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
                           ) : (
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
                           )}
@@ -440,11 +440,11 @@ export default function Profile() {
                       </button>
                     <button
                       onClick={handleCancel}
-                      className="px-8 py-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-2xl font-semibold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 transform hover:scale-105 shadow-xl"
+                      className="px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl sm:rounded-2xl font-semibold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 transform hover:scale-105 shadow-xl text-sm sm:text-base w-full sm:w-auto"
                       style={{ fontFamily: 'Roboto, sans-serif' }}
                     >
-                      <span className="flex items-center gap-2">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                         Cancel
@@ -480,30 +480,30 @@ export default function Profile() {
           )}
 
           {/* Profile Details */}
-          <div className="p-8">
-            <div className="space-y-8">
+          <div className="p-4 sm:p-6 md:p-8">
+            <div className="space-y-4 sm:space-y-6 md:space-y-8">
               {/* Basic Information */}
-              <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-8 shadow-lg border border-gray-100 relative overflow-hidden hover-lift">
+              <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-100 relative overflow-hidden hover-lift">
                 {/* Decorative Elements */}
-                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-100 to-transparent rounded-bl-full"></div>
-                <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-orange-100 to-transparent rounded-tr-full"></div>
+                <div className="absolute top-0 right-0 w-12 sm:w-16 md:w-20 h-12 sm:h-16 md:h-20 bg-gradient-to-br from-blue-100 to-transparent rounded-bl-full"></div>
+                <div className="absolute bottom-0 left-0 w-10 sm:w-12 md:w-16 h-10 sm:h-12 md:h-16 bg-gradient-to-tr from-orange-100 to-transparent rounded-tr-full"></div>
                 
                 <div className="relative z-10">
-                  <div className="flex items-center gap-3 mb-8">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6 md:mb-8">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
-                    <h3 className="text-2xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                       Basic Information
                     </h3>
                   </div>
                 
-                  <div className="space-y-6">
+                  <div className="space-y-4 sm:space-y-5 md:space-y-6">
                     <div className="space-y-2">
-                      <label className="block text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <label className="block text-xs sm:text-sm font-semibold mb-2 sm:mb-3 flex items-center gap-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                         Full Name
@@ -514,19 +514,19 @@ export default function Profile() {
                           name="name"
                           value={editData.name}
                           onChange={handleChange}
-                          className="w-full px-5 py-4 border-2 border-gray-200 rounded-2xl focus:ring-2 focus:border-transparent transition-all duration-300 bg-white shadow-sm hover:shadow-md focus:shadow-lg focus:scale-[1.02]"
+                          className="w-full px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 md:py-4 border-2 border-gray-200 rounded-xl sm:rounded-2xl focus:ring-2 focus:border-transparent transition-all duration-300 bg-white shadow-sm hover:shadow-md focus:shadow-lg text-sm sm:text-base"
                           style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
                         />
                       ) : (
-                        <div className="px-5 py-4 bg-white rounded-2xl border-2 border-gray-100 shadow-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                        <div className="px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 md:py-4 bg-white rounded-xl sm:rounded-2xl border-2 border-gray-100 shadow-sm text-sm sm:text-base" style={{ fontFamily: 'Roboto, sans-serif' }}>
                           {user.name || 'Not provided'}
                         </div>
                       )}
                     </div>
 
                     <div className="space-y-2">
-                      <label className="block text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <label className="block text-xs sm:text-sm font-semibold mb-2 sm:mb-3 flex items-center gap-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                         Email ID
@@ -537,39 +537,39 @@ export default function Profile() {
                           name="email"
                           value={editData.email}
                           onChange={handleChange}
-                          className="w-full px-5 py-4 border-2 border-gray-200 rounded-2xl focus:ring-2 focus:border-transparent transition-all duration-300 bg-white shadow-sm hover:shadow-md focus:shadow-lg focus:scale-[1.02]"
+                          className="w-full px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 md:py-4 border-2 border-gray-200 rounded-xl sm:rounded-2xl focus:ring-2 focus:border-transparent transition-all duration-300 bg-white shadow-sm hover:shadow-md focus:shadow-lg text-sm sm:text-base"
                           style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
                         />
                       ) : (
-                        <div className="px-5 py-4 bg-white rounded-2xl border-2 border-gray-100 shadow-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                        <div className="px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 md:py-4 bg-white rounded-xl sm:rounded-2xl border-2 border-gray-100 shadow-sm text-sm sm:text-base break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
                           {user.email || 'Not provided'}
                         </div>
                       )}
                     </div>
 
                     <div className="space-y-2">
-                      <label className="block text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <label className="block text-xs sm:text-sm font-semibold mb-2 sm:mb-3 flex items-center gap-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                         </svg>
                         Phone Number
                       </label>
-                      <div className="px-5 py-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl border-2 border-gray-200 text-gray-600 shadow-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                        {user.phone || 'Not provided'}
-                        <span className="ml-2 text-xs bg-gray-200 px-2 py-1 rounded-full">Cannot be changed</span>
+                      <div className="px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 md:py-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl sm:rounded-2xl border-2 border-gray-200 text-gray-600 shadow-sm text-sm sm:text-base" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                        <span className="break-all">{user.phone || 'Not provided'}</span>
+                        <span className="ml-2 text-xs bg-gray-200 px-2 py-1 rounded-full whitespace-nowrap">Cannot be changed</span>
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="block text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <label className="block text-xs sm:text-sm font-semibold mb-2 sm:mb-3 flex items-center gap-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6" />
                         </svg>
                         Profession
                       </label>
-                      <div className="px-5 py-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl border-2 border-gray-200 text-gray-600 shadow-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      <div className="px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 md:py-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl sm:rounded-2xl border-2 border-gray-200 text-gray-600 shadow-sm text-sm sm:text-base" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         {user.profession || 'Not specified'}
-                        <span className="ml-2 text-xs bg-gray-200 px-2 py-1 rounded-full">Cannot be changed</span>
+                        <span className="ml-2 text-xs bg-gray-200 px-2 py-1 rounded-full whitespace-nowrap">Cannot be changed</span>
                       </div>
                     </div>
                   </div>
@@ -578,27 +578,27 @@ export default function Profile() {
               </div>
 
               {/* Profession-specific Information */}
-              <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-8 shadow-lg border border-gray-100 relative overflow-hidden hover-lift">
+              <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-100 relative overflow-hidden hover-lift">
                 {/* Decorative Elements */}
-                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-orange-100 to-transparent rounded-bl-full"></div>
-                <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-blue-100 to-transparent rounded-tr-full"></div>
+                <div className="absolute top-0 right-0 w-12 sm:w-16 md:w-20 h-12 sm:h-16 md:h-20 bg-gradient-to-br from-orange-100 to-transparent rounded-bl-full"></div>
+                <div className="absolute bottom-0 left-0 w-10 sm:w-12 md:w-16 h-10 sm:h-12 md:h-16 bg-gradient-to-tr from-blue-100 to-transparent rounded-tr-full"></div>
                 
                 <div className="relative z-10">
-                  <div className="flex items-center gap-3 mb-8">
-                    <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6 md:mb-8">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       </svg>
                     </div>
-                    <h3 className="text-2xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                       {user.profession} Details
                     </h3>
                   </div>
 
                 {user.profession === "Student" && (
                   <>
-                    <div>
-                      <label className="block text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="mb-4 sm:mb-6">
+                      <label className="block text-xs sm:text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
                         College
                       </label>
                       {isEditing ? (
@@ -606,7 +606,7 @@ export default function Profile() {
                           name="college"
                           value={editData.college}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white text-sm sm:text-base"
                           style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
                         >
                           <option value="">Select college</option>
@@ -615,15 +615,15 @@ export default function Profile() {
                           ))}
                         </select>
                       ) : (
-                        <p className="px-4 py-3 bg-gray-50 rounded-xl text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                        <p className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-700 text-sm sm:text-base break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
                           {user.college || 'Not provided'}
                         </p>
                       )}
                     </div>
 
                     {user.college === "Other" && (
-                      <div>
-                        <label className="block text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                      <div className="mb-4 sm:mb-6">
+                        <label className="block text-xs sm:text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
                           College Name
                         </label>
                         {isEditing ? (
@@ -632,20 +632,20 @@ export default function Profile() {
                             name="collegeOther"
                             value={editData.collegeOther}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white text-sm sm:text-base"
                             style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
                           />
                         ) : (
-                          <p className="px-4 py-3 bg-gray-50 rounded-xl text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          <p className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-700 text-sm sm:text-base break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
                             {user.collegeOther || 'Not provided'}
                           </p>
                         )}
                       </div>
                     )}
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                       <div>
-                        <label className="block text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                        <label className="block text-xs sm:text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
                           Passing Month
                         </label>
                         {isEditing ? (
@@ -653,7 +653,7 @@ export default function Profile() {
                             name="passingMonth"
                             value={editData.passingMonth}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white text-sm sm:text-base"
                             style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
                           >
                             <option value="">Select month</option>
@@ -662,13 +662,13 @@ export default function Profile() {
                             ))}
                           </select>
                         ) : (
-                          <p className="px-4 py-3 bg-gray-50 rounded-xl text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          <p className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-700 text-sm sm:text-base" style={{ fontFamily: 'Roboto, sans-serif' }}>
                             {user.passingMonth || 'Not provided'}
                           </p>
                         )}
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                        <label className="block text-xs sm:text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
                           Passing Year
                         </label>
                         {isEditing ? (
@@ -676,7 +676,7 @@ export default function Profile() {
                             name="passingYear"
                             value={editData.passingYear}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white text-sm sm:text-base"
                             style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
                           >
                             <option value="">Select year</option>
@@ -685,7 +685,7 @@ export default function Profile() {
                             ))}
                           </select>
                         ) : (
-                          <p className="px-4 py-3 bg-gray-50 rounded-xl text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          <p className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-700 text-sm sm:text-base" style={{ fontFamily: 'Roboto, sans-serif' }}>
                             {user.passingYear || 'Not provided'}
                           </p>
                         )}
@@ -696,8 +696,8 @@ export default function Profile() {
 
                 {user.profession === "Lawyer" && (
                   <>
-                    <div>
-                      <label className="block text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="mb-4 sm:mb-6">
+                      <label className="block text-xs sm:text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
                         Bar Council ID
                       </label>
                       {isEditing ? (
@@ -706,17 +706,17 @@ export default function Profile() {
                           name="barCouncilId"
                           value={editData.barCouncilId}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white text-sm sm:text-base"
                           style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
                         />
                       ) : (
-                        <p className="px-4 py-3 bg-gray-50 rounded-xl text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                        <p className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-700 text-sm sm:text-base break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
                           {user.barCouncilId || 'Not provided'}
                         </p>
                       )}
                     </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="mb-4 sm:mb-6">
+                      <label className="block text-xs sm:text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
                         City
                       </label>
                       {isEditing ? (
@@ -724,7 +724,7 @@ export default function Profile() {
                           name="city"
                           value={editData.city}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white text-sm sm:text-base"
                           style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
                         >
                           <option value="">Select city</option>
@@ -733,14 +733,14 @@ export default function Profile() {
                           ))}
                         </select>
                       ) : (
-                        <p className="px-4 py-3 bg-gray-50 rounded-xl text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                        <p className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-700 text-sm sm:text-base" style={{ fontFamily: 'Roboto, sans-serif' }}>
                           {user.city || 'Not provided'}
                         </p>
                       )}
                     </div>
                     {user.city === "Other" && (
-                      <div>
-                        <label className="block text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                      <div className="mb-4 sm:mb-6">
+                        <label className="block text-xs sm:text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
                           City Name
                         </label>
                         {isEditing ? (
@@ -749,11 +749,11 @@ export default function Profile() {
                             name="cityOther"
                             value={editData.cityOther}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white text-sm sm:text-base"
                             style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
                           />
                         ) : (
-                          <p className="px-4 py-3 bg-gray-50 rounded-xl text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          <p className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-700 text-sm sm:text-base break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
                             {user.cityOther || 'Not provided'}
                           </p>
                         )}
@@ -764,8 +764,8 @@ export default function Profile() {
 
                 {user.profession === "Law Firm" && (
                   <>
-                    <div>
-                      <label className="block text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="mb-4 sm:mb-6">
+                      <label className="block text-xs sm:text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
                         Registration Number
                       </label>
                       {isEditing ? (
@@ -774,17 +774,17 @@ export default function Profile() {
                           name="registrationNo"
                           value={editData.registrationNo}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white text-sm sm:text-base"
                           style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
                         />
                       ) : (
-                        <p className="px-4 py-3 bg-gray-50 rounded-xl text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                        <p className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-700 text-sm sm:text-base break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
                           {user.registrationNo || 'Not provided'}
                         </p>
                       )}
                     </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="mb-4 sm:mb-6">
+                      <label className="block text-xs sm:text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
                         Company Size
                       </label>
                       {isEditing ? (
@@ -792,7 +792,7 @@ export default function Profile() {
                           name="companySize"
                           value={editData.companySize}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white text-sm sm:text-base"
                           style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
                         >
                           <option value="">Select company size</option>
@@ -801,13 +801,13 @@ export default function Profile() {
                           ))}
                         </select>
                       ) : (
-                        <p className="px-4 py-3 bg-gray-50 rounded-xl text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                        <p className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-700 text-sm sm:text-base" style={{ fontFamily: 'Roboto, sans-serif' }}>
                           {user.companySize ? `${user.companySize} employees` : 'Not provided'}
                         </p>
                       )}
                     </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="mb-4 sm:mb-6">
+                      <label className="block text-xs sm:text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
                         City
                       </label>
                       {isEditing ? (
@@ -815,7 +815,7 @@ export default function Profile() {
                           name="city"
                           value={editData.city}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                          className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white text-sm sm:text-base"
                           style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
                         >
                           <option value="">Select city</option>
@@ -824,14 +824,14 @@ export default function Profile() {
                           ))}
                         </select>
                       ) : (
-                        <p className="px-4 py-3 bg-gray-50 rounded-xl text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                        <p className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-700 text-sm sm:text-base" style={{ fontFamily: 'Roboto, sans-serif' }}>
                           {user.city || 'Not provided'}
                         </p>
                       )}
                     </div>
                     {user.city === "Other" && (
-                      <div>
-                        <label className="block text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                      <div className="mb-4 sm:mb-6">
+                        <label className="block text-xs sm:text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
                           City Name
                         </label>
                         {isEditing ? (
@@ -840,11 +840,11 @@ export default function Profile() {
                             name="cityOther"
                             value={editData.cityOther}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white text-sm sm:text-base"
                             style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
                           />
                         ) : (
-                          <p className="px-4 py-3 bg-gray-50 rounded-xl text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          <p className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-700 text-sm sm:text-base break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
                             {user.cityOther || 'Not provided'}
                           </p>
                         )}
@@ -854,8 +854,8 @@ export default function Profile() {
                 )}
 
                 {user.profession === "Other" && (
-                  <div>
-                    <label className="block text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                  <div className="mb-4 sm:mb-6">
+                    <label className="block text-xs sm:text-sm font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
                       Designation
                     </label>
                     {isEditing ? (
@@ -864,11 +864,11 @@ export default function Profile() {
                         name="designation"
                         value={editData.designation}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white text-sm sm:text-base"
                         style={{ fontFamily: 'Roboto, sans-serif', '--tw-ring-color': '#1E65AD' }}
                       />
                     ) : (
-                      <p className="px-4 py-3 bg-gray-50 rounded-xl text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      <p className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 rounded-lg sm:rounded-xl text-gray-700 text-sm sm:text-base break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         {user.designation || 'Not provided'}
                       </p>
                     )}

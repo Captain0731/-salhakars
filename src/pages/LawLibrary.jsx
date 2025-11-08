@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
@@ -53,7 +53,16 @@ if (typeof document !== 'undefined') {
 
 export default function LawLibrary() {
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState("central"); // Default to Central Acts
+  const location = useLocation();
+  
+  // Initialize activeSection from URL search params or default to "central"
+  const getInitialSection = () => {
+    const searchParams = new URLSearchParams(location.search);
+    const section = searchParams.get('section');
+    return (section === 'state' || section === 'central') ? section : 'central';
+  };
+  
+  const [activeSection, setActiveSection] = useState(getInitialSection);
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   // Initialize filters based on active section
@@ -78,13 +87,15 @@ export default function LawLibrary() {
     }
   };
 
-  const [filters, setFilters] = useState(getInitialFilters("central"));
+  const [filters, setFilters] = useState(getInitialFilters(getInitialSection()));
   const [acts, setActs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState(null);
   const [totalCount, setTotalCount] = useState(0);
+  const [enableHighlights, setEnableHighlights] = useState(false);
+  const [searchInfo, setSearchInfo] = useState(null);
   
   const filtersRef = useRef(filters);
   useEffect(() => {
@@ -137,13 +148,18 @@ export default function LawLibrary() {
         offset: currentOffset
       };
 
-      // Add filter parameters - search/short_title
-      if (activeFilters.search && typeof activeFilters.search === 'string' && activeFilters.search.trim()) {
-        params.short_title = activeFilters.search.trim();
-      }
-      
       // Central Acts specific filters
       if (activeSection === "central") {
+        // For Central Acts: Use 'search' parameter for Elasticsearch full-text search
+        // This searches PDF content, not just metadata
+        if (activeFilters.search && typeof activeFilters.search === 'string' && activeFilters.search.trim()) {
+          params.search = activeFilters.search.trim();
+          // Add highlight parameter if enabled
+          if (enableHighlights) {
+            params.highlight = true;
+          }
+        }
+        
         if (activeFilters.act_id && typeof activeFilters.act_id === 'string' && activeFilters.act_id.trim()) {
           params.act_id = activeFilters.act_id.trim();
         }
@@ -151,6 +167,11 @@ export default function LawLibrary() {
           params.ministry = activeFilters.ministry.trim();
         }
       } else {
+        // State Acts: Use short_title for traditional search
+        if (activeFilters.search && typeof activeFilters.search === 'string' && activeFilters.search.trim()) {
+          params.short_title = activeFilters.search.trim();
+        }
+        
         // State Acts specific filters
         if (activeFilters.act_number && typeof activeFilters.act_number === 'string' && activeFilters.act_number.trim()) {
           params.act_number = activeFilters.act_number.trim();
@@ -187,11 +208,20 @@ export default function LawLibrary() {
         setActs([]);
         setError("No data received from the server");
         setPagination(null);
+        setSearchInfo(null);
         return;
       }
 
-      // Sort by year descending (newest first)
-      if (data.data && data.data.length > 0) {
+      // Store search info if available (from Elasticsearch)
+      if (data.search_info) {
+        setSearchInfo(data.search_info);
+      } else {
+        setSearchInfo(null);
+      }
+
+      // For Elasticsearch results, don't sort by year (they're already sorted by relevance)
+      // Only sort by year if not using Elasticsearch
+      if (data.data && data.data.length > 0 && !data.search_info) {
         data.data = data.data.sort((a, b) => {
           const yearA = parseInt(a.year) || 0;
           const yearB = parseInt(b.year) || 0;
@@ -241,12 +271,25 @@ export default function LawLibrary() {
     setActs([]);
     setPagination(null);
     setError(null);
+    setSearchInfo(null);
     // Reset offset when applying new filters
     const currentFilters = filtersRef.current;
     setTimeout(() => {
       fetchActs(false, currentFilters);
     }, 100);
   };
+  
+  // Re-fetch when highlight toggle changes (only if search is active)
+  useEffect(() => {
+    if (activeSection === "central" && filters.search && filters.search.trim()) {
+      const timeoutId = setTimeout(() => {
+        applyFilters();
+      }, 300); // Small debounce
+      
+      return () => clearTimeout(timeoutId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enableHighlights]);
   
   // Auto-apply filters when they change (with debounce) - but only for non-search filters
   useEffect(() => {
@@ -275,6 +318,7 @@ export default function LawLibrary() {
     setActs([]);
     setPagination(null);
     setError(null);
+    setSearchInfo(null);
     setTimeout(() => {
       fetchActs(false, emptyFilters);
     }, 100);
@@ -330,6 +374,16 @@ export default function LawLibrary() {
   const types = ["Central Act", "State Act", "Constitutional Document", "Ordinance", "Rule", "Regulation"];
   const years = Array.from({ length: 225 }, (_, i) => new Date().getFullYear() - i);
 
+  // Initial load - ensure URL has section parameter
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (!searchParams.get('section')) {
+      // If no section in URL, add it based on current activeSection
+      navigate(`${location.pathname}?section=${activeSection}`, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run on mount
+
   // Initial load
   useEffect(() => {
     if (!loading && acts.length === 0 && !isSearching) {
@@ -338,11 +392,25 @@ export default function LawLibrary() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run on mount
 
+  // Sync activeSection with URL on mount and when URL changes
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const sectionFromUrl = searchParams.get('section');
+    const newSection = (sectionFromUrl === 'state' || sectionFromUrl === 'central') ? sectionFromUrl : 'central';
+    
+    if (newSection !== activeSection) {
+      setActiveSection(newSection);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search]);
+
   // Reload data when section changes
   useEffect(() => {
     setActs([]);
     setPagination(null);
     setError(null);
+    setSearchInfo(null);
+    setEnableHighlights(false); // Reset highlight toggle when section changes
     const emptyFilters = getInitialFilters(activeSection);
     setFilters(emptyFilters);
     setSearchQuery('');
@@ -411,7 +479,11 @@ export default function LawLibrary() {
                 />
                 
                 <motion.button
-                  onClick={() => setActiveSection('central')}
+                  onClick={() => {
+                    setActiveSection('central');
+                    // Update URL without page reload
+                    navigate(`${location.pathname}?section=central`, { replace: true });
+                  }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 flex-1 sm:flex-none sm:min-w-[140px] md:min-w-[180px] text-xs sm:text-sm ${
@@ -426,7 +498,11 @@ export default function LawLibrary() {
                   Central Acts
                 </motion.button>
                 <motion.button
-                  onClick={() => setActiveSection('state')}
+                  onClick={() => {
+                    setActiveSection('state');
+                    // Update URL without page reload
+                    navigate(`${location.pathname}?section=state`, { replace: true });
+                  }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-300 relative z-10 flex-1 sm:flex-none sm:min-w-[140px] md:min-w-[180px] text-xs sm:text-sm ${
@@ -478,13 +554,20 @@ export default function LawLibrary() {
             <div className="mb-4 sm:mb-6">
               <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                 Search {sectionLabel}
+                {activeSection === "central" && (
+                  <span className="ml-2 text-xs text-blue-600 font-normal">
+                    (Full-text search in PDF content)
+                  </span>
+                )}
               </label>
               <div className="relative">
                 <input
                   type="text"
                   value={filters.search}
                   onChange={(e) => handleFilterChange('search', e.target.value)}
-                  placeholder={`Search ${sectionLabel.toLowerCase()}...`}
+                  placeholder={activeSection === "central" 
+                    ? "Search in PDF content (e.g., 'Section 302', 'murder', 'penalty')..." 
+                    : `Search ${sectionLabel.toLowerCase()}...`}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !loading) {
                       e.preventDefault();
@@ -513,6 +596,23 @@ export default function LawLibrary() {
                   </svg>
                 </button>
               </div>
+              
+              {/* Highlight Toggle - Only for Central Acts */}
+              {activeSection === "central" && filters.search && filters.search.trim() && (
+                <div className="mt-3 flex items-center">
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={enableHighlights}
+                      onChange={(e) => setEnableHighlights(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="ml-2 text-xs sm:text-sm text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      Show search highlights in results
+                    </span>
+                  </label>
+                </div>
+              )}
             </div>
 
             {/* Dynamic Filters - Hidden by default, shown when showFilters is true */}
@@ -800,7 +900,12 @@ export default function LawLibrary() {
                     : `Latest ${sectionLabel}`}
                 </h2>
                 <p className="text-xs sm:text-sm text-gray-600 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                  {Object.values(filters).some(val => {
+                  {searchInfo ? (
+                    <>
+                      Found {searchInfo.total_matches} {searchInfo.total_matches === 1 ? 'match' : 'matches'} using {searchInfo.search_engine}
+                      {searchInfo.took_ms && ` (${searchInfo.took_ms}ms)`}
+                    </>
+                  ) : Object.values(filters).some(val => {
                     if (!val) return false;
                     if (typeof val === 'string') return val.trim() !== '';
                     if (typeof val === 'number') return val !== 0;
@@ -937,13 +1042,25 @@ export default function LawLibrary() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start gap-2 sm:gap-3 mb-2 sm:mb-3">
                             <h3 className="text-base sm:text-lg md:text-xl font-semibold flex-1 group-hover:text-blue-700 transition-colors break-words" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                              {act.short_title || act.long_title || 'Untitled Act'}
+                              {/* Display highlighted title if available */}
+                              {act.highlights && act.highlights.short_title ? (
+                                <span dangerouslySetInnerHTML={{ __html: act.highlights.short_title[0] }} />
+                              ) : (
+                                act.short_title || act.long_title || 'Untitled Act'
+                              )}
                             </h3>
-                            {index === 0 && !loading && (
-                              <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium flex-shrink-0">
-                                Latest
-                              </span>
-                            )}
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              {act.relevance_score && (
+                                <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium" title={`Relevance Score: ${act.relevance_score.toFixed(2)}`}>
+                                  Score: {act.relevance_score.toFixed(1)}
+                                </span>
+                              )}
+                              {index === 0 && !loading && !searchInfo && (
+                                <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                                  Latest
+                                </span>
+                              )}
+                            </div>
                           </div>
                           
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 md:gap-4 text-xs sm:text-sm mb-2 sm:mb-3">
@@ -989,6 +1106,21 @@ export default function LawLibrary() {
                             <div className="mb-3">
                               <span className="font-medium text-gray-800 text-sm">Description:</span>
                               <p className="mt-1 text-sm" style={{ color: '#8C969F' }}>{act.long_title}</p>
+                            </div>
+                          )}
+                          
+                          {/* Display search highlights if available */}
+                          {act.highlights && act.highlights.content && act.highlights.content.length > 0 && (
+                            <div className="mb-3 mt-3 p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+                              <span className="font-medium text-gray-800 text-sm block mb-2">Search Matches:</span>
+                              {act.highlights.content.map((fragment, idx) => (
+                                <p 
+                                  key={idx} 
+                                  className="text-sm mb-2 last:mb-0" 
+                                  style={{ color: '#8C969F' }}
+                                  dangerouslySetInnerHTML={{ __html: fragment }}
+                                />
+                              ))}
                             </div>
                           )}
                         </div>

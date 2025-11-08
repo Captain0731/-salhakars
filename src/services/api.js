@@ -1670,6 +1670,26 @@ class ApiService {
     return await response.text(); // Return HTML as text
   }
 
+  async getJudgementByIdMarkdown(judgementId) {
+    const token = localStorage.getItem('access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
+    const headers = {
+      'Accept': 'text/markdown',
+      'ngrok-skip-browser-warning': 'true',
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    };
+    
+    const response = await fetch(`${this.baseURL}/api/judgements/${judgementId}?format=markdown`, {
+      method: 'GET',
+      headers: headers
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch judgment Markdown: ${response.statusText}`);
+    }
+    
+    return await response.text(); // Return Markdown as text
+  }
+
   // Bookmark an act (central or state)
   async bookmarkAct(actType, actId) {
     // Ensure actId is numeric - backend requires numeric ID

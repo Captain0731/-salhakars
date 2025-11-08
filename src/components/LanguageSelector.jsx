@@ -26,18 +26,18 @@ const LanguageSelector = () => {
   const measureRef = useRef(null);
 
   const languages = [
-    { code: 'en', langCode: 'EN', country: 'US', name: 'English', flag: '🇺🇸', display: 'English' },
-    { code: 'gu', langCode: 'GU', country: 'IN', name: 'ગુજરાતી', flag: '🇮🇳', display: 'IN' },
-    { code: 'hi', langCode: 'HI', country: 'IN', name: 'हिन्दी', flag: '🇮🇳', display: 'IN' },
-    { code: 'as', langCode: 'AS', country: 'IN', name: 'অসমীয়া', flag: '🇮🇳', display: 'IN' },
-    { code: 'bn', langCode: 'BN', country: 'BD', name: 'বাংলা', flag: '🇧🇩', display: 'BD' },  
-    { code: 'kn', langCode: 'KN', country: 'IN', name: 'ಕನ್ನಡ', flag: '🇮🇳', display: 'IN' },
-    { code: 'ml', langCode: 'ML', country: 'IN', name: 'മലയാളം', flag: '🇮🇳', display: 'IN' },
-    { code: 'mr', langCode: 'MR', country: 'IN', name: 'मराठी', flag: '🇮🇳', display: 'IN' },
-    { code: 'or', langCode: 'OR', country: 'IN', name: 'ଓଡ଼ିଆ', flag: '🇮🇳', display: 'IN' },
-    { code: 'pa', langCode: 'PA', country: 'IN', name: 'ਪੰਜਾਬੀ', flag: '🇮🇳', display: 'IN' },
-    { code: 'ta', langCode: 'TA', country: 'IN', name: 'தமிழ்', flag: '🇮🇳', display: 'IN' },
-    { code: 'te', langCode: 'TE', country: 'IN', name: 'తెలుగు', flag: '🇮🇳', display: 'IN' },
+    { code: 'en', langCode: 'English', country: 'US', name: 'English', flag: '🇺🇸', display: 'English' },
+    { code: 'gu', langCode: 'Gujrati', country: 'IN', name: 'ગુજરાતી', flag: '🇮🇳', display: 'IN' },
+    { code: 'hi', langCode: 'Hindi', country: 'IN', name: 'हिन्दी', flag: '🇮🇳', display: 'IN' },
+    { code: 'as', langCode: 'Assamese', country: 'IN', name: 'অসমীয়া', flag: '🇮🇳', display: 'IN' },
+    { code: 'bn', langCode: 'Bengali', country: 'BD', name: 'বাংলা', flag: '🇧🇩', display: 'BD' },  
+    { code: 'kn', langCode: 'Kannada', country: 'IN', name: 'ಕನ್ನಡ', flag: '🇮🇳', display: 'IN' },
+    { code: 'ml', langCode: 'Malayalam', country: 'IN', name: 'മലയാളം', flag: '🇮🇳', display: 'IN' },
+    { code: 'mr', langCode: 'Marathi', country: 'IN', name: 'मराठी', flag: '🇮🇳', display: 'IN' },
+    { code: 'or', langCode: 'Odia', country: 'IN', name: 'ଓଡ଼ିଆ', flag: '🇮🇳', display: 'IN' },
+    { code: 'pa', langCode: 'Punjabi', country: 'IN', name: 'ਪੰਜਾਬੀ', flag: '🇮🇳', display: 'IN' },
+    { code: 'ta', langCode: 'Tamil', country: 'IN', name: 'தமிழ்', flag: '🇮🇳', display: 'IN' },
+    { code: 'te', langCode: 'Telugu', country: 'IN', name: 'తెలుగు', flag: '🇮🇳', display: 'IN' },
   ];
 
   // Get current language from cookie
@@ -176,17 +176,24 @@ const LanguageSelector = () => {
       <style>{`
         .gradient-border-wrapper {
           position: relative;
-          border-radius: 12px;
-          padding: 3px;
+          border-radius: 8px;
+          padding: 2px;
           display: inline-block;
           width: 100%;
+        }
+        
+        @media (min-width: 640px) {
+          .gradient-border-wrapper {
+            border-radius: 12px;
+            padding: 3px;
+          }
         }
         
         .gradient-border-wrapper::before {
           content: '';
           position: absolute;
-          inset: -3px;
-          border-radius: 15px;
+          inset: -2px;
+          border-radius: 10px;
           background: conic-gradient(
             from 0deg,
             #ff6b9d,
@@ -200,22 +207,41 @@ const LanguageSelector = () => {
           z-index: -2;
         }
         
+        @media (min-width: 640px) {
+          .gradient-border-wrapper::before {
+            inset: -3px;
+            border-radius: 15px;
+          }
+        }
+        
         .gradient-border-wrapper::after {
           content: '';
           position: absolute;
           inset: 0;
-          border-radius: 12px;
+          border-radius: 8px;
           background: white;
           z-index: -1;
         }
         
+        @media (min-width: 640px) {
+          .gradient-border-wrapper::after {
+            border-radius: 12px;
+          }
+        }
+        
         .gradient-border-inner {
           background: transparent;
-          border-radius: 9px;
+          border-radius: 6px;
           width: 100%;
           height: 100%;
           position: relative;
           z-index: 1;
+        }
+        
+        @media (min-width: 640px) {
+          .gradient-border-inner {
+            border-radius: 9px;
+          }
         }
         
         .language-carousel {
@@ -236,12 +262,11 @@ const LanguageSelector = () => {
                 setShowTooltip(false);
                 setIsHovered(false);
               }}
-              className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full relative z-10 group"
+              className="flex items-center justify-between gap-1 sm:gap-2 px-1.5 sm:px-3 py-1 sm:py-2 rounded-md sm:rounded-lg transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full relative z-10 group min-h-[32px] sm:min-h-[38px]"
               style={{ 
                 color: '#1E65AD',
                 fontFamily: 'Roboto, sans-serif',
                 background: 'white',
-                minHeight: '38px',
                 cursor: 'pointer',
               }}
               aria-label={`Current language: ${currentLanguage.name}. Click to change language.`}
@@ -249,10 +274,10 @@ const LanguageSelector = () => {
               aria-haspopup="listbox"
               title="Select your language"
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2">
                 {/* Globe Icon */}
                 <svg 
-                  className="w-4 h-4 flex-shrink-0 transition-colors duration-500"
+                  className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 transition-colors duration-500"
                   style={{ color: '#1E65AD' }}
                   fill="none" 
                   stroke="currentColor" 
@@ -263,7 +288,7 @@ const LanguageSelector = () => {
                 </svg>
                 
                 {/* Auto-scrolling language display */}
-                <div className="h-5 sm:h-6 w-auto min-w-[60px] overflow-hidden relative language-carousel select-none">
+                <div className="h-4 sm:h-5 md:h-6 w-auto min-w-[45px] sm:min-w-[60px] overflow-hidden relative language-carousel select-none">
                   {/* ticker content */}
                   <div
                     className="will-change-transform"
@@ -278,12 +303,12 @@ const LanguageSelector = () => {
                       <div
                         key={`${language.code}-${index}`}
                         ref={index === 0 ? measureRef : null}
-                        className="h-5 sm:h-6 flex items-center gap-1.5"
+                        className="h-4 sm:h-5 md:h-6 flex items-center gap-1 sm:gap-1.5"
                       >
-                        <span className="text-xs font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                        <span className="text-[10px] sm:text-xs font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                           {language.langCode}
                         </span>
-                        <span className="text-xs font-medium" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                        <span className="text-[10px] sm:text-xs font-medium hidden sm:inline" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
                           {language.name}
                         </span>
                       </div>
@@ -294,7 +319,7 @@ const LanguageSelector = () => {
               
               {/* Chevron Icon */}
               <svg 
-                className={`w-3.5 h-3.5 transition-all duration-300 flex-shrink-0 ${isOpen ? 'rotate-180' : ''} ${isHovered ? 'translate-y-0.5' : ''}`}
+                className={`w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 transition-all duration-300 flex-shrink-0 ${isOpen ? 'rotate-180' : ''} ${isHovered ? 'translate-y-0.5' : ''}`}
                 style={{ color: '#1E65AD' }}
                 fill="none" 
                 stroke="currentColor" 

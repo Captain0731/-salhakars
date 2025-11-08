@@ -1,18 +1,16 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
+import ReactMarkdown from "react-markdown";
 import Navbar from "../components/landing/Navbar";
-import PDFTranslator from "../components/PDFTranslator";
 import BookmarkButton from "../components/BookmarkButton";
+import apiService from "../services/api";
 import { FileText, StickyNote, Share2 } from "lucide-react";
 
 export default function ViewPDF() {
   const navigate = useNavigate();
   const location = useLocation();
   const [pdfUrl, setPdfUrl] = useState("");
-  const [translatedPdfUrl, setTranslatedPdfUrl] = useState("");
-  const [isTranslating, setIsTranslating] = useState(false);
-  const [translationError, setTranslationError] = useState(false);
-  const [translationTimeout, setTranslationTimeout] = useState(null);
   const [judgmentInfo, setJudgmentInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -33,6 +31,37 @@ export default function ViewPDF() {
   const [isResizing, setIsResizing] = useState(false);
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const [isMobile, setIsMobile] = useState(false);
+  const [showMarkdown, setShowMarkdown] = useState(false);
+  const [markdownContent, setMarkdownContent] = useState("");
+  const [loadingMarkdown, setLoadingMarkdown] = useState(false);
+  const [markdownError, setMarkdownError] = useState("");
+
+  // Get current language from cookie (Google Translate)
+  const getCurrentLanguage = () => {
+    if (typeof window === 'undefined') return 'en';
+    
+    const cookie = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('googtrans='));
+    
+    if (cookie) {
+      const value = cookie.split('=')[1];
+      // Extract language code from /en/xx format
+      if (value && value.startsWith('/en/')) {
+        return value.replace('/en/', '').toLowerCase();
+      }
+    }
+    return 'en';
+  };
+
+  // Check if translation is active and set default view
+  useEffect(() => {
+    const currentLang = getCurrentLanguage();
+    // If a non-English language is selected, default to Translated (Markdown) view
+    if (currentLang !== 'en') {
+      setShowMarkdown(true);
+    }
+  }, []); // Run only once on mount
 
   // Detect mobile view
   useEffect(() => {
@@ -66,7 +95,6 @@ export default function ViewPDF() {
       }
       
       setPdfUrl(originalPdfUrl);
-      setTranslatedPdfUrl(originalPdfUrl); // Initialize with original URL
       setTotalPages(25); // Default page count, could be enhanced with API data
       setLoading(false);
     } else if (actData) {
@@ -74,7 +102,6 @@ export default function ViewPDF() {
       setJudgmentInfo(actData);
       const actPdfUrl = actData.pdf_link || actData.pdf_url || "";
       setPdfUrl(actPdfUrl);
-      setTranslatedPdfUrl(actPdfUrl);
       setLoading(false);
     } else {
       // No data provided, redirect back to appropriate page
@@ -110,46 +137,31 @@ export default function ViewPDF() {
     }
   }, [judgmentInfo?.id, judgmentInfo?.act_id]);
 
-  // Stable callback for PDF translation changes
-  const handleTranslatedUrlChange = useCallback((url) => {
-    setTranslatedPdfUrl(url);
-    const isTranslated = url !== pdfUrl && url.includes('translate.google.com');
-    setIsTranslating(isTranslated);
-    setTranslationError(false);
-    
-    // Set timeout for translation
-    if (isTranslated) {
-      // Clear existing timeout
-      if (translationTimeout) {
-        clearTimeout(translationTimeout);
-      }
-      
-      // Set new timeout - fallback to original after 2 seconds
-      const timeout = setTimeout(() => {
-        console.log('PDF translation timeout, falling back to original');
-        setTranslatedPdfUrl(pdfUrl);
-        setIsTranslating(false);
-        setTranslationError(true);
-      }, 2000);
-      
-      setTranslationTimeout(timeout);
-    } else {
-      // Clear timeout for original PDF
-      if (translationTimeout) {
-        clearTimeout(translationTimeout);
-        setTranslationTimeout(null);
-      }
-    }
-  }, [pdfUrl, translationTimeout]);
-
-  // Cleanup timeout on unmount
+  // Fetch markdown content when markdown view is selected
   useEffect(() => {
-    return () => {
-      if (translationTimeout) {
-        clearTimeout(translationTimeout);
-      }
-    };
-  }, [translationTimeout]);
+    if (showMarkdown && judgmentInfo && !markdownContent && !loadingMarkdown) {
+      const fetchMarkdown = async () => {
+        setLoadingMarkdown(true);
+        setMarkdownError("");
+        try {
+          const judgmentId = judgmentInfo.id || judgmentInfo.act_id;
+          if (judgmentId) {
+            const markdown = await apiService.getJudgementByIdMarkdown(judgmentId);
+            setMarkdownContent(markdown);
+          } else {
+            setMarkdownError("No judgment ID available");
+          }
+        } catch (error) {
+          console.error("Error fetching markdown:", error);
+          setMarkdownError(error.message || "Failed to load Transalted content");
+        } finally {
+          setLoadingMarkdown(false);
+        }
+      };
+      
+      fetchMarkdown();
+    }
+  }, [showMarkdown, judgmentInfo, markdownContent, loadingMarkdown]);
 
   // Handle window resize to keep popup within bounds
   useEffect(() => {
@@ -216,19 +228,13 @@ export default function ViewPDF() {
       <Navbar />
       <div className="pt-16 sm:pt-20">
       
-      {/* PDF Translator Component - Handles PDF translation */}
-      <PDFTranslator 
-        pdfUrl={pdfUrl} 
-        onTranslatedUrlChange={handleTranslatedUrlChange}
-      />
-
       {/* Responsive Layout: Stacked on mobile, side-by-side on desktop */}
-      <div className="flex-1 p-2 sm:p-3 md:p-4 lg:p-6" style={{ minHeight: 'calc(100vh - 80px)' }}>
+      <div className="flex-1 p-2 sm:p-3 md:p-4 lg:p-6" style={{ height: 'calc(100vh - 80px)', overflow: 'hidden' }}>
         <div className="max-w-7xl mx-auto h-full">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4 lg:gap-6 h-full">
-            {/* Details - Left Side */}
-            <div className="lg:col-span-1 order-1 lg:order-1 pt-3">
-              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-2 sm:p-2 md:p-6 h-auto lg:h-full max-h-[10S0vh] sm:max-h-[60vh] md:max-h-96 lg:max-h-none overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4 lg:gap-6 h-full" style={{ height: '100%' }}>
+            {/* Details - Left Side - Static */}
+            <div className="lg:col-span-1 order-1 lg:order-1 pt-3" style={{ height: '100%', overflow: 'hidden' }}>
+              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-2 sm:p-2 md:p-6 h-full overflow-y-auto" style={{ height: '100%', position: 'sticky', top: 0 }}>
                 <div className="mb-3 sm:mb-4 md:mb-6">
                   <div className="flex flex-col grid grid-cols-2  sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-2 sm:mb-3">
                     <h3 className="text-base sm:text-lg md:text-xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
@@ -431,7 +437,7 @@ export default function ViewPDF() {
                         onClick={() => {
                           navigate('/mobile-pdf', {
                             state: {
-                              pdfUrl: translatedPdfUrl || pdfUrl,
+                              pdfUrl: pdfUrl,
                               judgment: judgmentInfo,
                               act: location.state?.act ? judgmentInfo : null
                             }
@@ -461,11 +467,11 @@ export default function ViewPDF() {
               </div>
             </div>
 
-            {/* PDF Viewer - Right Side */}
-            <div className="lg:col-span-2 order-2 lg:order-2 hidden lg:block">
+            {/* PDF Viewer - Right Side - Scrollable */}
+            <div className="lg:col-span-2 order-2 lg:order-2 hidden lg:block" style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               {/* Desktop View: Show PDF Viewer */}
               {!isMobile && (
-              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 overflow-hidden h-[calc(100vh-280px)] sm:h-[calc(100vh-320px)] md:h-[500px] lg:h-full min-h-[400px] sm:min-h-[450px] md:min-h-[500px] flex flex-col">
+              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 overflow-hidden h-full flex flex-col" style={{ height: '100%' }}>
                 {/* PDF Toolbar - Search, Summary, Notes */}
                 <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 md:gap-3 p-2 sm:p-2.5 md:p-3 border-b border-gray-200 bg-gray-50 flex-shrink-0">
                   {/* Search Bar */}
@@ -551,44 +557,419 @@ export default function ViewPDF() {
                     <StickyNote className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     <span className="hidden sm:inline">Notes</span>
                   </button>
+                    
+                    {/* PDF/Markdown Toggle Button */}
+                    <div className="relative inline-flex items-center bg-gray-100 rounded-xl p-1 shadow-inner">
+                      {/* Sliding background indicator */}
+                      <motion.div
+                        className="absolute top-1 bottom-1 rounded-lg z-0"
+                        initial={false}
+                        animate={{
+                          left: !showMarkdown ? '4px' : 'calc(50% + 2px)',
+                          backgroundColor: !showMarkdown ? '#1E65AD' : '#CF9B63',
+                        }}
+                        transition={{ 
+                          type: "spring", 
+                          stiffness: 300, 
+                          damping: 30 
+                        }}
+                        style={{
+                          width: 'calc(50% - 4px)',
+                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                        }}
+                      />
+                      
+                      <motion.button
+                        onClick={() => setShowMarkdown(false)}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className={`px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 rounded-lg font-semibold transition-all duration-300 relative z-10 min-w-[100px] sm:min-w-[120px] text-xs sm:text-sm ${
+                          !showMarkdown
+                            ? 'text-white'
+                            : 'text-gray-600 hover:text-gray-800'
+                        }`}
+                        style={{
+                          fontFamily: 'Roboto, sans-serif',
+                        }}
+                      >
+                        Original
+                      </motion.button>
+                      <motion.button
+                        onClick={() => setShowMarkdown(true)}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className={`px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 rounded-lg font-semibold transition-all duration-300 relative z-10 min-w-[100px] sm:min-w-[120px] text-xs sm:text-sm ${
+                          showMarkdown
+                            ? 'text-white'
+                            : 'text-gray-600 hover:text-gray-800'
+                        }`}
+                        style={{
+                          fontFamily: 'Roboto, sans-serif',
+                        }}
+                      >
+                        Translated
+                      </motion.button>
+                    </div>
                   </div>
                 </div>
                 
-                {/* PDF Content */}
-                <div className="flex-1 overflow-hidden relative" style={{ minHeight: 0 }}>
-                {pdfUrl && pdfUrl.trim() !== "" ? (
-                  <div className="relative h-full w-full" style={{ minHeight: '350px', display: 'flex', flexDirection: 'column' }}>
-                    {/* Desktop View: Show PDF in iframe */}
-                    <>
-                      {/* PDF Embed - Try iframe first, fallback to button */}
-                      <div className="w-full h-full flex-1" style={{ minHeight: 0, position: 'relative' }}>
-                        <iframe
-                          src={`${translatedPdfUrl || pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&page=${currentPage}&zoom=page-fit&view=FitH`}
-                          className="absolute inset-0 w-full h-full border-0 rounded-lg"
-                          title={location.state?.act ? 'Act PDF' : 'Judgment PDF'}
-                          style={{ 
-                            width: '100%', 
-                            height: '100%',
-                            display: 'block'
-                          }}
-                          allow="fullscreen"
-                          scrolling="auto"
-                          onLoad={() => {
-                            setLoading(false);
-                            setIsTranslating(false);
-                            setTranslationError(false);
-                          }}
-                          onError={() => {
-                            // If iframe fails, show the button fallback
-                            setError("PDF cannot be embedded due to security restrictions");
-                            setIsTranslating(false);
-                            setTranslationError(true);
-                          }}
-                        />
+                {/* PDF/Markdown Content */}
+                <div className="flex-1 overflow-hidden relative" style={{ minHeight: 0, height: '100%' }}>
+                  {showMarkdown ? (
+                    /* Markdown View */
+                    <div 
+                      className="w-full h-full bg-white rounded-lg"
+                      style={{
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <style>
+                        {`
+                          .markdown-scroll-container::-webkit-scrollbar {
+                            width: 12px;
+                          }
+                          .markdown-scroll-container::-webkit-scrollbar-track {
+                            background: #f4f4f4;
+                            border-radius: 6px;
+                          }
+                          .markdown-scroll-container::-webkit-scrollbar-thumb {
+                            background: #CF9B63;
+                            border-radius: 6px;
+                          }
+                          .markdown-scroll-container::-webkit-scrollbar-thumb:hover {
+                            background: #b88a56;
+                          }
+                          .markdown-content {
+                            text-rendering: optimizeLegibility;
+                            -webkit-font-smoothing: antialiased;
+                            -moz-osx-font-smoothing: grayscale;
+                            font-feature-settings: "kern" 1;
+                            text-size-adjust: 100%;
+                          }
+                          .markdown-content h1:first-child,
+                          .markdown-content h2:first-child,
+                          .markdown-content h3:first-child,
+                          .markdown-content h4:first-child,
+                          .markdown-content h5:first-child,
+                          .markdown-content h6:first-child {
+                            margin-top: 0;
+                          }
+                          .markdown-content p:last-child,
+                          .markdown-content ul:last-child,
+                          .markdown-content ol:last-child,
+                          .markdown-content blockquote:last-child {
+                            margin-bottom: 0;
+                          }
+                          .markdown-content img {
+                            max-width: 100%;
+                            height: auto;
+                            border-radius: 0.625rem;
+                            margin: 2rem auto;
+                            display: block;
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                          }
+                          .markdown-content table {
+                            border-radius: 0.5rem;
+                            overflow: hidden;
+                          }
+                          .markdown-content tr:nth-child(even) {
+                            background-color: #f8f9fa;
+                          }
+                          .markdown-content tr:hover {
+                            background-color: #f1f3f5;
+                            transition: background-color 0.2s ease;
+                          }
+                          .markdown-content a:hover {
+                            color: #CF9B63;
+                            text-decoration-color: #1E65AD;
+                          }
+                          .markdown-content code {
+                            word-break: break-word;
+                          }
+                          .markdown-content pre code {
+                            display: block;
+                            padding: 0;
+                            background: transparent;
+                            border: none;
+                            color: inherit;
+                          }
+                        `}
+                      </style>
+                      <div 
+                        className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 markdown-scroll-container"
+                        style={{
+                          scrollbarWidth: 'thin',
+                          scrollbarColor: '#CF9B63 #f4f4f4',
+                          height: '100%',
+                          overflowY: 'scroll'
+                        }}
+                      >
+                        {loadingMarkdown ? (
+                          <div className="flex items-center justify-center" style={{ minHeight: '400px' }}>
+                            <div className="text-center">
+                              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                              <p className="text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>Loading Translated content...</p>
+                            </div>
+                          </div>
+                        ) : markdownError ? (
+                          <div className="flex items-center justify-center" style={{ minHeight: '400px' }}>
+                            <div className="text-center text-red-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                              <p className="text-lg font-semibold mb-2">Error loading Translated content</p>
+                              <p className="text-sm">{markdownError}</p>
+                            </div>
+                          </div>
+                        ) : markdownContent ? (
+                          <div className="markdown-content" style={{ 
+                            fontFamily: 'Roboto, sans-serif',
+                            lineHeight: '1.9',
+                            color: '#1a1a1a',
+                            fontSize: '17px',
+                            maxWidth: '100%',
+                            padding: '0',
+                            letterSpacing: '0.01em'
+                          }}>
+                            <ReactMarkdown
+                              components={{
+                                h1: ({node, ...props}) => <h1 style={{ 
+                                  fontSize: '1rem', 
+                                  fontWeight: '800', 
+                                  marginTop: '2.5rem', 
+                                  marginBottom: '1.5rem', 
+                                  color: '#1E65AD',
+                                  lineHeight: '1.2',
+                                  borderBottom: '3px solid #E3F2FD',
+                                  paddingBottom: '1rem',
+                                  // letterSpacing: '-0.02em',
+                                  textAlign: 'center'
+                                }} {...props} />,
+                                h2: ({node, ...props}) => <h2 style={{ 
+                                  fontSize: '1rem', 
+                                  fontWeight: '700', 
+                                  marginTop: '2rem', 
+                                  marginBottom: '1.25rem', 
+                                  color: '#1E65AD',
+                                  lineHeight: '1.3',
+                                  // letterSpacing: '-0.01em',
+                                  paddingLeft: '0.5rem',
+                                  // borderLeft: '4px solid #CF9B63',
+                                  paddingTop: '0.5rem',
+                                  paddingBottom: '0.5rem',
+                                  textAlign: 'center'
+                                }} {...props} />,
+                                h3: ({node, ...props}) => <h3 style={{ 
+                                  fontSize: '2rem', 
+                                  fontWeight: '600', 
+                                  marginTop: '1.75rem', 
+                                  marginBottom: '1rem', 
+                                  color: '#1E65AD',
+                                  lineHeight: '1.4',
+                                  textAlign: 'center',
+                                  letterSpacing: '0'
+                                }} {...props} />,
+                                h4: ({node, ...props}) => <h4 style={{ 
+                                  fontSize: '1.75rem', 
+                                  fontWeight: '600', 
+                                  marginTop: '1.5rem', 
+                                  marginBottom: '0.875rem', 
+                                  color: '#1E65AD',
+                                  textAlign: 'center',
+                                  lineHeight: '1.5'
+                                }} {...props} />,
+                                h5: ({node, ...props}) => <h5 style={{ 
+                                  fontSize: '1.5rem', 
+                                  fontWeight: '600', 
+                                  marginTop: '1.25rem', 
+                                  marginBottom: '0.75rem', 
+                                  color: '#1E65AD',
+                                  textAlign: 'center',
+                                  lineHeight: '1.5'
+                                }} {...props} />,
+                                h6: ({node, ...props}) => <h6 style={{ 
+                                  fontSize: '1.25rem', 
+                                  fontWeight: '600', 
+                                  marginTop: '1rem', 
+                                  marginBottom: '0.625rem', 
+                                  textAlign: 'center',
+                                  color: '#1E65AD',
+                                  lineHeight: '1.5'
+                                }} {...props} />,
+                                p: ({node, ...props}) => <p style={{ 
+                                  marginBottom: '1.5rem', 
+                                  marginTop: '0',
+                                  lineHeight: '1.95',
+                                  fontSize: '15px',
+                                  color: '#2c3e50',
+                                  // textAlign: 'left',
+                                  // wordSpacing: '0.05em',
+                                  // letterSpacing: '0.01em',
+                                  padding: '0.5rem 0',
+                                  maxWidth: '100%'
+                                }} {...props} />,
+                                ul: ({node, ...props}) => <ul style={{ 
+                                  marginBottom: '1.5rem', 
+                                  paddingLeft: '2.5rem', 
+                                  listStyleType: 'disc',
+                                  textAlign: 'left',
+                                  lineHeight: '1.9'
+                                }} {...props} />,
+                                ol: ({node, ...props}) => <ol style={{ 
+                                  marginBottom: '1.5rem', 
+                                  paddingLeft: '2.5rem', 
+                                  listStyleType: 'decimal',
+                                  textAlign: 'left',
+                                  lineHeight: '1.9'
+                                }} {...props} />,
+                                li: ({node, ...props}) => <li style={{ 
+                                  marginBottom: '0.75rem',
+                                  lineHeight: '1.9',
+                                  color: '#2c3e50',
+                                  textAlign: 'left',
+                                  fontSize: '18px',
+                                  paddingLeft: '0.5rem'
+                                }} {...props} />,
+                                strong: ({node, ...props}) => <strong style={{ 
+                                  fontWeight: '700', 
+                                  color: '#1E65AD',
+                                  letterSpacing: '0.01em'
+                                }} {...props} />,
+                                em: ({node, ...props}) => <em style={{ 
+                                  fontStyle: 'italic',
+                                  color: '#2c3e50',
+                                  fontWeight: '500'
+                                }} {...props} />,
+                                code: ({node, ...props}) => <code style={{ 
+                                  backgroundColor: '#f1f3f5', 
+                                  padding: '0.3rem 0.6rem', 
+                                  borderRadius: '0.375rem', 
+                                  fontFamily: '"Fira Code", "Courier New", monospace', 
+                                  fontSize: '0.9em',
+                                  color: '#d63384',
+                                  border: '1px solid #dee2e6',
+                                  fontWeight: '500',
+                                  letterSpacing: '0'
+                                }} {...props} />,
+                                pre: ({node, ...props}) => <pre style={{ 
+                                  backgroundColor: '#f8f9fa',
+                                  padding: '1.25rem',
+                                  borderRadius: '0.625rem',
+                                  overflowX: 'auto',
+                                  marginBottom: '1.5rem',
+                                  border: '1px solid #e9ecef',
+                                  fontSize: '0.9em',
+                                  lineHeight: '1.7',
+                                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                                }} {...props} />,
+                                blockquote: ({node, ...props}) => <blockquote style={{ 
+                                  borderLeft: '5px solid #1E65AD',
+                                  paddingLeft: '1.5rem',
+                                  marginLeft: '0',
+                                  marginBottom: '1.5rem',
+                                  fontStyle: 'italic',
+                                  color: '#495057',
+                                  backgroundColor: '#f8f9fa',
+                                  padding: '1.25rem 1.25rem 1.25rem 1.5rem',
+                                  borderRadius: '0.5rem',
+                                  borderTop: '1px solid #e9ecef',
+                                  borderRight: '1px solid #e9ecef',
+                                  borderBottom: '1px solid #e9ecef',
+                                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                                }} {...props} />,
+                                hr: ({node, ...props}) => <hr style={{ 
+                                  border: 'none',
+                                  borderTop: '2px solid #E3F2FD',
+                                  margin: '2.5rem 0',
+                                  borderRadius: '1px',
+                                  height: '2px',
+                                  background: 'linear-gradient(90deg, transparent, #E3F2FD, transparent)'
+                                }} {...props} />,
+                                a: ({node, ...props}) => <a style={{ 
+                                  color: '#1E65AD',
+                                  textDecoration: 'underline',
+                                  textDecorationColor: '#CF9B63',
+                                  textUnderlineOffset: '3px',
+                                  fontWeight: '500',
+                                  transition: 'color 0.2s ease'
+                                }} {...props} />,
+                                table: ({node, ...props}) => <table style={{ 
+                                  width: '100%',
+                                  borderCollapse: 'collapse',
+                                  marginBottom: '1.5rem',
+                                  fontSize: '16px',
+                                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                                  borderRadius: '0.5rem',
+                                  overflow: 'hidden'
+                                }} {...props} />,
+                                th: ({node, ...props}) => <th style={{ 
+                                  backgroundColor: '#1E65AD',
+                                  color: '#ffffff',
+                                  padding: '1rem',
+                                  textAlign: 'left',
+                                  fontWeight: '600',
+                                  border: '1px solid #1a5a9a',
+                                  fontSize: '0.95em',
+                                  letterSpacing: '0.02em'
+                                }} {...props} />,
+                                td: ({node, ...props}) => <td style={{ 
+                                  padding: '0.875rem 1rem',
+                                  border: '1px solid #e9ecef',
+                                  backgroundColor: '#ffffff',
+                                  fontSize: '0.95em'
+                                }} {...props} />,
+                                img: ({node, ...props}) => <img style={{
+                                  maxWidth: '100%',
+                                  height: 'auto',
+                                  borderRadius: '0.625rem',
+                                  margin: '2rem 0',
+                                  boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                                  display: 'block',
+                                  marginLeft: 'auto',
+                                  marginRight: 'auto'
+                                }} {...props} />,
+                              }}
+                            >
+                              {markdownContent}
+                            </ReactMarkdown>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center" style={{ minHeight: '400px' }}>
+                            <p className="text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>No Translated content available</p>
+                          </div>
+                        )}
                       </div>
+                    </div>
+                  ) : pdfUrl && pdfUrl.trim() !== "" ? (
+                    /* PDF View */
+                    <div className="relative h-full w-full" style={{ minHeight: '350px', display: 'flex', flexDirection: 'column' }}>
+                      {/* Desktop View: Show PDF in iframe */}
+                      <>
+                        {/* PDF Embed - Try iframe first, fallback to button */}
+                        <div className="w-full h-full flex-1" style={{ minHeight: 0, position: 'relative' }}>
+                          <iframe
+                            src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&page=${currentPage}&zoom=page-fit&view=FitH`}
+                            className="absolute inset-0 w-full h-full border-0 rounded-lg"
+                            title={location.state?.act ? 'Act PDF' : 'Judgment PDF'}
+                            style={{ 
+                              width: '100%', 
+                              height: '100%',
+                              display: 'block'
+                            }}
+                            allow="fullscreen"
+                            scrolling="auto"
+                            onLoad={() => {
+                              setLoading(false);
+                            }}
+                            onError={() => {
+                              // If iframe fails, show the button fallback
+                              setError("PDF cannot be embedded due to security restrictions");
+                            }}
+                          />
+                        </div>
                         
                         {/* Fallback PDF Access - Show when iframe fails */}
-                        {translationError && (
+                        {error && (
                       <div className="absolute inset-0 bg-white flex items-center justify-center p-3 sm:p-4 md:p-8">
                         <div className="text-center max-w-md w-full px-2">
                           <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-24 md:h-24 mx-auto mb-3 sm:mb-4 md:mb-6 rounded-full bg-gradient-to-br flex items-center justify-center" 
@@ -605,7 +986,7 @@ export default function ViewPDF() {
                           </p>
                           <div className="space-y-2 sm:space-y-3 px-2">
                             <button
-                              onClick={() => window.open(translatedPdfUrl || pdfUrl, '_blank')}
+                              onClick={() => window.open(pdfUrl, '_blank')}
                               className="w-full px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-lg hover:shadow-xl flex items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm md:text-base"
                               style={{ fontFamily: 'Roboto, sans-serif' }}
                             >
@@ -620,33 +1001,6 @@ export default function ViewPDF() {
                     )}
                     </>
                     
-                    {/* Translation Status Indicator - Only show on desktop */}
-                    {isTranslating && (
-                      <div className="absolute top-2 right-2 sm:top-3 md:top-4 sm:right-3 md:right-4 bg-blue-100 border border-blue-300 text-blue-700 px-2 sm:px-2.5 md:px-3 py-1 sm:py-1.5 md:py-2 rounded-lg text-xs sm:text-sm font-medium shadow-lg z-10 max-w-[calc(100%-1rem)] sm:max-w-none">
-                        <div className="flex items-center gap-1 sm:gap-2">
-                          <div className="animate-spin rounded-full h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 border-2 border-blue-600 border-t-transparent flex-shrink-0"></div>
-                          <span className="hidden sm:inline">Translating PDF...</span>
-                          <span className="sm:hidden">Translating...</span>
-                        </div>
-                        <div className="text-xs text-blue-600 mt-1 hidden sm:block">
-                          Fast translation in progress...
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Translation Error Indicator - Only show on desktop */}
-                    {translationError && !error && (
-                      <div className="absolute top-2 right-2 sm:top-3 md:top-4 sm:right-3 md:right-4 bg-yellow-100 border border-yellow-300 text-yellow-700 px-2 sm:px-2.5 md:px-3 py-1 sm:py-1.5 md:py-2 rounded-lg text-xs sm:text-sm font-medium shadow-lg z-10 max-w-[calc(100%-1rem)] sm:max-w-none">
-                        <div className="flex items-center gap-1 sm:gap-2">
-                          <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                          </svg>
-                          <span className="hidden sm:inline">Fast fallback - showing original</span>
-                          <span className="sm:hidden">Fallback</span>
-                        </div>
-                      </div>
-                    )}
-
                     {/* Loading Overlay - Only show on desktop */}
                     {loading && (
                       <div className="absolute inset-0 bg-gradient-to-br from-white to-gray-50 flex items-center justify-center rounded-lg">
@@ -656,17 +1010,17 @@ export default function ViewPDF() {
                             <div className="animate-spin rounded-full h-7 w-7 sm:h-8 sm:w-8 md:h-12 md:w-12 border-4 border-transparent border-t-blue-600 absolute top-0 left-0"></div>
                           </div>
                           <p className="mt-2 sm:mt-3 md:mt-4 text-gray-600 font-medium text-xs sm:text-sm md:text-base px-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                            {translatedPdfUrl !== pdfUrl ? 'Loading Translated PDF...' : 'Loading PDF Document...'}
+                            Loading PDF Document...
                           </p>
                           <p className="mt-1 text-xs sm:text-sm text-gray-500 px-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                            {translatedPdfUrl !== pdfUrl ? 'Please wait while we load the translated document' : 'Please wait while we prepare the document'}
+                            Please wait while we prepare the document
                           </p>
                         </div>
                       </div>
                     )}
                   </div>
-                ) : (
-                   <div className="flex items-center justify-center h-full min-h-[350px] sm:min-h-[400px]">
+                  ) : (
+                    <div className="flex items-center justify-center h-full min-h-[350px] sm:min-h-[400px]">
                      <div className="text-center p-3 sm:p-4 md:p-8">
                        <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto mb-2 sm:mb-3 md:mb-4 rounded-full bg-gradient-to-br flex items-center justify-center" 
                             style={{ background: 'linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)' }}>

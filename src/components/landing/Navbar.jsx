@@ -17,6 +17,10 @@ const navItems = [
         path: "/judgment-access",
       },
       { 
+        label: "Judgment by Name", 
+        path: "/judgment-by-name",
+      },
+      { 
         label: "Law Library", 
         path: "/law-library"
       },
@@ -31,6 +35,18 @@ const navItems = [
       { 
         label: "YouTube Summarizer", 
         path: "/youtube-summary",
+      },
+      { 
+        label: "DOCX Viewer", 
+        path: "/view-docx",
+      },
+      { 
+        label: "PDF Viewer", 
+        path: "/react-pdf-viewer",
+      },
+      { 
+        label: "Judgment Details", 
+        path: "/judgment-details",
       },
     ],
   },
@@ -210,24 +226,32 @@ const Navbar = () => {
           />
         </div>
 
-        {/* Menu Button - Mobile */}
-        <button
-          className="md:hidden p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-all duration-300 touch-manipulation flex items-center justify-center"
-          onClick={() => setMenuOpen(!menuOpen)}
-          style={{ 
-            minWidth: '44px', 
-            minHeight: '44px',
-            color: '#1E65AD'
-          }}
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={menuOpen}
-        >
-          {menuOpen ? (
-            <X className="w-6 h-6" strokeWidth={2.5} />
-          ) : (
-            <Menu className="w-6 h-6" strokeWidth={2.5} />
-          )}
-        </button>
+        {/* Right Side - Mobile: Language Selector + Menu Button */}
+        <div className="flex items-center gap-2 md:hidden">
+          {/* Language Selector - Mobile (in navbar bar) */}
+          <div className="flex-shrink-0 max-w-[100px] sm:max-w-[120px]">
+            <LanguageSelector />
+          </div>
+          
+          {/* Menu Button - Mobile */}
+          <button
+            className="p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-all duration-300 touch-manipulation flex items-center justify-center"
+            onClick={() => setMenuOpen(!menuOpen)}
+            style={{ 
+              minWidth: '44px', 
+              minHeight: '44px',
+              color: '#1E65AD'
+            }}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? (
+              <X className="w-6 h-6" strokeWidth={2.5} />
+            ) : (
+              <Menu className="w-6 h-6" strokeWidth={2.5} />
+            )}
+          </button>
+        </div>
 
         {/* Nav Links */}
         <ul
@@ -529,13 +553,6 @@ const Navbar = () => {
             </li>
           ))}
 
-          {/* Language Selector - Mobile */}
-          <li className="w-full md:hidden mt-4">
-            <div className="mb-3">
-              <LanguageSelector />
-            </div>
-          </li>
-
           {/* User Profile or Login Button - Mobile */}
           <li className="w-full md:hidden mt-2">
             {isAuthenticated ? (
@@ -544,9 +561,6 @@ const Navbar = () => {
                   <div>
                     <div className="font-semibold text-gray-800" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       {user?.name || 'name'}
-                    </div>
-                    <div className="text-sm text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      {user?.email || user?.phone || 'No email'}
                     </div>
                   </div>
                   <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
@@ -647,9 +661,6 @@ const Navbar = () => {
                     <div className="font-semibold text-gray-800 text-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       {user?.name || 'name'}
                     </div>
-                    <div className="text-xs text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      {user?.email || user?.phone || 'No email'}
-                    </div>
                   </div>
                   <svg 
                     className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${userDropdownOpen ? 'rotate-180' : ''}`}
@@ -668,13 +679,16 @@ const Navbar = () => {
                   <div className="px-4 py-3 border-b" style={{ borderColor: '#E5E7EB' }}>
                     <div className="font-semibold text-gray-800" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       {user?.name || 'name'}
+                       
                     </div>
-                    <div className="text-sm text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      {user?.email || user?.phone || 'No email'}
+                    <div className="font-semibold text-gray-800 text-xs" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      {user?.email || 'email'}
+                       
                     </div>
                     {user?.profession && (
                       <div className="text-xs text-blue-600 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         {user.profession}
+                       
                       </div>
                     )}
                   </div>
