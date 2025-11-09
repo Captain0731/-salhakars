@@ -363,7 +363,7 @@ export default function Profile() {
           <div className="absolute bottom-1/4 left-1/4 w-20 h-20 rounded-full opacity-4 animate-float animation-delay-2000" style={{ backgroundColor: '#8C969F' }}></div>
         </div>
 
-      {/* Navbar hidden on Profile page */}
+      <Navbar />
       <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pt-8 sm:pt-12 md:pt-16 pb-6 sm:pb-8 md:pb-12 relative z-10">
         {/* Header */}
         <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-100 overflow-hidden relative hover-lift mb-20 mt-20">

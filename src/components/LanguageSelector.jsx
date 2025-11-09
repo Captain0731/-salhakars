@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../contexts/AuthContext';
 
 /**
  * LanguageSelector Component
@@ -15,6 +17,8 @@ import { motion, AnimatePresence } from 'framer-motion';
  */
 
 const LanguageSelector = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState('en');
   const [currentScrollIndex, setCurrentScrollIndex] = useState(0);
@@ -24,6 +28,15 @@ const LanguageSelector = () => {
   const dropdownRef = useRef(null);
   const intervalRef = useRef(null);
   const measureRef = useRef(null);
+
+  // Check if user is authenticated
+  const isUserAuthenticated = useMemo(() => {
+    const token = localStorage.getItem('access_token') || 
+                  localStorage.getItem('accessToken') || 
+                  localStorage.getItem('token');
+    const hasValidToken = !!token && token !== 'null' && token !== 'undefined';
+    return isAuthenticated && hasValidToken;
+  }, [isAuthenticated]);
 
   const languages = [
     { code: 'en', langCode: 'English', country: 'US', flag: '🇺🇸', display: 'English' },
@@ -62,17 +75,34 @@ const LanguageSelector = () => {
   const handleLanguageSelect = (langCode) => {
     if (typeof window === 'undefined') return;
 
+    // If user is not authenticated and selecting any language other than English, redirect to pricing page
+    if (!isUserAuthenticated && langCode !== 'en') {
+      navigate('/pricing');
+      setIsOpen(false);
+      return;
+    }
+
+    // If user is authenticated, allow any language translation
+    if (isUserAuthenticated) {
+      if (langCode === 'en') {
+        // Clear translation for English
+        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      } else {
+        // Set translation cookie for selected language
+        document.cookie = `googtrans=/en/${langCode}; path=/; max-age=31536000; SameSite=Lax`;
+      }
+      // Reload page to apply translation
+      window.location.reload();
+      return;
+    }
+
+    // For non-authenticated users, only allow English
     if (langCode === 'en') {
       // Clear translation
       document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    } else {
-      // Set translation cookie
-      const cookieValue = `/en/${langCode}`;
-      document.cookie = `googtrans=${cookieValue}; path=/; max-age=31536000`;
+      // Reload page to apply translation
+      window.location.reload();
     }
-
-    // Reload page to apply translation
-    window.location.reload();
   };
 
   // Update current language on mount

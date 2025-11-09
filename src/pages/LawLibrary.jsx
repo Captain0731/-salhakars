@@ -7,7 +7,6 @@ import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 import { SkeletonGrid, SmoothTransitionWrapper } from "../components/EnhancedLoadingComponents";
 import { InfiniteScrollLoader } from "../components/LoadingComponents";
 import { useAuth } from "../contexts/AuthContext";
-import { StickyNote } from "lucide-react";
 
 // Add custom CSS animations
 const customStyles = `
@@ -449,53 +448,6 @@ export default function LawLibrary() {
             <p className="text-sm sm:text-base md:text-lg max-w-3xl mx-auto px-2 animate-fade-in-up" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif', animationDelay: '0.4s' }}>
               Your comprehensive resource for accessing legal acts, regulations, and legislative documents from across India
             </p>
-            
-            {/* Notes Button */}
-            <div className="flex justify-center mt-4 sm:mt-6 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-              {isUserAuthenticated ? (
-                <button
-                  onClick={() => {
-                    navigate('/dashboard', { state: { activeTab: 'notes' } });
-                  }}
-                  className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 text-white rounded-lg transition-all duration-200 font-medium text-sm sm:text-base shadow-sm hover:shadow-md"
-                  style={{ 
-                    fontFamily: 'Roboto, sans-serif',
-                    background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = 'linear-gradient(90deg, #1a5a9a 0%, #b88a56 100%)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)';
-                  }}
-                  title="View Notes"
-                >
-                  <StickyNote className="h-4 w-4 sm:h-5 sm:w-5" />
-                  <span>Notes</span>
-                </button>
-              ) : (
-                <button
-                  onClick={() => {
-                    navigate('/login');
-                  }}
-                  className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 text-white rounded-lg transition-all duration-200 font-medium text-sm sm:text-base shadow-sm hover:shadow-md"
-                  style={{ 
-                    fontFamily: 'Roboto, sans-serif',
-                    background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = 'linear-gradient(90deg, #1a5a9a 0%, #b88a56 100%)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)';
-                  }}
-                  title="Login to Add Notes"
-                >
-                  <StickyNote className="h-4 w-4 sm:h-5 sm:w-5" />
-                  <span>Notes</span>
-                </button>
-              )}
-            </div>
           </div>
         </div>
       </div>
