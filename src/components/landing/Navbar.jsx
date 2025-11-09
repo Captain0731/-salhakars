@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import LanguageSelector from "../LanguageSelector";
+import UserIcon from "../UserIcon";
 import { Menu, X } from "lucide-react";
 
 const navItems = [
@@ -563,9 +564,7 @@ const Navbar = () => {
                       {user?.name || 'name'}
                     </div>
                   </div>
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
-                    {(user?.name || 'U').charAt(0).toUpperCase()}
-                  </div>
+                  <UserIcon size="md" />
                 </div>
                 
                 <button
@@ -654,9 +653,7 @@ const Navbar = () => {
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                   className="flex items-center gap-3 px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200"
                 >
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                    {(user?.name || 'U').charAt(0).toUpperCase()}
-                  </div>
+                  <UserIcon size="md" showSelector={false} />
                   <div className="text-left">
                     <div className="font-semibold text-gray-800 text-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       {user?.name || 'name'}
@@ -676,21 +673,21 @@ const Navbar = () => {
                 <div className={`absolute right-0 top-full mt-2 w-64 backdrop-blur-md rounded-xl shadow-xl border py-2 z-50 transition-all duration-300 ease-out ${
                   isScrolled ? 'bg-white/80' : 'bg-white/95'
                 } ${userDropdownOpen ? 'block opacity-100' : 'hidden opacity-0'}`} style={{ borderColor: '#E5E7EB' }}>
-                  <div className="px-4 py-3 border-b" style={{ borderColor: '#E5E7EB' }}>
-                    <div className="font-semibold text-gray-800" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      {user?.name || 'name'}
-                       
-                    </div>
-                    <div className="font-semibold text-gray-800 text-xs" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      {user?.email || 'email'}
-                       
-                    </div>
-                    {user?.profession && (
-                      <div className="text-xs text-blue-600 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                        {user.profession}
-                       
+                  <div className="px-4 py-3 border-b flex items-center gap-3" style={{ borderColor: '#E5E7EB' }}>
+                    <UserIcon size="md" />
+                    <div className="flex-1">
+                      <div className="font-semibold text-gray-800" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                        {user?.name || 'name'}
                       </div>
-                    )}
+                      <div className="font-semibold text-gray-800 text-xs" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                        {user?.email || 'email'}
+                      </div>
+                      {user?.profession && (
+                        <div className="text-xs text-blue-600 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          {user.profession}
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <button
                     onClick={() => {

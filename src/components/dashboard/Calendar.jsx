@@ -194,10 +194,10 @@ const Calendar = () => {
               Week
             </button>
               {/* <button
-                onClick={() => setViewMode('agenda')}
+              onClick={() => setViewMode('agenda')}
                 className={`px-2 sm:px-3 py-1.5 sm:py-1 text-xs sm:text-sm flex-1 sm:flex-initial ${viewMode === 'agenda' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
-              >
-                Agenda
+            >
+              Agenda
               </button> */}
           </div>
           
@@ -238,7 +238,7 @@ const Calendar = () => {
                       <div className="flex items-center">
                         <CalendarIcon className="h-3 w-3 mr-1 flex-shrink-0" />
                         <span className="truncate">{formatDate(event.date)}</span>
-                      </div>
+                    </div>
                       {event.time && (
                         <div className="flex items-center ml-1 sm:ml-2">
                           <Clock className="h-3 w-3 mr-1 flex-shrink-0" />

@@ -220,7 +220,9 @@ const Bookmarks = () => {
             console.log('✅ Complete judgment data to navigate:', completeJudgment);
             
             // Navigate to PDF view with complete judgment data
-            navigate('/view-pdf', { state: { judgment: completeJudgment } });
+            const judgmentId = completeJudgment.id || completeJudgment.cnr;
+            const url = judgmentId ? `/judgment/${judgmentId}` : '/judgment';
+            navigate(url, { state: { judgment: completeJudgment } });
           } catch (err) {
             console.error('❌ Error fetching judgment:', err);
             // Fallback: use item data if available
@@ -232,7 +234,9 @@ const Bookmarks = () => {
                 pdf_link: item.pdf_link || item.pdf_url || "",
                 pdf_url: item.pdf_url || item.pdf_link || ""
               };
-              navigate('/view-pdf', { state: { judgment: fallbackJudgment } });
+              const judgmentId = fallbackJudgment.id || fallbackJudgment.cnr;
+              const url = judgmentId ? `/judgment/${judgmentId}` : '/judgment';
+              navigate(url, { state: { judgment: fallbackJudgment } });
             } else {
               setError(`Failed to load judgment: ${err.message || 'Unknown error'}`);
               throw err;

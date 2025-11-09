@@ -496,7 +496,9 @@ export default function LegalJudgments() {
   });
 
   const viewJudgment = (judgment) => {
-    navigate('/view-pdf', { state: { judgment } });
+    const judgmentId = judgment.id || judgment.cnr;
+    const url = judgmentId ? `/judgment/${judgmentId}` : '/judgment';
+    navigate(url, { state: { judgment } });
   };
 
   // Cleanup effect

@@ -99,12 +99,16 @@ export default function Bookmarks() {
         const fullJudgment = await apiService.getJudgementById(item.id);
         
         // Navigate with full judgment data including PDF link
-        navigate('/view-pdf', { state: { judgment: fullJudgment } });
+        const judgmentId = fullJudgment?.id || fullJudgment?.cnr || item?.id || item?.cnr;
+        const url = judgmentId ? `/judgment/${judgmentId}` : '/judgment';
+        navigate(url, { state: { judgment: fullJudgment } });
       } catch (err) {
         console.error('Error fetching judgment details:', err);
         setError('Failed to load judgment details. Please try again.');
         // Fallback to navigate with basic data if full fetch fails
-        navigate('/view-pdf', { state: { judgment: item } });
+        const judgmentId = item?.id || item?.cnr;
+        const url = judgmentId ? `/judgment/${judgmentId}` : '/judgment';
+        navigate(url, { state: { judgment: item } });
       } finally {
         setLoading(false);
       }

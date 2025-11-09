@@ -136,13 +136,15 @@ const Notes = () => {
     try {
       if (note.reference_type === 'judgment') {
         const judgment = await apiService.getJudgementById(note.reference_id);
-        navigate('/view-pdf', { state: { judgment } });
+        const judgmentId = judgment?.id || judgment?.cnr || note.reference_id;
+        const url = judgmentId ? `/judgment/${judgmentId}` : '/judgment';
+        navigate(url, { state: { judgment } });
       } else if (note.reference_type === 'central_act') {
         const act = await apiService.getCentralActById(note.reference_id);
-        navigate('/view-pdf', { state: { act } });
+        navigate('/judgment', { state: { act } });
       } else if (note.reference_type === 'state_act') {
         const act = await apiService.getStateActById(note.reference_id);
-        navigate('/view-pdf', { state: { act } });
+        navigate('/judgment', { state: { act } });
       } else {
         // For mappings, navigate to law mapping page
         navigate(`/law-mapping?type=${note.reference_type}`, { 

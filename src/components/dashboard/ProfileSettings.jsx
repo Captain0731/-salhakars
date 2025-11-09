@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import UserIcon from '../UserIcon';
 import { 
   User, 
   Mail, 
@@ -234,9 +235,7 @@ const ProfileSettings = () => {
                 {/* Profile Form */}
                 <div className="space-y-4">
                   <div className="flex items-center space-x-4">
-                    <div className="h-20 w-20 bg-blue-600 rounded-full flex items-center justify-center">
-                      <User className="h-10 w-10 text-white" />
-                    </div>
+                    <UserIcon size="lg" />
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900">{profileData.name}</h3>
                       <p className="text-gray-500">{profileData.email}</p>

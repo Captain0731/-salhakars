@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Bookmark, BookmarkCheck, Star, StarOff, Loader2, CheckCircle, XCircle } from 'lucide-react';
 import apiService from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 
 /**
  * Perfect Bookmark Button Component
@@ -24,13 +26,24 @@ const BookmarkButton = ({
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState(null);
   const [bookmarkId, setBookmarkId] = useState(null);
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  // Check if user is authenticated
+  const isUserAuthenticated = () => {
+    const token = localStorage.getItem('access_token') || 
+                  localStorage.getItem('accessToken') || 
+                  localStorage.getItem('token');
+    const hasValidToken = !!token && token !== 'null' && token !== 'undefined';
+    return isAuthenticated && hasValidToken;
+  };
 
   // Check bookmark status on mount
   useEffect(() => {
-    if (autoCheckStatus && item?.id) {
+    if (autoCheckStatus && item?.id && isUserAuthenticated()) {
       checkBookmarkStatus();
     }
-  }, [item?.id, type]);
+  }, [item?.id, type, isAuthenticated]);
 
   const checkBookmarkStatus = async () => {
     if (!item?.id) return;
@@ -81,6 +94,12 @@ const BookmarkButton = ({
 
   const handleBookmarkToggle = async () => {
     if (isLoading || !item) return;
+    
+    // Check authentication first
+    if (!isUserAuthenticated()) {
+      navigate('/pricing');
+      return;
+    }
     
     // For acts, ensure we have a valid numeric ID
     let itemId = item.id;

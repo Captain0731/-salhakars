@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 
@@ -174,6 +175,7 @@ const pricingData = {
 };
 
 function PricingPage() {
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState("student");
   const [billingCycle, setBillingCycle] = useState("monthly");
   const [openFaqs, setOpenFaqs] = useState([]);
@@ -267,11 +269,16 @@ function PricingPage() {
     }
   };
 
-  const handleButtonClick = (buttonText) => {
-    if (buttonText === "Start Free Trial") {
-      window.location.href = "/signup";
-    } else {
+  const handleButtonClick = (buttonText, planTitle) => {
+    // Redirect to login page for Get Started, Pro, and Ultimate buttons
+    if (buttonText === "Get Started" || buttonText === "Start Free Trial") {
+      navigate('/login');
+    } else if (buttonText === "Contact Sales Team") {
+      // Keep existing behavior for Contact Sales Team
       window.location.href = "/legal-chatbot";
+    } else {
+      // Default fallback
+      navigate('/login');
     }
   };
 
@@ -578,7 +585,7 @@ function PricingPage() {
                 </div>
 
                 <button
-                  onClick={() => handleButtonClick(plan.button)}
+                  onClick={() => handleButtonClick(plan.button, plan.title)}
                   className={`w-full py-2.5 sm:py-3 md:py-3.5 lg:py-4 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm md:text-base transition-all duration-200 ${plan.popular
                       ? "bg-[#1E65AD] text-white hover:bg-[#185a9a] hover:shadow-lg"
                       : "bg-white text-[#1E65AD] border-2 border-[#1E65AD] hover:bg-[#F9FAFC]"

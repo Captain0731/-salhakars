@@ -273,7 +273,7 @@ const GoogleTranslate = ({ pdfUrl = null }) => {
         hasError: () => hasError,
         createTranslatedPdfUrl,
         getTranslatedPdfUrl: getTranslatedPdfUrl,
-        getCurrentLanguage: () => currentLang
+        getCurrentLang: () => currentLang
       };
     }
   }, [isLoaded, hasError, currentLang, pdfUrl]);

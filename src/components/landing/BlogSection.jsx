@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const BlogSection = () => {
+  const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const blogPosts = [
@@ -223,7 +225,8 @@ const BlogSection = () => {
                       .map((post) => (
                         <article
                           key={post.id}
-                          className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 overflow-hidden"
+                          onClick={() => navigate('/blog')}
+                          className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 overflow-hidden cursor-pointer"
                         >
                           {/* Blog Image */}
                           <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
@@ -331,6 +334,27 @@ const BlogSection = () => {
               />
             ))}
           </div>
+        </div>
+
+        {/* View All Blogs Button */}
+        <div className="text-center mt-12 sm:mt-16">
+          <button
+            onClick={() => navigate('/blog')}
+            className="px-8 py-3 sm:px-10 sm:py-4 rounded-lg font-semibold text-base sm:text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+            style={{ 
+              backgroundColor: '#1E65AD',
+              color: '#FFFFFF',
+              fontFamily: 'Roboto, sans-serif'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#CF9B63';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = '#1E65AD';
+            }}
+          >
+            View All Blogs
+          </button>
         </div>
 
       </div>

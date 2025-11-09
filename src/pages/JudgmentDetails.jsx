@@ -92,7 +92,9 @@ export default function JudgmentDetails() {
   const handleViewPDF = () => {
     if (judgment?.pdf_link || judgment?.pdf_url) {
       const pdfUrl = judgment.pdf_link || judgment.pdf_url;
-      navigate('/view-pdf', {
+      const judgmentId = judgment.id || judgment.cnr || id;
+      const url = judgmentId ? `/judgment/${judgmentId}` : '/judgment';
+      navigate(url, {
         state: {
           judgment: {
             ...judgment,

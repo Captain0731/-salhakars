@@ -1,17 +1,27 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useState, useEffect, useMemo } from "react";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import Navbar from "../components/landing/Navbar";
 import BookmarkButton from "../components/BookmarkButton";
 import apiService from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
-import { FileText, StickyNote, Share2 } from "lucide-react";
+import { FileText, StickyNote, Share2, Download } from "lucide-react";
 
 export default function ViewPDF() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { id: urlId } = useParams();
   const { isAuthenticated } = useAuth();
+  
+  // Additional check to ensure token exists - memoized to update when token changes
+  const isUserAuthenticated = useMemo(() => {
+    const token = localStorage.getItem('access_token') || 
+                  localStorage.getItem('accessToken') || 
+                  localStorage.getItem('token');
+    const hasValidToken = !!token && token !== 'null' && token !== 'undefined';
+    return isAuthenticated && hasValidToken;
+  }, [isAuthenticated]);
   const [pdfUrl, setPdfUrl] = useState("");
   const [judgmentInfo, setJudgmentInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -43,6 +53,7 @@ export default function ViewPDF() {
   const [notesCount, setNotesCount] = useState(0);
   const [loadingNotes, setLoadingNotes] = useState(false);
   const [savingNote, setSavingNote] = useState(false);
+  const [showDownloadDropdown, setShowDownloadDropdown] = useState(false);
 
   // Get current language from cookie (Google Translate)
   const getCurrentLanguage = () => {
@@ -83,47 +94,100 @@ export default function ViewPDF() {
   }, []);
 
   useEffect(() => {
-    // Get act or judgment data from location state
-    const actData = location.state?.act;
-    const judgmentData = location.state?.judgment;
+    const loadJudgmentData = async () => {
+      // Get act or judgment data from location state
+      const actData = location.state?.act;
+      const judgmentData = location.state?.judgment;
+     
+      // If URL has ID but no judgment data in state, fetch by ID
+      if (urlId && !judgmentData && !actData) {
+        try {
+          setLoading(true);
+          setError("");
+          console.log('📄 ViewPDF: Fetching judgment by ID from URL:', urlId);
+          
+          const response = await apiService.getJudgementById(urlId);
+          
+          // Handle different response structures
+          let fetchedJudgment = response;
+          if (Array.isArray(response)) {
+            fetchedJudgment = response[0]; // Take first item if array
+          } else if (response?.data) {
+            fetchedJudgment = Array.isArray(response.data) ? response.data[0] : response.data;
+          } else if (response?.judgment) {
+            fetchedJudgment = response.judgment;
+          }
+          
+          if (fetchedJudgment) {
+            console.log('📄 ViewPDF: Fetched judgment data:', fetchedJudgment);
+            setJudgmentInfo(fetchedJudgment);
+            
+            const originalPdfUrl = fetchedJudgment.pdf_link || fetchedJudgment.pdf_url || "";
+            if (!originalPdfUrl || originalPdfUrl.trim() === "") {
+              console.warn('⚠️ ViewPDF: No PDF URL found in judgment data');
+              setError('PDF URL not available for this judgment');
+            }
+            
+            setPdfUrl(originalPdfUrl);
+            setTotalPages(25);
+            setLoading(false);
+          } else {
+            throw new Error('Judgment not found');
+          }
+        } catch (err) {
+          console.error('❌ ViewPDF: Error fetching judgment by ID:', err);
+          setError(err.message || 'Failed to load judgment');
+          setLoading(false);
+        }
+        return;
+      }
    
-    if (judgmentData) {
-      console.log('📄 ViewPDF: Received judgment data:', judgmentData);
-      setJudgmentInfo(judgmentData);
-      
-      // Handle both pdf_url (from API) and pdf_link (for backward compatibility)
-      // Priority: pdf_link > pdf_url > empty string
-      const originalPdfUrl = judgmentData.pdf_link || judgmentData.pdf_url || "";
-      
-      console.log('📄 ViewPDF: PDF URL resolved:', originalPdfUrl);
-      
-      if (!originalPdfUrl || originalPdfUrl.trim() === "") {
-        console.warn('⚠️ ViewPDF: No PDF URL found in judgment data');
-        setError('PDF URL not available for this judgment');
+      if (judgmentData) {
+        console.log('📄 ViewPDF: Received judgment data:', judgmentData);
+        setJudgmentInfo(judgmentData);
+        
+        // Update URL to include ID if not already present
+        const judgmentId = judgmentData.id || judgmentData.cnr;
+        if (judgmentId && urlId !== String(judgmentId)) {
+          navigate(`/judgment/${judgmentId}`, { replace: true, state: { judgment: judgmentData } });
+        }
+        
+        // Handle both pdf_url (from API) and pdf_link (for backward compatibility)
+        // Priority: pdf_link > pdf_url > empty string
+        const originalPdfUrl = judgmentData.pdf_link || judgmentData.pdf_url || "";
+        
+        console.log('📄 ViewPDF: PDF URL resolved:', originalPdfUrl);
+        
+        if (!originalPdfUrl || originalPdfUrl.trim() === "") {
+          console.warn('⚠️ ViewPDF: No PDF URL found in judgment data');
+          setError('PDF URL not available for this judgment');
+        }
+        
+        setPdfUrl(originalPdfUrl);
+        setTotalPages(25); // Default page count, could be enhanced with API data
+        setLoading(false);
+      } else if (actData) {
+        // Handle act data if needed
+        setJudgmentInfo(actData);
+        const actPdfUrl = actData.pdf_link || actData.pdf_url || "";
+        setPdfUrl(actPdfUrl);
+        setLoading(false);
+      } else if (!urlId) {
+        // No data provided and no URL ID, redirect back to appropriate page
+        console.warn('⚠️ ViewPDF: No judgment or act data provided, redirecting...');
+        const referrer = document.referrer;
+        if (referrer.includes('/state-acts')) {
+          navigate('/state-acts');
+        } else if (referrer.includes('/supreme-court') || referrer.includes('/high-court')) {
+          navigate('/supreme-court');
+        } else {
+          navigate('/central-acts');
+        }
       }
-      
-      setPdfUrl(originalPdfUrl);
-      setTotalPages(25); // Default page count, could be enhanced with API data
-      setLoading(false);
-    } else if (actData) {
-      // Handle act data if needed
-      setJudgmentInfo(actData);
-      const actPdfUrl = actData.pdf_link || actData.pdf_url || "";
-      setPdfUrl(actPdfUrl);
-      setLoading(false);
-    } else {
-      // No data provided, redirect back to appropriate page
-      console.warn('⚠️ ViewPDF: No judgment or act data provided, redirecting...');
-      const referrer = document.referrer;
-      if (referrer.includes('/state-acts')) {
-        navigate('/state-acts');
-      } else if (referrer.includes('/supreme-court') || referrer.includes('/high-court')) {
-        navigate('/supreme-court');
-      } else {
-        navigate('/central-acts');
-      }
-    }
-  }, [location.state, navigate]);
+    };
+
+    loadJudgmentData();
+  }, [location.state, navigate, urlId]);
 
   // Helper function to determine reference type and ID
   const getReferenceInfo = () => {
@@ -156,7 +220,7 @@ export default function ViewPDF() {
   // Load notes from API when judgment/act changes
   useEffect(() => {
     const loadNotes = async () => {
-      if (!judgmentInfo || !isAuthenticated) {
+      if (!judgmentInfo || !isUserAuthenticated) {
         setNotesCount(0);
         return;
       }
@@ -211,12 +275,12 @@ export default function ViewPDF() {
     };
 
     loadNotes();
-  }, [judgmentInfo?.id, judgmentInfo?.act_id, isAuthenticated]);
+  }, [judgmentInfo?.id, judgmentInfo?.act_id, isUserAuthenticated]);
 
   // Load user folders from API
   useEffect(() => {
     const loadFolders = async () => {
-      if (!isAuthenticated) {
+      if (!isUserAuthenticated) {
         setApiFolders([]);
         return;
       }
@@ -238,7 +302,7 @@ export default function ViewPDF() {
     };
 
     loadFolders();
-  }, [isAuthenticated]);
+  }, [isUserAuthenticated]);
 
   // Fetch markdown content when markdown view is selected
   useEffect(() => {
@@ -344,9 +408,13 @@ export default function ViewPDF() {
                       {location.state?.act ? 'Act Details' : 'Judgment Details'}
                     </h3>
                     {judgmentInfo && (
-                      <div className="flex items-center gap-2 justify-end self-start sm:self-auto">
+                      <div className="flex items-center gap-2 justify-end self-start sm:self-auto relative">
                         <button
                           onClick={() => {
+                            if (!isUserAuthenticated) {
+                              navigate('/pricing');
+                              return;
+                            }
                             const url = window.location.href;
                             navigator.clipboard.writeText(url).then(() => {
                               alert('Link copied to clipboard!');
@@ -369,6 +437,116 @@ export default function ViewPDF() {
                         >
                           <Share2 className="h-4 w-4 sm:h-5 sm:w-5" style={{ color: '#FFFFFF' }} />
                         </button>
+                        
+                        {/* Download Button with Dropdown */}
+                        <div className="relative">
+                          <button
+                            onClick={() => {
+                              if (!isUserAuthenticated) {
+                                navigate('/pricing');
+                                return;
+                              }
+                              setShowDownloadDropdown(!showDownloadDropdown);
+                            }}
+                            className="p-1.5 sm:p-2 rounded-lg transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
+                            style={{ 
+                              backgroundColor: '#1E65AD',
+                              color: '#FFFFFF'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.backgroundColor = '#1a5a9a';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.backgroundColor = '#1E65AD';
+                            }}
+                            title="Download"
+                          >
+                            <Download className="h-4 w-4 sm:h-5 sm:w-5" style={{ color: '#FFFFFF' }} />
+                          </button>
+                          
+                          {/* Download Dropdown Menu */}
+                          {showDownloadDropdown && (
+                            <>
+                              <div 
+                                className="fixed inset-0 z-40" 
+                                onClick={() => setShowDownloadDropdown(false)}
+                              ></div>
+                              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
+                                <button
+                                  onClick={() => {
+                                    if (pdfUrl) {
+                                      const link = document.createElement('a');
+                                      link.href = pdfUrl;
+                                      link.download = `${judgmentInfo?.title || 'judgment'}_original.pdf`;
+                                      link.target = '_blank';
+                                      document.body.appendChild(link);
+                                      link.click();
+                                      document.body.removeChild(link);
+                                    } else {
+                                      alert('Original PDF not available');
+                                    }
+                                    setShowDownloadDropdown(false);
+                                  }}
+                                  className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm"
+                                  style={{ fontFamily: 'Roboto, sans-serif', color: '#1a1a1a' }}
+                                >
+                                  <FileText className="h-4 w-4" style={{ color: '#1E65AD' }} />
+                                  <span>Original PDF</span>
+                                </button>
+                                <button
+                                  onClick={async () => {
+                                    if (markdownContent) {
+                                      // Convert markdown to PDF or download as text
+                                      // For now, we'll download as a text file with markdown content
+                                      const blob = new Blob([markdownContent], { type: 'text/plain' });
+                                      const url = URL.createObjectURL(blob);
+                                      const link = document.createElement('a');
+                                      link.href = url;
+                                      link.download = `${judgmentInfo?.title || 'judgment'}_translated.txt`;
+                                      document.body.appendChild(link);
+                                      link.click();
+                                      document.body.removeChild(link);
+                                      URL.revokeObjectURL(url);
+                                    } else {
+                                      // Try to fetch markdown if not loaded
+                                      try {
+                                        const judgmentId = judgmentInfo?.id || judgmentInfo?.cnr;
+                                        if (judgmentId) {
+                                          const markdown = await apiService.getJudgementByIdMarkdown(judgmentId);
+                                          if (markdown) {
+                                            const blob = new Blob([markdown], { type: 'text/plain' });
+                                            const url = URL.createObjectURL(blob);
+                                            const link = document.createElement('a');
+                                            link.href = url;
+                                            link.download = `${judgmentInfo?.title || 'judgment'}_translated.txt`;
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            document.body.removeChild(link);
+                                            URL.revokeObjectURL(url);
+                                          } else {
+                                            alert('Translated PDF not available');
+                                          }
+                                        } else {
+                                          alert('Translated PDF not available');
+                                        }
+                                      } catch (error) {
+                                        console.error('Error downloading translated PDF:', error);
+                                        alert('Failed to download translated PDF');
+                                      }
+                                    }
+                                    setShowDownloadDropdown(false);
+                                  }}
+                                  className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm border-t border-gray-200"
+                                  style={{ fontFamily: 'Roboto, sans-serif', color: '#1a1a1a' }}
+                                >
+                                  <FileText className="h-4 w-4" style={{ color: '#CF9B63' }} />
+                                  <span>Translated PDF</span>
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                        
                         <BookmarkButton
                           item={judgmentInfo}
                           type={location.state?.act ? "act" : "judgement"}
@@ -607,6 +785,10 @@ export default function ViewPDF() {
                     {/* Summary Button */}
                     <button
                       onClick={() => {
+                        if (!isUserAuthenticated) {
+                          navigate('/pricing');
+                          return;
+                        }
                         // Navigate to summary or show summary modal
                         console.log('Summary clicked for:', judgmentInfo?.id || judgmentInfo?.title);
                         // You can implement summary functionality here
@@ -619,15 +801,11 @@ export default function ViewPDF() {
                       <span className="hidden sm:inline">Summary</span>
                     </button>
                     
-                    {/* Notes Button */}
-                    {isAuthenticated && (
+                    {/* Notes Button - Fake when not logged in, Real when logged in */}
+                    {isUserAuthenticated ? (
+                      // Real Notes Button (when logged in)
                       <button
                         onClick={() => {
-                          if (!isAuthenticated) {
-                            navigate('/login');
-                            return;
-                          }
-                          
                           // If we have existing notes, load the first one
                           if (existingNotes.length > 0 && !activeNoteId) {
                             const firstNote = existingNotes[0];
@@ -667,6 +845,28 @@ export default function ViewPDF() {
                             {notesCount}
                           </span>
                         )}
+                      </button>
+                    ) : (
+                      // Fake Notes Button (when not logged in - navigates to pricing)
+                      <button
+                        onClick={() => {
+                          navigate('/pricing');
+                        }}
+                        className="flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 text-white rounded-lg transition-all duration-200 font-medium text-xs sm:text-sm shadow-sm hover:shadow-md whitespace-nowrap"
+                        style={{ 
+                          fontFamily: 'Roboto, sans-serif',
+                          background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.background = 'linear-gradient(90deg, #1a5a9a 0%, #b88a56 100%)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.background = 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)';
+                        }}
+                        title="Login to Add Notes"
+                      >
+                        <StickyNote className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        <span className="hidden sm:inline">Notes</span>
                       </button>
                     )}
                     
@@ -1048,6 +1248,17 @@ export default function ViewPDF() {
                             >
                               {markdownContent}
                             </ReactMarkdown>
+                            
+                            {/* Footer - Appears at bottom of markdown content */}
+                            <div className="mt-12 pt-8 border-t-2 border-gray-300 text-center" style={{ 
+                              fontFamily: 'Roboto, sans-serif',
+                              color: '#666',
+                              fontSize: '14px',
+                              paddingBottom: '20px',
+                              marginTop: '48px'
+                            }}>
+                              <p style={{ fontWeight: '500' }}>salhakar - /judgment/{urlId || judgmentInfo?.id || judgmentInfo?.cnr || ''}</p>
+                            </div>
                           </div>
                         ) : (
                           <div className="flex items-center justify-center" style={{ minHeight: '400px' }}>
@@ -1471,7 +1682,7 @@ export default function ViewPDF() {
               </button>
               <button
                 onClick={async () => {
-                  if (!isAuthenticated) {
+                  if (!isUserAuthenticated) {
                     navigate('/login');
                     return;
                   }

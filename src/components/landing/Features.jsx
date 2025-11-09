@@ -164,7 +164,7 @@ const Features = React.forwardRef((props, ref) => {
       description: "Access comprehensive database of legal judgments from High Courts and Supreme Court with advanced search and filtering capabilities.",
       color: "#1E65AD",
       secondaryColor: "#CF9B63",
-      path: "/high-court-judgments"
+      path: "/judgment-access"
     },
     {
       id: 2,
@@ -172,7 +172,7 @@ const Features = React.forwardRef((props, ref) => {
       description: "Seamlessly map between old and new legal frameworks including BNS to IEA, BNSS to CrPC, and BNS to IPC transitions.",
       color: "#CF9B63",
       secondaryColor: "#1E65AD",
-      path: "/old-to-new-law-mapping"
+      path: "/law-mapping"
     },
     {
       id: 3,
@@ -180,7 +180,7 @@ const Features = React.forwardRef((props, ref) => {
       description: "Comprehensive collection of Central Acts and State Acts with detailed provisions, amendments, and cross-references.",
       color: "#8C969F",
       secondaryColor: "#1E65AD",
-      path: "/browse-acts"
+      path: "/law-library"
     },
     {
       id: 4,

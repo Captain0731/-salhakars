@@ -50,7 +50,7 @@ function AppLayout() {
   const hideChatbotPaths = [
     '/login',
     '/signup',
-    '/view-pdf',
+    '/judgment',
     '/mobile-pdf',
     '/view-docx',
     '/react-pdf-viewer',
@@ -84,7 +84,7 @@ function AppLayout() {
         <Route path="/refund-policy" element={<RefundPolicy />} />
         
         {/* Public Routes - No Authentication Required */}
-        <Route path="/view-pdf" element={<ViewPDF />} />
+        <Route path="/judgment/:id?" element={<ViewPDF />} />
         <Route path="/mobile-pdf" element={<MobilePDFViewer />} />
         <Route path="/view-docx" element={<ViewDOCX />} />
         <Route path="/react-pdf-viewer" element={<ReactPDFViewerDemo />} />

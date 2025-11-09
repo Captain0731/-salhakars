@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Navbar from "../components/landing/Navbar";
+import UserIcon from "../components/UserIcon";
 import apiService from "../services/api";
 
 export default function Profile() {
@@ -362,12 +363,12 @@ export default function Profile() {
           <div className="absolute bottom-1/4 left-1/4 w-20 h-20 rounded-full opacity-4 animate-float animation-delay-2000" style={{ backgroundColor: '#8C969F' }}></div>
         </div>
 
-      <Navbar />
-      <div className="max-w-5xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 relative z-10">
+      {/* Navbar hidden on Profile page */}
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pt-8 sm:pt-12 md:pt-16 pb-6 sm:pb-8 md:pb-12 relative z-10">
         {/* Header */}
-        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-100 overflow-hidden relative hover-lift">
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-100 overflow-hidden relative hover-lift mb-20 mt-20">
           {/* Decorative Elements */}
-          <div className="absolute top-0 right-0 w-16 sm:w-24 md:w-32 h-16 sm:h-24 md:h-32 bg-gradient-to-br from-transparent to-blue-50 rounded-bl-full"></div>
+          <div className="absolute top-0 right-0 w-16 sm:w-24 md:w-32 h-16 sm:h-24 md:h-32 bg-gradient-to-br from-transparent to-blue-50 rounded-bl-full "></div>
           <div className="absolute bottom-0 left-0 w-12 sm:w-16 md:w-24 h-12 sm:h-16 md:h-24 bg-gradient-to-tr from-transparent to-orange-50 rounded-tr-full"></div>
           
           {/* Profile Header */}
@@ -381,15 +382,13 @@ export default function Profile() {
             </div>
             
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 md:gap-8 relative z-10">
-              <div className="relative">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 bg-gradient-to-br from-white/30 to-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-3xl sm:text-4xl md:text-5xl font-bold shadow-2xl border-2 sm:border-4 border-white/20 animate-shimmer">
-                  {(user.name || 'U').charAt(0).toUpperCase()}
-                </div>
+              <div className="relative flex-shrink-0">
+                <UserIcon size="xl" className="shadow-2xl border-2 sm:border-4 border-white/20" />
                 <div className="absolute -top-1 sm:-top-2 -right-1 sm:-right-2 w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
                   <span className="text-white text-xs sm:text-sm">✓</span>
                 </div>
               </div>
-              <div className="flex-1 text-center sm:text-left w-full sm:w-auto">
+              <div className="flex-1 text-center sm:text-left w-full sm:w-auto min-w-0">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 text-white" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   {user.name || 'User'}
                 </h1>
@@ -402,7 +401,7 @@ export default function Profile() {
                   </span>
                 )}
               </div>
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto flex-shrink-0">
                 {!isEditing ? (
                   <button
                     onClick={() => setIsEditing(true)}
@@ -480,10 +479,10 @@ export default function Profile() {
           )}
 
           {/* Profile Details */}
-          <div className="p-4 sm:p-6 md:p-8">
-            <div className="space-y-4 sm:space-y-6 md:space-y-8">
+          <div className="p-4 sm:p-6 md:p-8 bg-white ">
+            <div className="space-y-6 sm:space-y-8 ">
               {/* Basic Information */}
-              <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-100 relative overflow-hidden hover-lift">
+              <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 shadow-md border border-gray-200 relative overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 {/* Decorative Elements */}
                 <div className="absolute top-0 right-0 w-12 sm:w-16 md:w-20 h-12 sm:h-16 md:h-20 bg-gradient-to-br from-blue-100 to-transparent rounded-bl-full"></div>
                 <div className="absolute bottom-0 left-0 w-10 sm:w-12 md:w-16 h-10 sm:h-12 md:h-16 bg-gradient-to-tr from-orange-100 to-transparent rounded-tr-full"></div>
@@ -575,10 +574,9 @@ export default function Profile() {
                   </div>
                 </div>
               </div>
-              </div>
 
               {/* Profession-specific Information */}
-              <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-100 relative overflow-hidden hover-lift">
+              <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 shadow-md border border-gray-200 relative overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 {/* Decorative Elements */}
                 <div className="absolute top-0 right-0 w-12 sm:w-16 md:w-20 h-12 sm:h-16 md:h-20 bg-gradient-to-br from-orange-100 to-transparent rounded-bl-full"></div>
                 <div className="absolute bottom-0 left-0 w-10 sm:w-12 md:w-16 h-10 sm:h-12 md:h-16 bg-gradient-to-tr from-blue-100 to-transparent rounded-tr-full"></div>
@@ -875,10 +873,10 @@ export default function Profile() {
                   </div>
                 )}
               </div>
-            </div>
+              </div>
 
-            {/* Password Section */}
-            <div className="mt-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl p-8 shadow-lg border border-gray-100 relative overflow-hidden hover-lift">
+              {/* Password Section */}
+              <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 shadow-md border border-gray-200 relative overflow-hidden hover:shadow-lg transition-shadow duration-300">
               {/* Decorative Elements */}
               <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-green-100 to-transparent rounded-bl-full"></div>
               <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-blue-100 to-transparent rounded-tr-full"></div>
@@ -1129,9 +1127,9 @@ export default function Profile() {
               )}
               </div>
             </div>
+            </div>
           </div>
         </div>
-
       </div>
     </div>
     </>
