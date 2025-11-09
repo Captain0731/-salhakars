@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
+import apiService from "../services/api";
+import { motion } from "framer-motion";
 
 export default function YoutubeVideoSummary() {
   const navigate = useNavigate();
@@ -38,9 +40,46 @@ export default function YoutubeVideoSummary() {
     setSummary(null);
     setVideoInfo(null);
 
-    // TODO: Implement real API call for video summarization
-    setError("Video summarization feature is not yet implemented. Please check back later.");
-    setLoading(false);
+    try {
+      const response = await apiService.summarizeYouTubeVideo(videoUrl);
+      
+      if (response.success) {
+        // Parse the summary text (assuming it's a 5-point summary)
+        const summaryText = response.summary || "";
+        
+        // Extract video ID for thumbnail
+        const videoId = extractVideoId(videoUrl);
+        const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null;
+        
+        // Set summary data
+        setSummary({
+          summary: summaryText,
+          // Split summary into key points if it contains bullet points
+          keyPoints: summaryText.split('\n').filter(line => line.trim().length > 0).slice(0, 5),
+          tags: [],
+          confidence: 0.95,
+          processingTime: "Few seconds"
+        });
+
+        // Set basic video info
+        setVideoInfo({
+          title: "YouTube Video",
+          channel: "Unknown",
+          duration: "Unknown",
+          views: "Unknown",
+          publishedAt: new Date().toISOString(),
+          description: "",
+          thumbnail: thumbnailUrl
+        });
+      } else {
+        setError(response.detail || "Failed to generate summary. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error summarizing video:", err);
+      setError(err.message || "An error occurred while generating the summary. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const clearForm = () => {
@@ -52,22 +91,42 @@ export default function YoutubeVideoSummary() {
 
   const copySummary = () => {
     if (summary) {
-      const textToCopy = `Summary: ${summary.summary}\n\nKey Points:\n${summary.keyPoints.map(point => `• ${point}`).join('\n')}`;
+      const keyPointsText = summary.keyPoints && summary.keyPoints.length > 0 
+        ? `\n\nKey Points:\n${summary.keyPoints.map((point, index) => `${index + 1}. ${point.replace(/^[•\-\*]\s*/, '').trim()}`).join('\n')}`
+        : '';
+      const textToCopy = `YouTube Video Summary\n\n${summary.summary}${keyPointsText}\n\nGenerated on: ${new Date().toLocaleString()}`;
       navigator.clipboard.writeText(textToCopy).then(() => {
-        alert("Summary copied to clipboard!");
+        // Show success message
+        const button = document.activeElement;
+        const originalText = button.textContent;
+        button.textContent = "Copied!";
+        button.style.backgroundColor = '#10b981';
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.style.backgroundColor = '';
+        }, 2000);
+      }).catch(() => {
+        alert("Failed to copy to clipboard");
       });
     }
   };
 
   const downloadSummary = () => {
-    if (summary && videoInfo) {
-      const content = `YouTube Video Summary\n\nTitle: ${videoInfo.title}\nChannel: ${videoInfo.channel}\nDuration: ${videoInfo.duration}\n\nSummary:\n${summary.summary}\n\nKey Points:\n${summary.keyPoints.map(point => `• ${point}`).join('\n')}\n\nTags: ${summary.tags.join(', ')}\n\nGenerated on: ${new Date().toLocaleString()}`;
+    if (summary) {
+      const keyPointsText = summary.keyPoints && summary.keyPoints.length > 0 
+        ? `\n\nKey Points:\n${summary.keyPoints.map((point, index) => `${index + 1}. ${point.replace(/^[•\-\*]\s*/, '').trim()}`).join('\n')}`
+        : '';
+      const tagsText = summary.tags && summary.tags.length > 0 
+        ? `\n\nTags: ${summary.tags.join(', ')}`
+        : '';
+      const content = `YouTube Video Summary\n\nURL: ${videoUrl}\n\nSummary:\n${summary.summary}${keyPointsText}${tagsText}\n\nGenerated on: ${new Date().toLocaleString()}`;
       
       const blob = new Blob([content], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${videoInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_summary.txt`;
+      const videoId = extractVideoId(videoUrl);
+      a.download = `youtube_summary_${videoId || 'video'}_${Date.now()}.txt`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -145,17 +204,57 @@ export default function YoutubeVideoSummary() {
 
               {/* Loading State */}
               {loading && (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 md:p-12 mb-8"
+                >
                   <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <h3 className="text-lg font-semibold mb-2" style={{ color: '#1E65AD' }}>
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="w-16 h-16 mx-auto mb-6"
+                    >
+                      <svg className="w-full h-full text-blue-600" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    </motion.div>
+                    <h3 className="text-xl md:text-2xl font-semibold mb-3" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                       Analyzing Video Content
                     </h3>
-                    <p className="text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <p className="text-gray-600 mb-6 text-base md:text-lg" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       Our AI is processing the video to extract key information and generate a comprehensive summary...
                     </p>
+                    
+                    {/* Progress indicators */}
+                    <div className="space-y-3 max-w-md mx-auto">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: "100%" }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                        className="h-2 bg-blue-100 rounded-full overflow-hidden"
+                      >
+                        <motion.div
+                          initial={{ x: "-100%" }}
+                          animate={{ x: "100%" }}
+                          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                          className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"
+                          style={{ width: "40%" }}
+                        />
+                      </motion.div>
+                      
+                      <div className="flex items-center justify-center gap-2 text-sm text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                        <motion.span
+                          animate={{ opacity: [1, 0.5, 1] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        >
+                          ⏳ This may take a few moments
+                        </motion.span>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </motion.div>
               )}
 
               {/* Video Info */}
@@ -195,75 +294,101 @@ export default function YoutubeVideoSummary() {
               )}
 
               {/* Summary Results */}
-              {summary && (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-semibold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+              {summary && !loading && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 md:p-8"
+                >
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+                    <h2 className="text-xl md:text-2xl font-semibold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                       AI-Generated Summary
                     </h2>
                     <div className="flex gap-2">
                       <button
                         onClick={copySummary}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"
                         style={{ fontFamily: 'Roboto, sans-serif' }}
                       >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
                         Copy
                       </button>
                       <button
                         onClick={downloadSummary}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium flex items-center gap-2"
                         style={{ fontFamily: 'Roboto, sans-serif' }}
                       >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
                         Download
                       </button>
                     </div>
                   </div>
 
                   <div className="mb-6">
-                    <h3 className="font-semibold mb-3" style={{ color: '#1E65AD' }}>Summary</h3>
-                    <p className="text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      {summary.summary}
-                    </p>
+                    <h3 className="font-semibold mb-3 text-lg" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>Summary</h3>
+                    <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-blue-600">
+                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                        {summary.summary}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="mb-6">
-                    <h3 className="font-semibold mb-3" style={{ color: '#1E65AD' }}>Key Points</h3>
-                    <ul className="space-y-2">
-                      {summary.keyPoints.map((point, index) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <span className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></span>
-                          <span className="text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                            {point}
+                  {summary.keyPoints && summary.keyPoints.length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="font-semibold mb-3 text-lg" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>Key Points</h3>
+                      <ul className="space-y-3">
+                        {summary.keyPoints.map((point, index) => (
+                          <motion.li 
+                            key={index} 
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="flex items-start gap-3 bg-blue-50 rounded-lg p-3"
+                          >
+                            <span className="w-6 h-6 bg-blue-600 rounded-full mt-0.5 flex-shrink-0 flex items-center justify-center text-white text-xs font-bold">
+                              {index + 1}
+                            </span>
+                            <span className="text-gray-700 flex-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                              {point.replace(/^[•\-\*]\s*/, '').trim()}
+                            </span>
+                          </motion.li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {summary.tags && summary.tags.length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="font-semibold mb-3 text-lg" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>Tags</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {summary.tags.map((tag, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                            style={{ fontFamily: 'Roboto, sans-serif' }}
+                          >
+                            {tag}
                           </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-                  <div className="mb-6">
-                    <h3 className="font-semibold mb-3" style={{ color: '#1E65AD' }}>Tags</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {summary.tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                          style={{ fontFamily: 'Roboto, sans-serif' }}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between text-sm" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-sm pt-4 border-t border-gray-200 gap-2" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}>
                     <div>
-                      <strong>Confidence:</strong> {Math.round(summary.confidence * 100)}%
+                      <strong>Generated:</strong> {new Date().toLocaleString()}
                     </div>
-                    <div>
-                      <strong>Processing Time:</strong> {summary.processingTime}
-                    </div>
+                    {summary.processingTime && (
+                      <div>
+                        <strong>Processing Time:</strong> {summary.processingTime}
+                      </div>
+                    )}
                   </div>
-                </div>
+                </motion.div>
               )}
             </div>
 

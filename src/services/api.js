@@ -2145,6 +2145,18 @@ class ApiService {
     });
     return await this.handleResponse(response);
   }
+
+  // YouTube Summary API Methods
+
+  // Summarize YouTube video
+  async summarizeYouTubeVideo(videoUrl) {
+    const response = await fetch(`${this.baseURL}/api/yt_summary`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ url: videoUrl })
+    });
+    return await this.handleResponse(response);
+  }
 }
 
 // Create and export a singleton instance
