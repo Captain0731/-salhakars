@@ -5,11 +5,13 @@ import ReactMarkdown from "react-markdown";
 import Navbar from "../components/landing/Navbar";
 import BookmarkButton from "../components/BookmarkButton";
 import apiService from "../services/api";
+import { useAuth } from "../contexts/AuthContext";
 import { FileText, StickyNote, Share2 } from "lucide-react";
 
 export default function ViewPDF() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
   const [pdfUrl, setPdfUrl] = useState("");
   const [judgmentInfo, setJudgmentInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,8 +22,11 @@ export default function ViewPDF() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showNotesPopup, setShowNotesPopup] = useState(false);
   const [notesContent, setNotesContent] = useState("");
-  const [notesFolders, setNotesFolders] = useState([{ id: 'default', name: 'Default', content: '' }]);
-  const [activeFolderId, setActiveFolderId] = useState('default');
+  const [notesFolders, setNotesFolders] = useState([]); // API folders
+  const [apiFolders, setApiFolders] = useState([]); // All user folders from API
+  const [existingNotes, setExistingNotes] = useState([]); // Notes for current reference
+  const [activeFolderId, setActiveFolderId] = useState(null);
+  const [activeNoteId, setActiveNoteId] = useState(null); // Current note being edited
   const [showNewFolderInput, setShowNewFolderInput] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [popupPosition, setPopupPosition] = useState({ x: 100, y: 100 });
@@ -35,6 +40,9 @@ export default function ViewPDF() {
   const [markdownContent, setMarkdownContent] = useState("");
   const [loadingMarkdown, setLoadingMarkdown] = useState(false);
   const [markdownError, setMarkdownError] = useState("");
+  const [notesCount, setNotesCount] = useState(0);
+  const [loadingNotes, setLoadingNotes] = useState(false);
+  const [savingNote, setSavingNote] = useState(false);
 
   // Get current language from cookie (Google Translate)
   const getCurrentLanguage = () => {
@@ -117,25 +125,120 @@ export default function ViewPDF() {
     }
   }, [location.state, navigate]);
 
-  // Load saved notes from localStorage when judgment/act changes
-  useEffect(() => {
-    if (judgmentInfo) {
-      const notesKey = `notes_${judgmentInfo?.id || judgmentInfo?.act_id || 'default'}`;
-      const savedNotes = localStorage.getItem(notesKey);
-      if (savedNotes) {
-        try {
-          const parsedFolders = JSON.parse(savedNotes);
-          if (parsedFolders && Array.isArray(parsedFolders) && parsedFolders.length > 0) {
-            setNotesFolders(parsedFolders);
-            setActiveFolderId(parsedFolders[0].id);
-            setNotesContent(parsedFolders[0].content || '');
-          }
-        } catch (error) {
-          console.error('Error loading saved notes:', error);
-        }
+  // Helper function to determine reference type and ID
+  const getReferenceInfo = () => {
+    if (!judgmentInfo) return null;
+    
+    // Check if it's an act (from location.state)
+    if (location.state?.act) {
+      // Determine if central or state act
+      // State acts typically have 'location' or 'state' field
+      if (judgmentInfo.location || judgmentInfo.state) {
+        return {
+          reference_type: 'state_act',
+          reference_id: judgmentInfo.act_id || judgmentInfo.id
+        };
+      } else {
+        return {
+          reference_type: 'central_act',
+          reference_id: judgmentInfo.act_id || judgmentInfo.id
+        };
       }
     }
-  }, [judgmentInfo?.id, judgmentInfo?.act_id]);
+    
+    // Otherwise it's a judgment
+    return {
+      reference_type: 'judgment',
+      reference_id: judgmentInfo.id
+    };
+  };
+
+  // Load notes from API when judgment/act changes
+  useEffect(() => {
+    const loadNotes = async () => {
+      if (!judgmentInfo || !isAuthenticated) {
+        setNotesCount(0);
+        return;
+      }
+
+      const refInfo = getReferenceInfo();
+      if (!refInfo || !refInfo.reference_id) {
+        setNotesCount(0);
+        return;
+      }
+
+      try {
+        setLoadingNotes(true);
+        const response = await apiService.getNotesByReference(
+          refInfo.reference_type,
+          refInfo.reference_id
+        );
+        
+        // Handle different response formats
+        let notes = [];
+        if (response.success && response.data?.notes) {
+          notes = response.data.notes;
+        } else if (Array.isArray(response)) {
+          notes = response;
+        } else if (response.data && Array.isArray(response.data)) {
+          notes = response.data;
+        }
+        
+        setExistingNotes(notes);
+        setNotesCount(notes.length);
+        
+        // If there are notes, load the first one
+        if (notes.length > 0) {
+          const firstNote = notes[0];
+          setActiveNoteId(firstNote.id);
+          setNotesContent(firstNote.content || '');
+          setActiveFolderId(firstNote.folder_id || null);
+        } else {
+          setActiveNoteId(null);
+          setNotesContent('');
+          setActiveFolderId(null);
+        }
+      } catch (error) {
+        console.error('Error loading notes:', error);
+        setExistingNotes([]);
+        setNotesCount(0);
+        setActiveNoteId(null);
+        setNotesContent('');
+        setActiveFolderId(null);
+      } finally {
+        setLoadingNotes(false);
+      }
+    };
+
+    loadNotes();
+  }, [judgmentInfo?.id, judgmentInfo?.act_id, isAuthenticated]);
+
+  // Load user folders from API
+  useEffect(() => {
+    const loadFolders = async () => {
+      if (!isAuthenticated) {
+        setApiFolders([]);
+        return;
+      }
+
+      try {
+        const response = await apiService.getFolders();
+        if (response.success && response.data?.folders) {
+          setApiFolders(response.data.folders);
+        } else if (Array.isArray(response)) {
+          // Handle case where API returns array directly
+          setApiFolders(response);
+        } else {
+          setApiFolders([]);
+        }
+      } catch (error) {
+        console.error('Error loading folders:', error);
+        setApiFolders([]);
+      }
+    };
+
+    loadFolders();
+  }, [isAuthenticated]);
 
   // Fetch markdown content when markdown view is selected
   useEffect(() => {
@@ -148,7 +251,7 @@ export default function ViewPDF() {
           if (judgmentId) {
             const markdown = await apiService.getJudgementByIdMarkdown(judgmentId);
             setMarkdownContent(markdown);
-          } else {
+    } else {
             setMarkdownError("No judgment ID available");
           }
         } catch (error) {
@@ -227,7 +330,7 @@ export default function ViewPDF() {
     <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
       <div className="pt-16 sm:pt-20">
-      
+
       {/* Responsive Layout: Stacked on mobile, side-by-side on desktop */}
       <div className="flex-1 p-2 sm:p-3 md:p-4 lg:p-6" style={{ height: 'calc(100vh - 80px)', overflow: 'hidden' }}>
         <div className="max-w-7xl mx-auto h-full">
@@ -517,46 +620,55 @@ export default function ViewPDF() {
                     </button>
                     
                     {/* Notes Button */}
-                    <button
-                    onClick={() => {
-                      // Check if we have saved notes, if not initialize with default content
-                      const notesKey = `notes_${judgmentInfo?.id || judgmentInfo?.act_id || 'default'}`;
-                      const savedNotes = localStorage.getItem(notesKey);
-                      
-                      if (!savedNotes) {
-                        // Initialize notes content with judgment/act data for default folder
-                        const initialContent = `# ${judgmentInfo?.title || judgmentInfo?.short_title || 'Untitled Note'}\n\n${judgmentInfo?.summary || 'No summary available.'}\n\n## Details\n\n${location.state?.act ? 'Ministry' : 'Court'}: ${location.state?.act ? (judgmentInfo?.ministry || 'N/A') : (judgmentInfo?.court_name || 'N/A')}\nDate: ${judgmentInfo?.decision_date || judgmentInfo?.year || 'N/A'}`;
-                        
-                        // Initialize folders if empty
-                        if (notesFolders.length === 0 || (notesFolders.length === 1 && notesFolders[0].content === '')) {
-                          setNotesFolders([{ id: 'default', name: 'Default', content: initialContent }]);
-                          setActiveFolderId('default');
-                          setNotesContent(initialContent);
-                        }
-                      } else {
-                        // Load existing content
-                        const currentFolder = notesFolders.find(f => f.id === activeFolderId);
-                        setNotesContent(currentFolder?.content || '');
-                      }
-                      
-                      setShowNotesPopup(true);
-                    }}
-                    className="flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 text-white rounded-lg transition-all duration-200 font-medium text-xs sm:text-sm shadow-sm hover:shadow-md whitespace-nowrap"
-                    style={{ 
-                      fontFamily: 'Roboto, sans-serif',
-                      background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.background = 'linear-gradient(90deg, #1a5a9a 0%, #b88a56 100%)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.background = 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)';
-                    }}
-                    title="Add Notes"
-                  >
-                    <StickyNote className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                    <span className="hidden sm:inline">Notes</span>
-                  </button>
+                    {isAuthenticated && (
+                      <button
+                        onClick={() => {
+                          if (!isAuthenticated) {
+                            navigate('/login');
+                            return;
+                          }
+                          
+                          // If we have existing notes, load the first one
+                          if (existingNotes.length > 0 && !activeNoteId) {
+                            const firstNote = existingNotes[0];
+                            setActiveNoteId(firstNote.id);
+                            setNotesContent(firstNote.content || '');
+                            setActiveFolderId(firstNote.folder_id || null);
+                          } else if (existingNotes.length === 0) {
+                            // Initialize with default content for new note
+                            const refInfo = getReferenceInfo();
+                            if (refInfo) {
+                              const initialContent = `# ${judgmentInfo?.title || judgmentInfo?.short_title || 'Untitled Note'}\n\n${judgmentInfo?.summary || 'No summary available.'}\n\n## Details\n\n${location.state?.act ? 'Ministry' : 'Court'}: ${location.state?.act ? (judgmentInfo?.ministry || 'N/A') : (judgmentInfo?.court_name || 'N/A')}\nDate: ${judgmentInfo?.decision_date || judgmentInfo?.year || 'N/A'}`;
+                              setNotesContent(initialContent);
+                              setActiveNoteId(null);
+                              setActiveFolderId(null);
+                            }
+                          }
+                          
+                          setShowNotesPopup(true);
+                        }}
+                        className="flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 text-white rounded-lg transition-all duration-200 font-medium text-xs sm:text-sm shadow-sm hover:shadow-md whitespace-nowrap relative"
+                        style={{ 
+                          fontFamily: 'Roboto, sans-serif',
+                          background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.background = 'linear-gradient(90deg, #1a5a9a 0%, #b88a56 100%)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.background = 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)';
+                        }}
+                        title="Add Notes"
+                      >
+                        <StickyNote className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        <span className="hidden sm:inline">Notes</span>
+                        {notesCount > 0 && (
+                          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                            {notesCount}
+                          </span>
+                        )}
+                      </button>
+                    )}
                     
                     {/* PDF/Markdown Toggle Button */}
                     <div className="relative inline-flex items-center bg-gray-100 rounded-xl p-1 shadow-inner">
@@ -733,7 +845,7 @@ export default function ViewPDF() {
                           }}>
                             <ReactMarkdown
                               components={{
-                                h1: ({node, ...props}) => <h1 style={{ 
+                                h1: ({node, children, ...props}) => <h1 style={{ 
                                   fontSize: '1rem', 
                                   fontWeight: '800', 
                                   marginTop: '2.5rem', 
@@ -744,8 +856,8 @@ export default function ViewPDF() {
                                   paddingBottom: '1rem',
                                   // letterSpacing: '-0.02em',
                                   textAlign: 'center'
-                                }} {...props} />,
-                                h2: ({node, ...props}) => <h2 style={{ 
+                                }} {...props}>{children || ''}</h1>,
+                                h2: ({node, children, ...props}) => <h2 style={{ 
                                   fontSize: '1rem', 
                                   fontWeight: '700', 
                                   marginTop: '2rem', 
@@ -758,8 +870,8 @@ export default function ViewPDF() {
                                   paddingTop: '0.5rem',
                                   paddingBottom: '0.5rem',
                                   textAlign: 'center'
-                                }} {...props} />,
-                                h3: ({node, ...props}) => <h3 style={{ 
+                                }} {...props}>{children || ''}</h2>,
+                                h3: ({node, children, ...props}) => <h3 style={{ 
                                   fontSize: '2rem', 
                                   fontWeight: '600', 
                                   marginTop: '1.75rem', 
@@ -768,8 +880,8 @@ export default function ViewPDF() {
                                   lineHeight: '1.4',
                                   textAlign: 'center',
                                   letterSpacing: '0'
-                                }} {...props} />,
-                                h4: ({node, ...props}) => <h4 style={{ 
+                                }} {...props}>{children || ''}</h3>,
+                                h4: ({node, children, ...props}) => <h4 style={{ 
                                   fontSize: '1.75rem', 
                                   fontWeight: '600', 
                                   marginTop: '1.5rem', 
@@ -777,8 +889,8 @@ export default function ViewPDF() {
                                   color: '#1E65AD',
                                   textAlign: 'center',
                                   lineHeight: '1.5'
-                                }} {...props} />,
-                                h5: ({node, ...props}) => <h5 style={{ 
+                                }} {...props}>{children || ''}</h4>,
+                                h5: ({node, children, ...props}) => <h5 style={{ 
                                   fontSize: '1.5rem', 
                                   fontWeight: '600', 
                                   marginTop: '1.25rem', 
@@ -786,8 +898,8 @@ export default function ViewPDF() {
                                   color: '#1E65AD',
                                   textAlign: 'center',
                                   lineHeight: '1.5'
-                                }} {...props} />,
-                                h6: ({node, ...props}) => <h6 style={{ 
+                                }} {...props}>{children || ''}</h5>,
+                                h6: ({node, children, ...props}) => <h6 style={{ 
                                   fontSize: '1.25rem', 
                                   fontWeight: '600', 
                                   marginTop: '1rem', 
@@ -795,7 +907,7 @@ export default function ViewPDF() {
                                   textAlign: 'center',
                                   color: '#1E65AD',
                                   lineHeight: '1.5'
-                                }} {...props} />,
+                                }} {...props}>{children || ''}</h6>,
                                 p: ({node, ...props}) => <p style={{ 
                                   marginBottom: '1.5rem', 
                                   marginTop: '0',
@@ -885,14 +997,14 @@ export default function ViewPDF() {
                                   height: '2px',
                                   background: 'linear-gradient(90deg, transparent, #E3F2FD, transparent)'
                                 }} {...props} />,
-                                a: ({node, ...props}) => <a style={{ 
+                                a: ({node, children, ...props}) => <a style={{ 
                                   color: '#1E65AD',
                                   textDecoration: 'underline',
                                   textDecorationColor: '#CF9B63',
                                   textUnderlineOffset: '3px',
                                   fontWeight: '500',
                                   transition: 'color 0.2s ease'
-                                }} {...props} />,
+                                }} {...props}>{children || props.href || ''}</a>,
                                 table: ({node, ...props}) => <table style={{ 
                                   width: '100%',
                                   borderCollapse: 'collapse',
@@ -946,31 +1058,31 @@ export default function ViewPDF() {
                     </div>
                   ) : pdfUrl && pdfUrl.trim() !== "" ? (
                     /* PDF View */
-                    <div className="relative h-full w-full" style={{ minHeight: '350px', display: 'flex', flexDirection: 'column' }}>
-                      {/* Desktop View: Show PDF in iframe */}
-                      <>
-                        {/* PDF Embed - Try iframe first, fallback to button */}
-                        <div className="w-full h-full flex-1" style={{ minHeight: 0, position: 'relative' }}>
-                          <iframe
+                  <div className="relative h-full w-full" style={{ minHeight: '350px', display: 'flex', flexDirection: 'column' }}>
+                    {/* Desktop View: Show PDF in iframe */}
+                    <>
+                      {/* PDF Embed - Try iframe first, fallback to button */}
+                      <div className="w-full h-full flex-1" style={{ minHeight: 0, position: 'relative' }}>
+                        <iframe
                             src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&page=${currentPage}&zoom=page-fit&view=FitH`}
-                            className="absolute inset-0 w-full h-full border-0 rounded-lg"
-                            title={location.state?.act ? 'Act PDF' : 'Judgment PDF'}
-                            style={{ 
-                              width: '100%', 
-                              height: '100%',
-                              display: 'block'
-                            }}
-                            allow="fullscreen"
-                            scrolling="auto"
-                            onLoad={() => {
-                              setLoading(false);
-                            }}
-                            onError={() => {
-                              // If iframe fails, show the button fallback
-                              setError("PDF cannot be embedded due to security restrictions");
-                            }}
-                          />
-                        </div>
+                          className="absolute inset-0 w-full h-full border-0 rounded-lg"
+                          title={location.state?.act ? 'Act PDF' : 'Judgment PDF'}
+                          style={{ 
+                            width: '100%', 
+                            height: '100%',
+                            display: 'block'
+                          }}
+                          allow="fullscreen"
+                          scrolling="auto"
+                          onLoad={() => {
+                            setLoading(false);
+                          }}
+                          onError={() => {
+                            // If iframe fails, show the button fallback
+                            setError("PDF cannot be embedded due to security restrictions");
+                          }}
+                        />
+                      </div>
                         
                         {/* Fallback PDF Access - Show when iframe fails */}
                         {error && (
@@ -1004,7 +1116,7 @@ export default function ViewPDF() {
                       </div>
                     )}
                     </>
-                    
+
                     {/* Loading Overlay - Only show on desktop */}
                     {loading && (
                       <div className="absolute inset-0 bg-gradient-to-br from-white to-gray-50 flex items-center justify-center rounded-lg">
@@ -1023,8 +1135,8 @@ export default function ViewPDF() {
                       </div>
                     )}
                   </div>
-                  ) : (
-                    <div className="flex items-center justify-center h-full min-h-[350px] sm:min-h-[400px]">
+                ) : (
+                   <div className="flex items-center justify-center h-full min-h-[350px] sm:min-h-[400px]">
                      <div className="text-center p-3 sm:p-4 md:p-8">
                        <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto mb-2 sm:mb-3 md:mb-4 rounded-full bg-gradient-to-br flex items-center justify-center" 
                             style={{ background: 'linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)' }}>
@@ -1241,57 +1353,26 @@ export default function ViewPDF() {
               title="Drag to resize"
             />
 
-            {/* Folder Tabs */}
+            {/* Folder Selector and Note Selector */}
             <div className="border-b border-gray-200 bg-gray-50 flex items-center gap-1 px-2 py-1 overflow-x-auto">
               <div className="flex items-center gap-1 flex-1 min-w-0">
-                {notesFolders.map((folder) => (
-                  <button
-                    key={folder.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Save current folder content before switching
-                      setNotesFolders(prev => prev.map(f => 
-                        f.id === activeFolderId ? { ...f, content: notesContent } : f
-                      ));
-                      // Switch to new folder
-                      setActiveFolderId(folder.id);
-                      setNotesContent(folder.content || '');
-                    }}
-                    className={`px-3 py-2 rounded-t-lg text-sm font-medium transition-all whitespace-nowrap flex items-center gap-2 ${
-                      activeFolderId === folder.id
-                        ? 'bg-white text-blue-600 border-b-2 border-blue-600'
-                        : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-                    }`}
-                    style={{ fontFamily: 'Roboto, sans-serif' }}
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                    </svg>
-                    <span>{folder.name}</span>
-                    {notesFolders.length > 1 && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (notesFolders.length > 1) {
-                            const newFolders = notesFolders.filter(f => f.id !== folder.id);
-                            setNotesFolders(newFolders);
-                            if (activeFolderId === folder.id) {
-                              const newActiveId = newFolders[0]?.id || 'default';
-                              setActiveFolderId(newActiveId);
-                              setNotesContent(newFolders.find(f => f.id === newActiveId)?.content || '');
-                            }
-                          }
-                        }}
-                        className="ml-1 hover:bg-gray-200 rounded p-0.5 transition-colors"
-                        title="Delete folder"
-                      >
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    )}
-                  </button>
-                ))}
+                {/* Folder Dropdown */}
+                <select
+                  value={activeFolderId || ''}
+                  onChange={(e) => {
+                    const folderId = e.target.value ? parseInt(e.target.value) : null;
+                    setActiveFolderId(folderId);
+                  }}
+                  className="px-3 py-2 rounded-lg text-sm font-medium border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  style={{ fontFamily: 'Roboto, sans-serif' }}
+                >
+                  <option value="">Unfiled</option>
+                  {apiFolders.map((folder) => (
+                    <option key={folder.id} value={folder.id}>
+                      {folder.name}
+                    </option>
+                  ))}
+                </select>
                 
                 {/* Add New Folder Button */}
                 {showNewFolderInput ? (
@@ -1300,18 +1381,21 @@ export default function ViewPDF() {
                       type="text"
                       value={newFolderName}
                       onChange={(e) => setNewFolderName(e.target.value)}
-                      onKeyPress={(e) => {
+                      onKeyPress={async (e) => {
                         if (e.key === 'Enter' && newFolderName.trim()) {
-                          const newFolder = {
-                            id: `folder-${Date.now()}`,
-                            name: newFolderName.trim(),
-                            content: ''
-                          };
-                          setNotesFolders([...notesFolders, newFolder]);
-                          setActiveFolderId(newFolder.id);
-                          setNotesContent('');
-                          setNewFolderName('');
-                          setShowNewFolderInput(false);
+                          try {
+                            const response = await apiService.createFolder({ name: newFolderName.trim() });
+                            if (response.success && response.data?.folder) {
+                              const newFolder = response.data.folder;
+                              setApiFolders([...apiFolders, newFolder]);
+                              setActiveFolderId(newFolder.id);
+                              setNewFolderName('');
+                              setShowNewFolderInput(false);
+                            }
+                          } catch (error) {
+                            console.error('Error creating folder:', error);
+                            alert('Failed to create folder. Please try again.');
+                          }
                         } else if (e.key === 'Escape') {
                           setShowNewFolderInput(false);
                           setNewFolderName('');
@@ -1341,7 +1425,7 @@ export default function ViewPDF() {
                       e.stopPropagation();
                       setShowNewFolderInput(true);
                     }}
-                    className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-t-lg transition-all flex items-center gap-1"
+                    className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all flex items-center gap-1"
                     title="Add new folder"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1359,10 +1443,6 @@ export default function ViewPDF() {
                 value={notesContent}
                 onChange={(e) => {
                   setNotesContent(e.target.value);
-                  // Update folder content in real-time
-                  setNotesFolders(prev => prev.map(f => 
-                    f.id === activeFolderId ? { ...f, content: e.target.value } : f
-                  ));
                 }}
                 placeholder="Write your notes here..."
                 className="flex-1 w-full p-4 border-0 resize-none focus:outline-none focus:ring-0"
@@ -1381,47 +1461,125 @@ export default function ViewPDF() {
             <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200 bg-gray-50">
               <button
                 onClick={() => {
-                  // Save current folder content before closing
-                  setNotesFolders(prev => prev.map(f => 
-                    f.id === activeFolderId ? { ...f, content: notesContent } : f
-                  ));
                   setShowNotesPopup(false);
                 }}
                 className="px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium text-sm"
                 style={{ fontFamily: 'Roboto, sans-serif', cursor: 'pointer' }}
+                disabled={savingNote}
               >
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  // Save notes logic here - save all folders
-                  setNotesFolders(prev => prev.map(f => 
-                    f.id === activeFolderId ? { ...f, content: notesContent } : f
-                  ));
-                  console.log('Saving notes folders:', notesFolders);
-                  // You can implement save functionality here (localStorage, API, etc.)
-                  // Save to localStorage for persistence
-                  const notesKey = `notes_${judgmentInfo?.id || judgmentInfo?.act_id || 'default'}`;
-                  const updatedFolders = notesFolders.map(f => 
-                    f.id === activeFolderId ? { ...f, content: notesContent } : f
-                  );
-                  localStorage.setItem(notesKey, JSON.stringify(updatedFolders));
-                  setShowNotesPopup(false);
+                onClick={async () => {
+                  if (!isAuthenticated) {
+                    navigate('/login');
+                    return;
+                  }
+
+                  const refInfo = getReferenceInfo();
+                  if (!refInfo || !refInfo.reference_id) {
+                    alert('Unable to determine reference information');
+                    return;
+                  }
+
+                  if (!notesContent.trim()) {
+                    alert('Please enter some content for the note');
+                    return;
+                  }
+
+                  try {
+                    setSavingNote(true);
+                    
+                    // Prepare reference_data
+                    const referenceData = {
+                      title: judgmentInfo?.title || judgmentInfo?.short_title || 'Untitled',
+                      ...(location.state?.act ? {
+                        ministry: judgmentInfo?.ministry || 'N/A',
+                        department: judgmentInfo?.department || 'N/A',
+                        year: judgmentInfo?.year || 'N/A'
+                      } : {
+                        court_name: judgmentInfo?.court_name || 'N/A',
+                        judge: judgmentInfo?.judge || 'N/A',
+                        decision_date: judgmentInfo?.decision_date || 'N/A'
+                      })
+                    };
+
+                    const noteData = {
+                      title: (judgmentInfo?.title || judgmentInfo?.short_title || 'Untitled Note').substring(0, 200),
+                      content: notesContent,
+                      reference_type: refInfo.reference_type,
+                      reference_id: refInfo.reference_id,
+                      reference_data: referenceData,
+                      folder_id: activeFolderId || null,
+                      tags: [] // Can be enhanced later
+                    };
+
+                    if (activeNoteId) {
+                      // Update existing note
+                      await apiService.updateNote(activeNoteId, noteData);
+                    } else {
+                      // Create new note
+                      const response = await apiService.createNote(noteData);
+                      if (response.success && response.data?.note) {
+                        setActiveNoteId(response.data.note.id);
+                      }
+                    }
+
+                    // Reload notes to update count
+                    const notesResponse = await apiService.getNotesByReference(
+                      refInfo.reference_type,
+                      refInfo.reference_id
+                    );
+                    
+                    // Handle different response formats
+                    let updatedNotes = [];
+                    if (notesResponse.success && notesResponse.data?.notes) {
+                      updatedNotes = notesResponse.data.notes;
+                    } else if (Array.isArray(notesResponse)) {
+                      updatedNotes = notesResponse;
+                    } else if (notesResponse.data && Array.isArray(notesResponse.data)) {
+                      updatedNotes = notesResponse.data;
+                    }
+                    
+                    setExistingNotes(updatedNotes);
+                    setNotesCount(updatedNotes.length);
+                    
+                    // Update active note if we just created one
+                    if (!activeNoteId && updatedNotes.length > 0) {
+                      const newNote = updatedNotes.find(n => 
+                        n.reference_type === refInfo.reference_type && 
+                        n.reference_id === refInfo.reference_id
+                      ) || updatedNotes[0];
+                      setActiveNoteId(newNote.id);
+                    }
+
+                    setShowNotesPopup(false);
+                  } catch (error) {
+                    console.error('Error saving note:', error);
+                    alert(`Failed to save note: ${error.message || 'Unknown error'}`);
+                  } finally {
+                    setSavingNote(false);
+                  }
                 }}
-                className="px-4 py-2 text-white rounded-lg transition-all font-medium text-sm shadow-sm hover:shadow-md"
+                className="px-4 py-2 text-white rounded-lg transition-all font-medium text-sm shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ 
                   fontFamily: 'Roboto, sans-serif',
                   background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)',
-                  cursor: 'pointer'
+                  cursor: savingNote ? 'not-allowed' : 'pointer'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.background = 'linear-gradient(90deg, #1a5a9a 0%, #b88a56 100%)';
+                  if (!savingNote) {
+                    e.target.style.background = 'linear-gradient(90deg, #1a5a9a 0%, #b88a56 100%)';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.background = 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)';
+                  if (!savingNote) {
+                    e.target.style.background = 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)';
+                  }
                 }}
+                disabled={savingNote}
               >
-                Save Notes
+                {savingNote ? 'Saving...' : 'Save Notes'}
               </button>
             </div>
           </div>

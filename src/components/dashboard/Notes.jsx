@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import apiService from '../../services/api';
 import { 
   FileText, 
   Folder, 
@@ -11,44 +13,239 @@ import {
   FolderPlus,
   Calendar,
   Clock,
-  Tag
+  Tag,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink
 } from 'lucide-react';
 
 const Notes = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFolder, setSelectedFolder] = useState(null);
+  const [selectedReferenceType, setSelectedReferenceType] = useState('');
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
 
   const [folders, setFolders] = useState([]);
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  // Load folders and notes from API
-  useEffect(() => {
-    // TODO: Load folders and notes from API
-    // For now, initialize with empty arrays
-    setFolders([]);
-    setNotes([]);
-  }, []);
-
-  const filteredNotes = notes.filter(note => {
-    const matchesSearch = note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         note.content.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFolder = selectedFolder ? note.folderId === selectedFolder.id : true;
-    return matchesSearch && matchesFolder;
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    pages: 1
   });
 
-  const handleNoteClick = (note) => {
-    navigate(`/notes/${note.id}`, { state: { note, folders } });
+  // Load folders from API
+  useEffect(() => {
+    const loadFolders = async () => {
+      if (!isAuthenticated) return;
+      
+      try {
+        const response = await apiService.getFolders();
+        let foldersData = [];
+        if (response.success && response.data?.folders) {
+          foldersData = response.data.folders;
+        } else if (Array.isArray(response)) {
+          foldersData = response;
+        } else if (response.data && Array.isArray(response.data)) {
+          foldersData = response.data;
+        }
+        setFolders(foldersData);
+      } catch (error) {
+        console.error('Error loading folders:', error);
+        setFolders([]);
+      }
+    };
+
+    loadFolders();
+  }, [isAuthenticated]);
+
+  // Load notes from API
+  useEffect(() => {
+    const loadNotes = async () => {
+      if (!isAuthenticated) {
+        setNotes([]);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const params = {
+          page: pagination.page,
+          limit: pagination.limit
+        };
+
+        if (selectedFolder && selectedFolder.id !== 'unfiled') {
+          // Only pass folder_id if it's not "unfiled"
+          // For unfiled, we'll filter client-side
+          params.folder_id = selectedFolder.id;
+        }
+
+        if (selectedReferenceType) {
+          params.reference_type = selectedReferenceType;
+        }
+
+        if (searchQuery.trim()) {
+          params.search = searchQuery.trim();
+        }
+
+        const response = await apiService.getNotes(params);
+        
+        let notesData = [];
+        let paginationData = pagination;
+        
+        if (response.success && response.data?.notes) {
+          notesData = response.data.notes;
+          if (response.data.pagination) {
+            paginationData = {
+              page: response.data.pagination.page || pagination.page,
+              limit: response.data.pagination.limit || pagination.limit,
+              total: response.data.pagination.total || 0,
+              pages: response.data.pagination.pages || 1
+            };
+          }
+        } else if (Array.isArray(response)) {
+          notesData = response;
+        } else if (response.data && Array.isArray(response.data)) {
+          notesData = response.data;
+        }
+
+        // Filter for unfiled notes if needed
+        let filteredNotesData = notesData;
+        if (selectedFolder && selectedFolder.id === 'unfiled') {
+          filteredNotesData = notesData.filter(note => !note.folder_id);
+        }
+
+        setNotes(filteredNotesData);
+        setPagination(paginationData);
+      } catch (error) {
+        console.error('Error loading notes:', error);
+        setNotes([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadNotes();
+  }, [isAuthenticated, pagination.page, selectedFolder, selectedReferenceType, searchQuery]);
+
+  const handleNoteClick = async (note) => {
+    // Navigate to the referenced item
+    try {
+      if (note.reference_type === 'judgment') {
+        const judgment = await apiService.getJudgementById(note.reference_id);
+        navigate('/view-pdf', { state: { judgment } });
+      } else if (note.reference_type === 'central_act') {
+        const act = await apiService.getCentralActById(note.reference_id);
+        navigate('/view-pdf', { state: { act } });
+      } else if (note.reference_type === 'state_act') {
+        const act = await apiService.getStateActById(note.reference_id);
+        navigate('/view-pdf', { state: { act } });
+      } else {
+        // For mappings, navigate to law mapping page
+        navigate(`/law-mapping?type=${note.reference_type}`, { 
+          state: { highlightId: note.reference_id } 
+        });
+      }
+    } catch (error) {
+      console.error('Error navigating to referenced item:', error);
+      alert('Failed to load the referenced item');
+    }
   };
 
   const handleFolderClick = (folder) => {
     setSelectedFolder(selectedFolder?.id === folder.id ? null : folder);
+    setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page
+  };
+
+  const handleDeleteNote = async (noteId, e) => {
+    e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this note?')) {
+      return;
+    }
+
+    try {
+      await apiService.deleteNote(noteId);
+      // Reload notes
+      setNotes(prev => prev.filter(note => note.id !== noteId));
+      setPagination(prev => ({ ...prev, total: Math.max(0, prev.total - 1) }));
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      alert('Failed to delete note. Please try again.');
+    }
+  };
+
+  const handleCreateFolder = async () => {
+    const folderName = prompt('Enter folder name:');
+    if (!folderName || !folderName.trim()) return;
+
+    try {
+      const response = await apiService.createFolder({ name: folderName.trim() });
+      if (response.success && response.data?.folder) {
+        setFolders(prev => [...prev, response.data.folder]);
+      }
+    } catch (error) {
+      console.error('Error creating folder:', error);
+      alert('Failed to create folder. Please try again.');
+    }
+  };
+
+  const handleDeleteFolder = async (folderId, e) => {
+    e.stopPropagation();
+    
+    const folder = folders.find(f => f.id === folderId);
+    const folderNotesCount = getFolderNotes(folderId).length;
+    
+    const confirmMessage = folderNotesCount > 0
+      ? `Are you sure you want to delete "${folder?.name}"? This folder contains ${folderNotesCount} note(s). The notes will be moved to "Unfiled" but will not be deleted.`
+      : `Are you sure you want to delete "${folder?.name}"?`;
+    
+    if (!window.confirm(confirmMessage)) {
+      return;
+    }
+
+    try {
+      await apiService.deleteFolder(folderId);
+      
+      // Remove folder from state
+      setFolders(prev => prev.filter(f => f.id !== folderId));
+      
+      // If this folder was selected, clear the selection
+      if (selectedFolder?.id === folderId) {
+        setSelectedFolder(null);
+      }
+      
+      // Reload notes to reflect the change (notes will now be unfiled)
+      // The useEffect will automatically reload notes when selectedFolder changes
+    } catch (error) {
+      console.error('Error deleting folder:', error);
+      alert('Failed to delete folder. Please try again.');
+    }
   };
 
   const getFolderNotes = (folderId) => {
-    return notes.filter(note => note.folderId === folderId);
+    return notes.filter(note => note.folder_id === folderId);
+  };
+
+  const getReferenceTypeLabel = (type) => {
+    const labels = {
+      'judgment': 'Judgment',
+      'central_act': 'Central Act',
+      'state_act': 'State Act',
+      'bns_ipc_mapping': 'BNS-IPC Mapping',
+      'bsa_iea_mapping': 'BSA-IEA Mapping',
+      'bnss_crpc_mapping': 'BNSS-CrPC Mapping'
+    };
+    return labels[type] || type;
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.pages) {
+      setPagination(prev => ({ ...prev, page: newPage }));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   return (
@@ -66,6 +263,7 @@ const Notes = () => {
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-3 sm:gap-0">
             <button 
+              onClick={handleCreateFolder}
               className="px-3 sm:px-4 py-2 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg flex items-center justify-center space-x-1.5 sm:space-x-2 text-xs sm:text-sm w-full sm:w-auto"
               style={{ 
                 backgroundColor: '#1E65AD', 
@@ -76,33 +274,44 @@ const Notes = () => {
               <FolderPlus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span>New Folder</span>
             </button>
-            <button 
-              className="px-3 sm:px-4 py-2 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg flex items-center justify-center space-x-1.5 sm:space-x-2 text-xs sm:text-sm w-full sm:w-auto"
-              style={{ 
-                backgroundColor: '#CF9B63', 
-                color: 'white',
-                fontFamily: 'Roboto, sans-serif'
-              }}
-            >
-              <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              <span>New Note</span>
-            </button>
           </div>
         </div>
       </div>
 
-      {/* Search Bar */}
+      {/* Search and Filters */}
       <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4 shadow-sm">
-        <div className="relative">
-          <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search notes..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-xs sm:text-sm"
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search notes..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page
+              }}
+              className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-xs sm:text-sm"
+              style={{ fontFamily: 'Roboto, sans-serif' }}
+            />
+          </div>
+          <select
+            value={selectedReferenceType}
+            onChange={(e) => {
+              setSelectedReferenceType(e.target.value);
+              setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page
+            }}
+            className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-xs sm:text-sm"
             style={{ fontFamily: 'Roboto, sans-serif' }}
-          />
+          >
+            <option value="">All Types</option>
+            <option value="judgment">Judgments</option>
+            <option value="central_act">Central Acts</option>
+            <option value="state_act">State Acts</option>
+            <option value="bns_ipc_mapping">BNS-IPC Mappings</option>
+            <option value="bsa_iea_mapping">BSA-IEA Mappings</option>
+            <option value="bnss_crpc_mapping">BNSS-CrPC Mappings</option>
+          </select>
         </div>
       </div>
 
@@ -112,26 +321,59 @@ const Notes = () => {
           Folders
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {/* Unfiled folder */}
+          <div
+            onClick={() => {
+              setSelectedFolder(selectedFolder?.id === 'unfiled' ? null : { id: 'unfiled', name: 'Unfiled' });
+              setPagination(prev => ({ ...prev, page: 1 }));
+            }}
+            className={`p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-lg ${
+              selectedFolder?.id === 'unfiled' ? 'ring-2 ring-offset-2 ring-blue-500' : ''
+            }`}
+            style={{
+              borderColor: selectedFolder?.id === 'unfiled' ? '#1E65AD' : '#E5E7EB',
+              backgroundColor: selectedFolder?.id === 'unfiled' ? '#E3F2FD' : 'white'
+            }}
+          >
+            <div className="flex items-center justify-between mb-2 sm:mb-3">
+              <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+                <div 
+                  className="p-1.5 sm:p-2 rounded-lg flex-shrink-0"
+                  style={{ backgroundColor: '#E3F2FD' }}
+                >
+                  <Folder className="h-4 w-4 sm:h-5 sm:w-5" style={{ color: '#1E65AD' }} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    Unfiled
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    {notes.filter(note => !note.folder_id).length} notes
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
           {folders.map((folder) => (
             <div
               key={folder.id}
               onClick={() => handleFolderClick(folder)}
-              className={`p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-lg ${
-                selectedFolder?.id === folder.id ? 'ring-2 ring-offset-2' : ''
+              className={`p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-lg relative ${
+                selectedFolder?.id === folder.id ? 'ring-2 ring-offset-2 ring-blue-500' : ''
               }`}
               style={{
-                borderColor: selectedFolder?.id === folder.id ? folder.color : '#E5E7EB',
-                ringColor: folder.color,
-                backgroundColor: selectedFolder?.id === folder.id ? `${folder.color}10` : 'white'
+                borderColor: selectedFolder?.id === folder.id ? '#1E65AD' : '#E5E7EB',
+                backgroundColor: selectedFolder?.id === folder.id ? '#E3F2FD' : 'white'
               }}
             >
               <div className="flex items-center justify-between mb-2 sm:mb-3">
                 <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
                   <div 
                     className="p-1.5 sm:p-2 rounded-lg flex-shrink-0"
-                    style={{ backgroundColor: `${folder.color}20` }}
+                    style={{ backgroundColor: '#E3F2FD' }}
                   >
-                    <Folder className="h-4 w-4 sm:h-5 sm:w-5" style={{ color: folder.color }} />
+                    <Folder className="h-4 w-4 sm:h-5 sm:w-5" style={{ color: '#1E65AD' }} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate" style={{ fontFamily: 'Roboto, sans-serif' }}>
@@ -142,6 +384,14 @@ const Notes = () => {
                     </p>
                   </div>
                 </div>
+                <button
+                  onClick={(e) => handleDeleteFolder(folder.id, e)}
+                  className="p-1.5 rounded hover:bg-red-100 flex-shrink-0 transition-colors"
+                  title="Delete folder"
+                  style={{ marginLeft: '0.5rem' }}
+                >
+                  <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-500" />
+                </button>
               </div>
             </div>
           ))}
@@ -154,7 +404,7 @@ const Notes = () => {
           <h2 className="text-base sm:text-lg font-semibold truncate flex-1 min-w-0" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
             <span className="hidden sm:inline">{selectedFolder ? `${selectedFolder.name} Notes` : 'All Notes'}</span>
             <span className="sm:hidden">{selectedFolder ? selectedFolder.name : 'All Notes'}</span>
-            <span className="ml-1 sm:ml-2">({filteredNotes.length})</span>
+            <span className="ml-1 sm:ml-2">({pagination.total})</span>
           </h2>
           <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
             <button
@@ -180,61 +430,76 @@ const Notes = () => {
           </div>
         </div>
 
-        {filteredNotes.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-8 sm:py-12">
+            <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-600 mx-auto mb-3 sm:mb-4"></div>
+            <p className="text-gray-500 text-xs sm:text-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
+              Loading notes...
+            </p>
+          </div>
+        ) : notes.length === 0 ? (
           <div className="text-center py-8 sm:py-12">
             <FileText className="h-12 w-12 sm:h-16 sm:w-16 text-gray-300 mx-auto mb-3 sm:mb-4" />
             <p className="text-gray-500 text-xs sm:text-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
-              No notes found. Create your first note!
+              No notes found. Create your first note from a judgment or act!
             </p>
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {filteredNotes.map((note) => {
-              const folder = folders.find(f => f.id === note.folderId);
+            {notes.map((note) => {
+              const folder = folders.find(f => f.id === note.folder_id);
               return (
                 <div
                   key={note.id}
                   onClick={() => handleNoteClick(note)}
-                  className="p-3 sm:p-4 md:p-5 rounded-lg sm:rounded-xl border border-gray-200 cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1 bg-white"
+                  className="p-3 sm:p-4 md:p-5 rounded-lg sm:rounded-xl border border-gray-200 cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1 bg-white relative"
                 >
                   <div className="flex items-start justify-between mb-2 sm:mb-3 gap-2">
                     <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          {getReferenceTypeLabel(note.reference_type)}
+                        </span>
+                      </div>
                       <h3 className="font-semibold text-gray-900 mb-1.5 sm:mb-2 line-clamp-2 text-sm sm:text-base" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         {note.title}
                       </h3>
                       <p className="text-xs sm:text-sm text-gray-600 line-clamp-3 mb-2 sm:mb-3" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                        {note.content}
+                        {note.content?.substring(0, 150)}...
                       </p>
                     </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // Handle menu click
-                      }}
-                      className="p-1 sm:p-1 rounded hover:bg-gray-100 flex-shrink-0"
-                    >
-                      <MoreVertical className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400" />
-                    </button>
+                    <div className="relative">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteNote(note.id, e);
+                        }}
+                        className="p-1 sm:p-1 rounded hover:bg-red-100 flex-shrink-0"
+                        title="Delete note"
+                      >
+                        <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-500" />
+                      </button>
+                    </div>
                   </div>
                   
                   <div className="flex items-center justify-between mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200 gap-2">
                     <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0 flex-1">
-                      {folder && (
+                      {folder ? (
                         <span
-                          className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs font-medium truncate"
-                          style={{ 
-                            backgroundColor: `${folder.color}20`,
-                            color: folder.color,
-                            fontFamily: 'Roboto, sans-serif'
-                          }}
+                          className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs font-medium truncate bg-blue-100 text-blue-800"
+                          style={{ fontFamily: 'Roboto, sans-serif' }}
                         >
                           {folder.name}
+                        </span>
+                      ) : (
+                        <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs font-medium text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          Unfiled
                         </span>
                       )}
                     </div>
                     <div className="flex items-center space-x-1 text-[10px] sm:text-xs text-gray-500 flex-shrink-0" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       <Clock className="h-3 w-3 flex-shrink-0" />
-                      <span className="whitespace-nowrap">{new Date(note.updatedAt).toLocaleDateString()}</span>
+                      <span className="whitespace-nowrap">{new Date(note.updated_at || note.updatedAt).toLocaleDateString()}</span>
                     </div>
                   </div>
                 </div>
@@ -243,8 +508,8 @@ const Notes = () => {
           </div>
         ) : (
           <div className="space-y-2 sm:space-y-3">
-            {filteredNotes.map((note) => {
-              const folder = folders.find(f => f.id === note.folderId);
+            {notes.map((note) => {
+              const folder = folders.find(f => f.id === note.folder_id);
               return (
                 <div
                   key={note.id}
@@ -253,28 +518,37 @@ const Notes = () => {
                 >
                   <div className="flex items-center space-x-2 sm:space-x-3 sm:space-x-4 flex-1 min-w-0">
                     <div 
-                      className="p-2 sm:p-2.5 md:p-3 rounded-lg flex-shrink-0"
-                      style={{ backgroundColor: folder ? `${folder.color}20` : '#F3F4F6' }}
+                      className="p-2 sm:p-2.5 md:p-3 rounded-lg flex-shrink-0 bg-blue-100"
                     >
-                      <FileText className="h-4 w-4 sm:h-5 sm:w-5" style={{ color: folder?.color || '#6B7280' }} />
+                      <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                     </div>
                     <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          {getReferenceTypeLabel(note.reference_type)}
+                        </span>
+                      </div>
                       <h3 className="font-semibold text-gray-900 mb-0.5 sm:mb-1 text-sm sm:text-base truncate" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         {note.title}
                       </h3>
                       <p className="text-xs sm:text-sm text-gray-600 line-clamp-1 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                        {note.content}
+                        {note.content?.substring(0, 100)}...
                       </p>
                       <div className="flex items-center flex-wrap gap-2 sm:gap-3 text-[10px] sm:text-xs text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                        {folder && (
+                        {folder ? (
                           <span className="flex items-center space-x-1">
                             <Folder className="h-3 w-3 flex-shrink-0" />
                             <span className="truncate">{folder.name}</span>
                           </span>
+                        ) : (
+                          <span className="flex items-center space-x-1 text-gray-400">
+                            <Folder className="h-3 w-3 flex-shrink-0" />
+                            <span>Unfiled</span>
+                          </span>
                         )}
                         <span className="flex items-center space-x-1">
                           <Clock className="h-3 w-3 flex-shrink-0" />
-                          <span>{new Date(note.updatedAt).toLocaleDateString()}</span>
+                          <span>{new Date(note.updated_at || note.updatedAt).toLocaleDateString()}</span>
                         </span>
                       </div>
                     </div>
@@ -282,15 +556,46 @@ const Notes = () => {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      // Handle menu click
+                      handleDeleteNote(note.id, e);
                     }}
-                    className="p-1.5 sm:p-2 rounded hover:bg-gray-100 flex-shrink-0"
+                    className="p-1.5 sm:p-2 rounded hover:bg-red-100 flex-shrink-0"
+                    title="Delete note"
                   >
-                    <MoreVertical className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+                    <Trash2 className="h-4 w-4 sm:h-5 sm:w-5 text-red-500" />
                   </button>
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {!loading && pagination.pages > 1 && (
+          <div className="flex items-center justify-between mt-4 sm:mt-6 pt-4 border-t border-gray-200">
+            <div className="text-xs sm:text-sm text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
+              Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} notes
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handlePageChange(pagination.page - 1)}
+                disabled={pagination.page === 1}
+                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                title="Previous page"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <span className="text-xs sm:text-sm text-gray-700 px-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                Page {pagination.page} of {pagination.pages}
+              </span>
+              <button
+                onClick={() => handlePageChange(pagination.page + 1)}
+                disabled={pagination.page === pagination.pages}
+                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                title="Next page"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         )}
       </div>

@@ -2008,20 +2008,8 @@ class ApiService {
   }
 
   // Additional API endpoints from documentation
-
-  // Get sessions (alias for getActiveSessions for consistency with documentation)
-  async getSessions() {
-    return await this.getActiveSessions();
-  }
-
-  // Delete session (alias for consistency with documentation)
-  async deleteSession(sessionId) {
-    const response = await fetch(`${this.baseURL}/auth/sessions/${sessionId}`, {
-      method: 'DELETE',
-      headers: this.getAuthHeaders()
-    });
-    return await this.handleResponse(response);
-  }
+  // Note: getSessions() and deleteSession() are already defined above (lines 317, 326)
+  // These were duplicates and have been removed to fix build errors
 
   // Health check endpoint
   async healthCheck() {
@@ -2055,6 +2043,105 @@ class ApiService {
         'Content-Type': 'application/json',
         'ngrok-skip-browser-warning': 'true'
       }
+    });
+    return await this.handleResponse(response);
+  }
+
+  // Notes API Methods
+
+  // Create a note
+  async createNote(noteData) {
+    const response = await fetch(`${this.baseURL}/api/notes`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(noteData)
+    });
+    return await this.handleResponse(response);
+  }
+
+  // Get notes by reference (judgment, act, or mapping)
+  async getNotesByReference(referenceType, referenceId) {
+    const response = await fetch(`${this.baseURL}/api/notes/reference/${referenceType}/${referenceId}`, {
+      method: 'GET',
+      headers: this.getAuthHeaders()
+    });
+    return await this.handleResponse(response);
+  }
+
+  // List user notes with filters
+  async getNotes(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    const response = await fetch(`${this.baseURL}/api/notes?${queryString}`, {
+      method: 'GET',
+      headers: this.getAuthHeaders()
+    });
+    return await this.handleResponse(response);
+  }
+
+  // Update a note
+  async updateNote(noteId, noteData) {
+    const response = await fetch(`${this.baseURL}/api/notes/${noteId}`, {
+      method: 'PUT',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(noteData)
+    });
+    return await this.handleResponse(response);
+  }
+
+  // Delete a note
+  async deleteNote(noteId) {
+    const response = await fetch(`${this.baseURL}/api/notes/${noteId}`, {
+      method: 'DELETE',
+      headers: this.getAuthHeaders()
+    });
+    return await this.handleResponse(response);
+  }
+
+  // Folders API Methods
+
+  // List user folders
+  async getFolders() {
+    const response = await fetch(`${this.baseURL}/api/folders`, {
+      method: 'GET',
+      headers: this.getAuthHeaders()
+    });
+    const result = await this.handleResponse(response);
+    // Handle different response formats
+    if (result.success && result.data?.folders) {
+      return result;
+    } else if (Array.isArray(result)) {
+      return { success: true, data: { folders: result } };
+    } else if (result.data && Array.isArray(result.data)) {
+      return { success: true, data: { folders: result.data } };
+    }
+    return result;
+  }
+
+  // Create a folder
+  async createFolder(folderData) {
+    const response = await fetch(`${this.baseURL}/api/folders`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(folderData)
+    });
+    return await this.handleResponse(response);
+  }
+
+  // Update a folder
+  async updateFolder(folderId, folderData) {
+    const response = await fetch(`${this.baseURL}/api/folders/${folderId}`, {
+      method: 'PUT',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(folderData)
+    });
+    return await this.handleResponse(response);
+  }
+
+  // Delete a folder
+  async deleteFolder(folderId) {
+    const response = await fetch(`${this.baseURL}/api/folders/${folderId}`, {
+      method: 'DELETE',
+      headers: this.getAuthHeaders()
     });
     return await this.handleResponse(response);
   }
