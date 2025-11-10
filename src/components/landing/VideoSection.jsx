@@ -3,6 +3,8 @@ import useScrollAnimation from "../../hooks/useScrollAnimation";
 
 const VideoSection = () => {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   const videoRef = useRef(null);
   const { ref: sectionRef, isVisible } = useScrollAnimation({ threshold: 0.1, rootMargin: '50px' });
 
@@ -40,12 +42,35 @@ const VideoSection = () => {
   ];
 
   const handlePlayVideo = () => {
+    setIsVideoLoading(true);
+    setVideoError(false);
     setIsVideoPlaying(true);
     if (videoRef.current) {
-      videoRef.current.play().catch(error => {
-        console.error('Error playing video:', error);
-      });
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsVideoLoading(false);
+          })
+          .catch(error => {
+            console.error('Error playing video:', error);
+            setIsVideoLoading(false);
+            setVideoError(true);
+            setIsVideoPlaying(false);
+          });
+      }
     }
+  };
+
+  const handleVideoError = () => {
+    setVideoError(true);
+    setIsVideoLoading(false);
+    setIsVideoPlaying(false);
+  };
+
+  const handleVideoLoaded = () => {
+    setIsVideoLoading(false);
+    setVideoError(false);
   };
 
   return (
@@ -175,7 +200,7 @@ const VideoSection = () => {
               {/* Video Container */}
               <div className="relative aspect-video bg-gray-300 overflow-hidden">
                 {/* Gray Cover Photo - Shows when video is not playing */}
-                {!isVideoPlaying && (
+                {(!isVideoPlaying || videoError) && (
                   <div 
                     className="absolute inset-0 flex items-center justify-center z-10"
                     style={{ backgroundColor: '#9CA3AF' }}
@@ -191,53 +216,91 @@ const VideoSection = () => {
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="text-center">
-                        {/* Play Button */}
-                        <button
-                          onClick={handlePlayVideo}
-                          className="w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 hover:shadow-lg"
-                          style={{ 
-                            backgroundColor: '#FFFFFF',
-                            boxShadow: '0 8px 25px rgba(255, 255, 255, 0.3)'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.target.style.backgroundColor = '#F3F4F6';
-                            e.target.style.boxShadow = '0 12px 30px rgba(255, 255, 255, 0.4)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.target.style.backgroundColor = '#FFFFFF';
-                            e.target.style.boxShadow = '0 8px 25px rgba(255, 255, 255, 0.3)';
-                          }}
-                        >
-                          <svg 
-                            className="w-8 h-8 ml-1" 
-                            fill="currentColor" 
-                            viewBox="0 0 24 24"
-                            style={{ color: '#1E65AD' }}
-                          >
-                            <path d="M8 5v14l11-7z"/>
-                          </svg>
-                        </button>
-                        
-                        <p 
-                          className="mt-4 text-lg font-semibold"
-                          style={{ color: '#FFFFFF', fontFamily: 'Roboto, sans-serif' }}
-                        >
-                          Watch Video
-                        </p>
+                        {videoError ? (
+                          <>
+                            <div className="mb-4">
+                              <svg className="w-12 h-12 mx-auto text-white opacity-75" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
+                            <p className="text-white text-sm mb-4" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                              Video unavailable
+                            </p>
+                            <button
+                              onClick={handlePlayVideo}
+                              className="px-4 py-2 bg-white text-blue-600 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                              style={{ fontFamily: 'Roboto, sans-serif' }}
+                            >
+                              Retry
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            {/* Play Button */}
+                            <button
+                              onClick={handlePlayVideo}
+                              disabled={isVideoLoading}
+                              className="w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                              style={{ 
+                                backgroundColor: '#FFFFFF',
+                                boxShadow: '0 8px 25px rgba(255, 255, 255, 0.3)'
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!isVideoLoading) {
+                                  e.target.style.backgroundColor = '#F3F4F6';
+                                  e.target.style.boxShadow = '0 12px 30px rgba(255, 255, 255, 0.4)';
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                e.target.style.backgroundColor = '#FFFFFF';
+                                e.target.style.boxShadow = '0 8px 25px rgba(255, 255, 255, 0.3)';
+                              }}
+                            >
+                              {isVideoLoading ? (
+                                <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                              ) : (
+                                <svg 
+                                  className="w-8 h-8 ml-1" 
+                                  fill="currentColor" 
+                                  viewBox="0 0 24 24"
+                                  style={{ color: '#1E65AD' }}
+                                >
+                                  <path d="M8 5v14l11-7z"/>
+                                </svg>
+                              )}
+                            </button>
+                            
+                            <p 
+                              className="mt-4 text-lg font-semibold"
+                              style={{ color: '#FFFFFF', fontFamily: 'Roboto, sans-serif' }}
+                            >
+                              {isVideoLoading ? 'Loading...' : 'Watch Video'}
+                            </p>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
                 )}
                 <video
                   ref={videoRef}
-                  className={`w-full h-full object-cover ${!isVideoPlaying ? 'opacity-0 absolute' : 'opacity-100 relative'} transition-opacity duration-300`}
+                  className={`w-full h-full object-cover ${!isVideoPlaying || videoError ? 'opacity-0 absolute' : 'opacity-100 relative'} transition-opacity duration-300`}
                   controls
-                  onPlay={() => setIsVideoPlaying(true)}
+                  preload="metadata"
+                  onPlay={() => {
+                    setIsVideoPlaying(true);
+                    setIsVideoLoading(false);
+                    setVideoError(false);
+                  }}
                   onPause={() => setIsVideoPlaying(false)}
                   onEnded={() => setIsVideoPlaying(false)}
+                  onError={handleVideoError}
+                  onLoadedData={handleVideoLoaded}
+                  onCanPlay={handleVideoLoaded}
                   poster="/slaha.png"
                 >
                   <source src="/sl.mp4" type="video/mp4" />
+                  <source src="/sl.webm" type="video/webm" />
                   Your browser does not support the video tag.
                 </video>
               </div>

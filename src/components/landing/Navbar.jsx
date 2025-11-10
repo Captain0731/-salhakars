@@ -614,29 +614,54 @@ const Navbar = () => {
               </div>
             ) : (
               <button
+                type="button"
                 onClick={() => navigate("/login")}
-                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border-2 font-semibold hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full text-sm touch-manipulation"
-                style={{ 
-                  color: '#FFFFFF',
-                  fontFamily: 'Roboto, sans-serif',
-                  background: 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)',
-                  borderColor: '#1E65AD',
-                  minHeight: '50px',
-                  minWidth: '100px',
-                  boxShadow: '0 2px 8px rgba(30, 101, 173, 0.3)'
+                className="animated-login-button w-full"
+                style={{
+                  cursor: 'pointer',
+                  position: 'relative',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                  transition: 'all 0.25s ease',
+                  background: 'radial-gradient(65.28% 65.28% at 50% 100%, rgba(207, 155, 99, 0.6) 0%, rgba(207, 155, 99, 0) 100%), linear-gradient(0deg, #1E65AD, #1E65AD)',
+                  borderRadius: '0.75rem',
+                  border: '2px solid #CF9B63',
+                  outline: 'none',
+                  padding: '12px 18px',
+                  width: '100%',
+                  height: '48px'
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'linear-gradient(135deg, #CF9B63 0%, #1E65AD 100%)';
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(207, 155, 99, 0.5)';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(30, 101, 173, 0.3)';
-                  e.currentTarget.style.transform = 'translateY(0)';
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigate("/login");
+                  }
                 }}
               >
-                Login
+                <span className="fold"></span>
+                <div className="points_wrapper">
+                  {[...Array(10)].map((_, i) => (
+                    <i key={i} className="point"></i>
+                  ))}
+                </div>
+                <span className="inner">
+                  <svg
+                    className="icon"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2.5"
+                    style={{ width: '18px', height: '18px' }}
+                  >
+                    <path d="m15.626 11.769a6 6 0 1 0 -7.252 0 9.008 9.008 0 0 0 -5.374 8.231 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 9.008 9.008 0 0 0 -5.374-8.231zm-7.626-4.769a4 4 0 1 1 4 4 4 4 0 0 1 -4-4zm10 14h-12a1 1 0 0 1 -1-1 7 7 0 0 1 14 0 1 1 0 0 1 -1 1z"></path>
+                  </svg>
+                  Log In
+                </span>
               </button>
             )}
           </li>
@@ -720,29 +745,54 @@ const Navbar = () => {
               </div>
           ) : (
             <button
+              type="button"
               onClick={() => navigate("/login")}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border-2 font-semibold hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm touch-manipulation"
-              style={{ 
-                color: '#FFFFFF',
-                fontFamily: 'Roboto, sans-serif',
-                background: 'linear-gradient(135deg, #1E65AD 100%)',
-                borderColor: '#1E65AD',
-                minHeight: '50px',
-                minWidth: '100px',
-                boxShadow: '0 2px 8px rgba(30, 101, 173, 0.3)'
+              className="animated-login-button"
+              style={{
+                cursor: 'pointer',
+                position: 'relative',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                transition: 'all 0.25s ease',
+                background: 'radial-gradient(65.28% 65.28% at 50% 100%, rgba(223, 113, 255, 0.8) 0%, rgba(223, 113, 255, 0) 100%), linear-gradient(0deg, #7a5af8, #7a5af8)',
+                borderRadius: '0.75rem',
+                border: 'none',
+                outline: 'none',
+                padding: '12px 18px',
+                width: '120px',
+                height: '48px'
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'linear-gradient(135deg,rgba(207, 155, 99, 0.5) 100%)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(207, 155, 99, 0.5)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'linear-gradient(135deg, #1E65AD 100%)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(30, 101, 173, 0.3)';
-                e.currentTarget.style.transform = 'translateY(0)';
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  navigate("/login");
+                }
               }}
             >
-              Login
+              <span className="fold"></span>
+              <div className="points_wrapper">
+                {[...Array(10)].map((_, i) => (
+                  <i key={i} className="point"></i>
+                ))}
+              </div>
+              <span className="inner">
+                <svg
+                  className="icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2.5"
+                  style={{ width: '24px', height: '18px' }}
+                >
+                  <path d="m15.626 11.769a6 6 0 1 0 -7.252 0 9.008 9.008 0 0 0 -5.374 8.231 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 9.008 9.008 0 0 0 -5.374-8.231zm-7.626-4.769a4 4 0 1 1 4 4 4 4 0 0 1 -4-4zm10 14h-12a1 1 0 0 1 -1-1 7 7 0 0 1 14 0 1 1 0 0 1 -1 1z"></path>
+                </svg>
+                Log In
+              </span>
             </button>
           )}
 
@@ -777,6 +827,178 @@ const Navbar = () => {
           />
         </div>
       </div>
+      
+      {/* Animated Login Button Styles */}
+      <style>{`
+        .animated-login-button::before,
+        .animated-login-button::after {
+          content: "";
+          position: absolute;
+          transition: all 0.5s ease-in-out;
+          z-index: 0;
+        }
+        .animated-login-button::before {
+          inset: 1px;
+          border-radius: calc(0.75rem - 1px);
+          background: linear-gradient(
+            177.95deg,
+            rgba(255, 255, 255, 0.19) 0%,
+            rgba(255, 255, 255, 0) 100%
+          );
+        }
+        .animated-login-button::after {
+          inset: 2px;
+          border-radius: calc(0.75rem - 2px);
+          background: radial-gradient(
+              65.28% 65.28% at 50% 100%,
+              rgba(207, 155, 99, 0.6) 10%,
+              rgba(207, 155, 99, 0) 100%
+            ),
+            linear-gradient(0deg, #1E65AD, #1E65AD);
+        }
+        .animated-login-button:active {
+          transform: scale(0.95);
+        }
+        // .animated-login-button:hover {
+        //   border-color: #CF9B63;
+        //   box-shadow: 0 0 15px rgba(207, 155, 99, 0.4);
+        // }
+
+        .points_wrapper {
+          overflow: hidden;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          position: absolute;
+          z-index: 1;
+        }
+
+        .points_wrapper .point {
+          bottom: -10px;
+          position: absolute;
+          animation: floating-points infinite ease-in-out;
+          pointer-events: none;
+          width: 2px;
+          height: 2px;
+          background-color: #fff;
+          border-radius: 9999px;
+        }
+        @keyframes floating-points {
+          0% {
+            transform: translateY(0);
+          }
+          85% {
+            opacity: 0;
+          }
+          100% {
+            transform: translateY(-55px);
+            opacity: 0;
+          }
+        }
+        .points_wrapper .point:nth-child(1) {
+          left: 10%;
+          opacity: 1;
+          animation-duration: 2.35s;
+          animation-delay: 0.2s;
+        }
+        .points_wrapper .point:nth-child(2) {
+          left: 30%;
+          opacity: 0.7;
+          animation-duration: 2.5s;
+          animation-delay: 0.5s;
+        }
+        .points_wrapper .point:nth-child(3) {
+          left: 25%;
+          opacity: 0.8;
+          animation-duration: 2.2s;
+          animation-delay: 0.1s;
+        }
+        .points_wrapper .point:nth-child(4) {
+          left: 44%;
+          opacity: 0.6;
+          animation-duration: 2.05s;
+        }
+        .points_wrapper .point:nth-child(5) {
+          left: 50%;
+          opacity: 1;
+          animation-duration: 1.9s;
+        }
+        .points_wrapper .point:nth-child(6) {
+          left: 75%;
+          opacity: 0.5;
+          animation-duration: 1.5s;
+          animation-delay: 1.5s;
+        }
+        .points_wrapper .point:nth-child(7) {
+          left: 88%;
+          opacity: 0.9;
+          animation-duration: 2.2s;
+          animation-delay: 0.2s;
+        }
+        .points_wrapper .point:nth-child(8) {
+          left: 58%;
+          opacity: 0.8;
+          animation-duration: 2.25s;
+          animation-delay: 0.2s;
+        }
+        .points_wrapper .point:nth-child(9) {
+          left: 98%;
+          opacity: 0.6;
+          animation-duration: 2.6s;
+          animation-delay: 0.1s;
+        }
+        .points_wrapper .point:nth-child(10) {
+          left: 65%;
+          opacity: 1;
+          animation-duration: 2.5s;
+          animation-delay: 0.2s;
+        }
+
+        .animated-login-button .inner {
+          z-index: 2;
+          gap: 6px;
+          position: relative;
+          width: 100%;
+          color: white;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          font-weight: 500;
+          line-height: 1.5;
+          transition: color 0.2s ease-in-out;
+          font-family: 'Roboto', sans-serif;
+        }
+
+        .animated-login-button .inner svg.icon {
+          width: 18px;
+          height: 18px;
+          transition: fill 0.1s linear;
+        }
+
+        .animated-login-button:focus svg.icon {
+          fill: white;
+        }
+        .animated-login-button:hover svg.icon {
+          fill: transparent;
+          animation:
+            dasharray 1s linear forwards,
+            filled 0.1s linear forwards 0.95s;
+        }
+        @keyframes dasharray {
+          from {
+            stroke-dasharray: 0 0 0 0;
+          }
+          to {
+            stroke-dasharray: 68 68 0 0;
+          }
+        }
+        @keyframes filled {
+          to {
+            fill: white;
+          }
+        }
+      `}</style>
     </nav>
   );
 };

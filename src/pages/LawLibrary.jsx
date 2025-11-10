@@ -105,7 +105,8 @@ export default function LawLibrary() {
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState(null);
   const [totalCount, setTotalCount] = useState(0);
-  const [enableHighlights, setEnableHighlights] = useState(false);
+  // Highlights are now enabled by default when searching
+  // Removed enableHighlights state - highlights are always on for searches
   const [searchInfo, setSearchInfo] = useState(null);
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const scrollTimeoutRef = useRef(null);
@@ -167,10 +168,8 @@ export default function LawLibrary() {
         // This searches PDF content, not just metadata
         if (activeFilters.search && typeof activeFilters.search === 'string' && activeFilters.search.trim()) {
           params.search = activeFilters.search.trim();
-          // Add highlight parameter if enabled
-          if (enableHighlights) {
-            params.highlight = true;
-          }
+          // Always enable highlights when searching
+          params.highlight = true;
         }
         
         if (activeFilters.act_id && typeof activeFilters.act_id === 'string' && activeFilters.act_id.trim()) {
@@ -292,17 +291,7 @@ export default function LawLibrary() {
     }, 100);
   };
   
-  // Re-fetch when highlight toggle changes (only if search is active)
-  useEffect(() => {
-    if (activeSection === "central" && filters.search && filters.search.trim()) {
-      const timeoutId = setTimeout(() => {
-        applyFilters();
-      }, 300); // Small debounce
-      
-      return () => clearTimeout(timeoutId);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enableHighlights]);
+  // Highlights are now always enabled for searches, so no need for this effect
   
   // Auto-apply filters when they change (with debounce) - but only for non-search filters
   useEffect(() => {
@@ -437,7 +426,7 @@ export default function LawLibrary() {
     setPagination(null);
     setError(null);
     setSearchInfo(null);
-    setEnableHighlights(false); // Reset highlight toggle when section changes
+    // Highlights are always enabled for searches, no reset needed
     const emptyFilters = getInitialFilters(activeSection);
     setFilters(emptyFilters);
     setSearchQuery('');
@@ -611,22 +600,7 @@ export default function LawLibrary() {
                 </motion.button>
               </div>
               
-              {/* Highlight Toggle - Only for Central Acts */}
-              {activeSection === "central" && filters.search && filters.search.trim() && (
-                <div className="mt-3 flex items-center">
-                  <label className="flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={enableHighlights}
-                      onChange={(e) => setEnableHighlights(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <span className="ml-2 text-xs sm:text-sm text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      Show search highlights in results
-                    </span>
-                  </label>
-                </div>
-              )}
+              {/* Highlights are now enabled by default for all searches - no checkbox needed */}
             </div>
 
             {/* Dynamic Filters - Hidden by default, shown when showFilters is true */}
