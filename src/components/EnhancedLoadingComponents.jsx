@@ -183,15 +183,12 @@ export const EnhancedInfiniteScrollLoader = ({
 
   if (isLoading || isFetching) {
     return (
-      <div className="flex flex-col items-center justify-center py-8 px-4 fade-in">
-        <div className="flex items-center gap-3 mb-4">
-          <ModernSpinner size="md" color="blue" />
-          <span className="text-gray-600 font-medium">Loading more judgments...</span>
-        </div>
-        <div className="w-full max-w-md">
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div className="h-full bg-blue-600 rounded-full animate-pulse"></div>
-          </div>
+      <div className="fade-in">
+        {/* Skeleton Cards */}
+        <div className="space-y-4">
+          {[...Array(3)].map((_, index) => (
+            <EnhancedJudgmentSkeleton key={`scroll-skeleton-${index}`} />
+          ))}
         </div>
       </div>
     );

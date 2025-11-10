@@ -60,7 +60,7 @@ const FAQ = () => {
             letterSpacing: "-0.02em"
           }}
         >
-          FAQ
+          FAQ's
         </h2>
         
         <div className="space-y-0 grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-4">

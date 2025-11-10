@@ -76,11 +76,14 @@ export default function ViewPDF() {
   // Check if translation is active and set default view
   useEffect(() => {
     const currentLang = getCurrentLanguage();
-    // If a non-English language is selected, default to Translated (Markdown) view
-    if (currentLang !== 'en') {
+    // If user is not logged in, always default to Translated (Markdown) view
+    if (!isUserAuthenticated) {
+      setShowMarkdown(true);
+    } else if (currentLang !== 'en') {
+      // If a non-English language is selected, default to Translated (Markdown) view
       setShowMarkdown(true);
     }
-  }, []); // Run only once on mount
+  }, [isUserAuthenticated]); // Run when authentication status changes
 
   // Detect mobile view
   useEffect(() => {
@@ -474,6 +477,13 @@ export default function ViewPDF() {
                               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
                                 <button
                                   onClick={() => {
+                                    // If user is not logged in, redirect to pricing page
+                                    if (!isUserAuthenticated) {
+                                      navigate('/pricing');
+                                      setShowDownloadDropdown(false);
+                                      return;
+                                    }
+                                    // If logged in, allow download
                                     if (pdfUrl) {
                                       const link = document.createElement('a');
                                       link.href = pdfUrl;
@@ -892,7 +902,15 @@ export default function ViewPDF() {
                       />
                       
                       <motion.button
-                        onClick={() => setShowMarkdown(false)}
+                        onClick={() => {
+                          // If user is not logged in, redirect to pricing page
+                          if (!isUserAuthenticated) {
+                            navigate('/pricing');
+                            return;
+                          }
+                          // If logged in, allow switching to Original view
+                          setShowMarkdown(false);
+                        }}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         className={`px-4 sm:px-5 md:px-6 py-1.5 sm:py-2 rounded-lg font-semibold transition-all duration-300 relative z-10 min-w-[100px] sm:min-w-[120px] text-xs sm:text-sm ${

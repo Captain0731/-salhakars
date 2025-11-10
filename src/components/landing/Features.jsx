@@ -16,7 +16,7 @@ const FeatureCard = ({ feature, index, onClick }) => {
   const getCardColors = (id) => {
     switch(id) {
       case 1: // Legal Judgment
-        return { linkColor: '#1E65AD', buttonBg: '#E5E7EB', buttonIcon: '#6B7280' };
+        return { linkColor: '#1E65AD', buttonBg: '#1E65AD', buttonIcon: '#FFFFFF' };
       case 2: // Law Mapping
         return { linkColor: '#CF9B63', buttonBg: '#FED7AA', buttonIcon: '#CF9B63' };
       case 3: // Law Library

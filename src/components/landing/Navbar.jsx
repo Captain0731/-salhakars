@@ -199,7 +199,7 @@ const Navbar = () => {
         ? 'bg-white/20 backdrop-blur-lg shadow-xl py-2' 
         : 'bg-white/90 backdrop-blur-md shadow-lg py-3 sm:py-4 md:py-4'
     }`} style={{ borderColor: '#E5E7EB' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center ">
+      <div className="max-w-7xl  mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center ">
         
         {/* Brand Logo - Left Corner */}
         <div
@@ -209,8 +209,8 @@ const Navbar = () => {
           <img
             src="/logo4.png"
             alt="सलहाकार Logo"
-            className={`max-h-12 sm:max-h-16 md:max-h-18 w-auto object-contain group-hover:scale-110 transition-all duration-500 ease-out ${
-              isScrolled ? 'max-h-14 sm:max-h-45 md:max-h-54' : 'max-h-12 sm:max-h-14 md:max-h-16'
+            className={`max-h-24 sm:max-h-16 md:max-h-18 w-auto object-contain group-hover:scale-110 transition-all duration-500 ease-out ${
+              isScrolled ? 'max-h-16 sm:max-h-16 md:max-h-18' : 'max-h-16 sm:max-h-16 md:max-h-18'
             }`}
             style={{ height: 'auto' }}
             onError={(e) => {

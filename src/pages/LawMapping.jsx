@@ -486,17 +486,13 @@ export default function LawMapping() {
             transition={{ duration: 0.5, delay: 0.8 }}
             className="bg-white rounded-lg shadow-sm border border-gray-200 p-2 sm:p-3 md:p-4 lg:p-8 mb-2 sm:mb-3 md:mb-4 lg:mb-8"
           >
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-5 md:mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-5 md:mb-6">
               <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                 Search {mappingTypeLabel}
               </h2>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-xs sm:text-sm font-medium text-gray-700 whitespace-nowrap" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                  Select Mapping Type:
-                </label>
-                
-                {/* Toggle Button - Three Options */}
-                <div className="relative inline-flex items-center bg-gray-100 rounded-xl p-1 shadow-inner w-full sm:w-auto">
+              
+              {/* Toggle Button - Three Options */}
+              <div className="relative inline-flex items-center bg-gray-100 rounded-xl p-1 shadow-inner">
                   {/* Sliding background indicator */}
                   <motion.div
                     className="absolute top-1 bottom-1 rounded-lg z-0"
@@ -562,22 +558,6 @@ export default function LawMapping() {
                     CrPC ↔ BNSS
                   </motion.button>
                 </div>
-              </div>
-              {/* <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors font-medium"
-                style={{ fontFamily: 'Roboto, sans-serif' }}
-              >
-                <svg 
-                  className={`w-5 h-5 transition-transform duration-200 ${showFilters ? 'rotate-180' : ''}`}
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                </svg>
-                <span>Filters</span>
-              </button> */}
             </div>
             
             {/* Search Bar */}

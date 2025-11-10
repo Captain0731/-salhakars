@@ -336,26 +336,7 @@ const BlogSection = () => {
           </div>
         </div>
 
-        {/* View All Blogs Button */}
-        <div className="text-center mt-12 sm:mt-16">
-          <button
-            onClick={() => navigate('/blog')}
-            className="px-8 py-3 sm:px-10 sm:py-4 rounded-lg font-semibold text-base sm:text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
-            style={{ 
-              backgroundColor: '#1E65AD',
-              color: '#FFFFFF',
-              fontFamily: 'Roboto, sans-serif'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#CF9B63';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = '#1E65AD';
-            }}
-          >
-            View All Blogs
-          </button>
-        </div>
+      
 
       </div>
 

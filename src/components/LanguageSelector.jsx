@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '../contexts/AuthContext';
 
 /**
  * LanguageSelector Component
@@ -17,8 +15,6 @@ import { useAuth } from '../contexts/AuthContext';
  */
 
 const LanguageSelector = () => {
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState('en');
   const [currentScrollIndex, setCurrentScrollIndex] = useState(0);
@@ -29,28 +25,19 @@ const LanguageSelector = () => {
   const intervalRef = useRef(null);
   const measureRef = useRef(null);
 
-  // Check if user is authenticated
-  const isUserAuthenticated = useMemo(() => {
-    const token = localStorage.getItem('access_token') || 
-                  localStorage.getItem('accessToken') || 
-                  localStorage.getItem('token');
-    const hasValidToken = !!token && token !== 'null' && token !== 'undefined';
-    return isAuthenticated && hasValidToken;
-  }, [isAuthenticated]);
-
   const languages = [
-    { code: 'en', langCode: 'English', country: 'US', flag: '🇺🇸', display: 'English' },
-    { code: 'gu', langCode: 'Gujrati', country: 'IN', flag: '🇮🇳', display: 'IN' },
-    { code: 'hi', langCode: 'Hindi', country: 'IN', flag: '🇮🇳', display: 'IN' },
-    { code: 'as', langCode: 'Assamese', country: 'IN', flag: '🇮🇳', display: 'IN' },
-    { code: 'bn', langCode: 'Bengali', country: 'BD', flag: '🇧🇩', display: 'BD' },  
-    { code: 'kn', langCode: 'Kannada', country: 'IN', flag: '🇮🇳', display: 'IN' },
-    { code: 'ml', langCode: 'Malayalam', country: 'IN', flag: '🇮🇳', display: 'IN' },
-    { code: 'mr', langCode: 'Marathi', country: 'IN', flag: '🇮🇳', display: 'IN' },
-    { code: 'or', langCode: 'Odia', country: 'IN', flag: '🇮🇳', display: 'IN' },
-    { code: 'pa', langCode: 'Punjabi', country: 'IN', flag: '🇮🇳', display: 'IN' },
-    { code: 'ta', langCode: 'Tamil', country: 'IN', flag: '🇮🇳', display: 'IN' },
-    { code: 'te', langCode: 'Telugu', country: 'IN', flag: '🇮🇳', display: 'IN' },
+    { code: 'en', langCode: 'Eng', name: 'English', country: 'US', flag: '🇺🇸', display: 'English' },
+    { code: 'gu', langCode: 'Guj', name: 'ગુજરાતી', country: 'IN', flag: '🇮🇳', display: 'IN' },
+    { code: 'hi', langCode: 'Hi', name: 'हिन्दी  ', flag: '🇮🇳', country: 'IN', display: 'IN' },
+    { code: 'as', langCode: 'As', name: 'অসমীয়া', flag: '🇮🇳', country: 'IN', display: 'IN' },
+    { code: 'bn', langCode: 'Bn', name: 'বাংলা', flag: '🇧🇩', country: 'BD', display: 'BD' },  
+    { code: 'kn', langCode: 'Kn', name: 'ಕನ್ನಡ', flag: '🇮🇳', country: 'IN', display: 'IN' },
+    { code: 'ml', langCode: 'Ml', name: 'മലയാളം', country: 'IN', flag: '🇮🇳', display: 'IN' },
+    { code: 'mr', langCode: 'Mr', name: 'मराठी', flag: '🇮🇳', country: 'IN', display: 'IN' },
+    { code: 'or', langCode: 'Odia', name: 'ଓଡ଼ିଆ', flag: '🇮🇳', country: 'IN', display: 'IN' },
+    { code: 'pa', langCode: 'Pa', name: 'ਪੰਜਾਬੀ', flag: '🇮🇳', country: 'IN', display: 'IN' },
+    { code: 'ta', langCode: 'Ta', name: 'தமிழ்', flag: '🇮🇳', country: 'IN', display: 'IN' },
+    { code: 'te', langCode: 'Te', name: 'తెలుగు', flag: '🇮🇳', country: 'IN', display: 'IN' },
   ];
 
   // Get current language from cookie
@@ -75,34 +62,16 @@ const LanguageSelector = () => {
   const handleLanguageSelect = (langCode) => {
     if (typeof window === 'undefined') return;
 
-    // If user is not authenticated and selecting any language other than English, redirect to pricing page
-    if (!isUserAuthenticated && langCode !== 'en') {
-      navigate('/pricing');
-      setIsOpen(false);
-      return;
-    }
-
-    // If user is authenticated, allow any language translation
-    if (isUserAuthenticated) {
-      if (langCode === 'en') {
-        // Clear translation for English
-        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      } else {
-        // Set translation cookie for selected language
-        document.cookie = `googtrans=/en/${langCode}; path=/; max-age=31536000; SameSite=Lax`;
-      }
-      // Reload page to apply translation
-      window.location.reload();
-      return;
-    }
-
-    // For non-authenticated users, only allow English
+    // Allow all languages to be translated without authentication
     if (langCode === 'en') {
-      // Clear translation
+      // Clear translation for English
       document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      // Reload page to apply translation
-      window.location.reload();
+    } else {
+      // Set translation cookie for selected language
+      document.cookie = `googtrans=/en/${langCode}; path=/; max-age=31536000; SameSite=Lax`;
     }
+    // Reload page to apply translation
+    window.location.reload();
   };
 
   // Update current language on mount
@@ -278,7 +247,7 @@ const LanguageSelector = () => {
           position: relative;
         }
       `}</style>
-      <div className="relative" ref={dropdownRef}>
+      <div className="relative notranslate" ref={dropdownRef}>
         <div className="gradient-border-wrapper">
           <div className="gradient-border-inner">
             <button
@@ -292,7 +261,7 @@ const LanguageSelector = () => {
                 setShowTooltip(false);
                 setIsHovered(false);
               }}
-              className="flex items-center justify-between gap-1 sm:gap-2 px-1.5 sm:px-3 py-1 sm:py-2 rounded-md sm:rounded-lg transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full relative z-10 group min-h-[32px] sm:min-h-[38px]"
+              className="flex items-center justify-between gap-1 sm:gap-2 px-1.5 sm:px-3 py-1 sm:py-2 rounded-md sm:rounded-lg transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full relative z-10 group min-h-[32px] sm:min-h-[38px] notranslate"
               style={{ 
                 color: '#1E65AD',
                 fontFamily: 'Roboto, sans-serif',
@@ -335,10 +304,10 @@ const LanguageSelector = () => {
                         ref={index === 0 ? measureRef : null}
                         className="h-4 sm:h-5 md:h-6 flex items-center gap-1 sm:gap-1.5"
                       >
-                        <span className="text-[10px] sm:text-xs font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                        <span className="text-[10px] sm:text-xs font-bold notranslate" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                           {language.langCode}
                         </span>
-                        <span className="text-[10px] sm:text-xs font-medium hidden sm:inline" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                        <span className="text-[10px] sm:text-xs font-medium hidden sm:inline notranslate" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
                           {language.name}
                         </span>
                       </div>
@@ -401,7 +370,7 @@ const LanguageSelector = () => {
               duration: 0.2,
               ease: [0.4, 0, 0.2, 1]
             }}
-            className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-2xl overflow-hidden z-50 flex"
+            className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-2xl overflow-hidden z-50 flex notranslate"
             style={{ 
               backgroundColor: '#FFFFFF',
               boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
@@ -449,11 +418,11 @@ const LanguageSelector = () => {
                   aria-selected={isSelected}
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <span className="text-sm font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                    <span className="text-sm font-bold notranslate" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                       {language.langCode}
                     </span>
                     <span 
-                      className="text-sm font-medium truncate"
+                      className="text-sm font-medium truncate notranslate"
                       style={{ 
                         color: '#1E65AD',
                         fontFamily: 'Roboto, sans-serif',
