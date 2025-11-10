@@ -16,7 +16,8 @@ const useSmoothInfiniteScroll = ({
   threshold = 0.1,
   rootMargin = '100px',
   preloadThreshold = 0.3,
-  throttleDelay = 100
+  throttleDelay = 100,
+  scrollContainer = null
 }) => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -80,7 +81,7 @@ const useSmoothInfiniteScroll = ({
     if (!loadingRef.current) return;
 
     const observerOptions = {
-      root: null,
+      root: scrollContainer || null, // Use scroll container if provided, otherwise use viewport
       rootMargin: rootMargin,
       threshold: threshold
     };
@@ -110,7 +111,7 @@ const useSmoothInfiniteScroll = ({
         clearTimeout(throttleTimeoutRef.current);
       }
     };
-  }, [hasMore, isLoading, isLoadingMore, throttledFetch, threshold, rootMargin, preloadThreshold]);
+  }, [hasMore, isLoading, isLoadingMore, throttledFetch, threshold, rootMargin, preloadThreshold, scrollContainer]);
 
   // Cleanup on unmount
   useEffect(() => {

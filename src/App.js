@@ -42,6 +42,7 @@ import BlogPost from "./pages/BlogPost";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import Chatbot from "./components/Chatbot";
+import Footer from "./components/landing/Footer";
 
 function AppLayout() {
   const location = useLocation();
@@ -60,7 +61,19 @@ function AppLayout() {
     '/law-mapping'
   ];
   
+  // Pages where footer should be hidden
+  const hideFooterPaths = [
+    '/login',
+    '/signup',
+    '/dashboard',
+    '/profile'
+  ];
+  
   const shouldShowChatbot = !hideChatbotPaths.some(path => location.pathname.startsWith(path));
+  const shouldShowFooter = !hideFooterPaths.some(path => {
+    // Match exact path or paths that start with the excluded path followed by '/'
+    return location.pathname === path || location.pathname.startsWith(path + '/');
+  });
   
   return (
     <div style={{ minHeight: "100vh", overflowY: "auto" }}>
@@ -126,6 +139,8 @@ function AppLayout() {
         <Route path="/chatbot" element={<LegalChatbot />} />
         
       </Routes>
+      {/* Footer - Show on all pages except login, signup, dashboard, and profile */}
+      {shouldShowFooter && <Footer />}
     </div>
   );
 }

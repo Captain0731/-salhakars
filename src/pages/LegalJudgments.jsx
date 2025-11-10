@@ -116,6 +116,8 @@ export default function LegalJudgments() {
   const isFetchingRef = useRef(false);
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const scrollTimeoutRef = useRef(null);
+  const scrollContainerRef = useRef(null);
+  const [scrollContainer, setScrollContainer] = useState(null);
 
   // Filter states - will change based on court type
   const [filters, setFilters] = useState({
@@ -491,10 +493,11 @@ export default function LegalJudgments() {
     fetchMore: loadMoreData,
     hasMore,
     isLoading: loading || isSearching,
-    threshold: 0.1,
-    rootMargin: '100px',
-    preloadThreshold: 0.3,
-    throttleDelay: 150
+    threshold: 0.01,
+    rootMargin: '200px',
+    preloadThreshold: 0.1,
+    throttleDelay: 100,
+    scrollContainer: scrollContainer
   });
 
   const viewJudgment = (judgment) => {
@@ -1005,15 +1008,26 @@ export default function LegalJudgments() {
               )}
             </AnimatePresence>
 
-            {loading && judgments.length === 0 ? (
-              <SkeletonGrid count={3} />
-            ) : judgments.length === 0 && !error ? (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="text-center py-8 sm:py-12 md:py-16 px-4"
-              >
+            <AnimatePresence mode="wait">
+              {loading && judgments.length === 0 ? (
+                <motion.div
+                  key="loading-skeletons"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                >
+                  <SkeletonGrid count={3} />
+                </motion.div>
+              ) : judgments.length === 0 && !error ? (
+                <motion.div 
+                  key="empty-state"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="text-center py-8 sm:py-12 md:py-16 px-4"
+                >
                 <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 bg-blue-50 rounded-full flex items-center justify-center">
                   <svg className="w-8 h-8 sm:w-10 sm:h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -1036,128 +1050,232 @@ export default function LegalJudgments() {
                     Clear All Filters
                   </button>
                 )}
-              </motion.div>
-            ) : (
-              <div className="space-y-4">
-                <AnimatePresence mode="popLayout">
-                  {judgments.map((judgment, index) => (
+                </motion.div>
+              ) : (
+                <div 
+                  key="judgments-list-container"
+                  className="relative"
+                  style={{ 
+                    maxHeight: '70vh',
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
+                    paddingRight: '8px'
+                  }}
+                  ref={(el) => {
+                    scrollContainerRef.current = el;
+                    if (el) {
+                      setScrollContainer(el);
+                      el.setAttribute('data-scroll-container', 'true');
+                    }
+                  }}
+                >
+                  <style>{`
+                    /* Custom scrollbar styling */
+                    [data-scroll-container]::-webkit-scrollbar {
+                      width: 8px;
+                    }
+                    [data-scroll-container]::-webkit-scrollbar-track {
+                      background: #f1f1f1;
+                      border-radius: 10px;
+                    }
+                    [data-scroll-container]::-webkit-scrollbar-thumb {
+                      background: #1E65AD;
+                      border-radius: 10px;
+                    }
+                    [data-scroll-container]::-webkit-scrollbar-thumb:hover {
+                      background: #CF9B63;
+                    }
+                  `}</style>
+                  <motion.div 
+                    className="space-y-5 sm:space-y-6"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                  >
+                  <AnimatePresence mode="popLayout">
+                    {judgments.map((judgment, index) => (
                     <motion.div
                       key={judgment.cnr || judgment.id || `${courtType}-${index}`}
-                      initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
                       transition={{ 
-                        duration: 0.4, 
-                        delay: index * 0.05,
+                        duration: 0.3, 
+                        delay: index * 0.03,
                         ease: [0.4, 0, 0.2, 1]
                       }}
                       whileHover={{ 
-                        y: -4, 
-                        scale: 1.01,
+                        y: -2,
                         transition: { duration: 0.2 }
                       }}
-                      whileTap={{ scale: 0.98 }}
                     >
                       <div 
                         onClick={() => viewJudgment(judgment)}
-                        className="border border-gray-200 rounded-lg p-4 sm:p-5 md:p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-300 bg-white group cursor-pointer"
+                        className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer"
+                        style={{
+                          borderLeft: '4px solid #1E65AD'
+                        }}
                       >
-                      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 sm:gap-4">
-                        <div className="flex-1">
-                          <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-3 mb-3">
-                            <h3 className="text-base sm:text-lg md:text-xl font-semibold flex-1 group-hover:text-blue-700 transition-colors" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                              {judgment.title || judgment.case_info || judgment.case_title || judgment.case_number || 'Untitled Judgment'}
-                            </h3>
-                            {index === 0 && judgments.length > 0 && !loading && (
-                              <span className="px-2 sm:px-2.5 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold whitespace-nowrap flex-shrink-0 self-start">
-                                Latest
-                              </span>
-                            )}
-                          </div>
-                          
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm mb-3 sm:mb-4">
-                            {(judgment.court_name || judgment.court) && (
-                              <div>
-                                <span className="font-medium text-gray-800">Court:</span>
-                                <span className="ml-2" style={{ color: '#8C969F' }}>{judgment.court_name || judgment.court}</span>
-                              </div>
-                            )}
-                            
-                            {judgment.decision_date && (
-                              <div>
-                                <span className="font-medium text-gray-800">Decision Date:</span>
-                                <span className="ml-2" style={{ color: '#8C969F' }}>{judgment.decision_date}</span>
-                              </div>
-                            )}
-                            
-                            {judgment.cnr && (
-                              <div>
-                                <span className="font-medium text-gray-800">CNR:</span>
-                                <span className="ml-2" style={{ color: '#8C969F' }}>{judgment.cnr}</span>
-                              </div>
-                            )}
-                            
-                            {judgment.judge && (
-                              <div>
-                                <span className="font-medium text-gray-800">Judge:</span>
-                                <span className="ml-2" style={{ color: '#8C969F' }}>{judgment.judge}</span>
-                              </div>
-                            )}
-
-                            {judgment.petitioner && (
-                              <div>
-                                <span className="font-medium text-gray-800">Petitioner:</span>
-                                <span className="ml-2" style={{ color: '#8C969F' }}>{judgment.petitioner}</span>
-                              </div>
-                            )}
-
-                            {judgment.respondent && (
-                              <div>
-                                <span className="font-medium text-gray-800">Respondent:</span>
-                                <span className="ml-2" style={{ color: '#8C969F' }}>{judgment.respondent}</span>
-                              </div>
-                            )}
+                        {/* Simple Card Header */}
+                        <div className="px-5 sm:px-6 py-4 sm:py-5 border-b border-gray-100">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <h3 
+                                className="text-base sm:text-lg md:text-xl font-bold mb-2 line-clamp-2 group-hover:text-blue-700 transition-colors" 
+                                style={{ 
+                                  color: '#1E65AD', 
+                                  fontFamily: 'Helvetica Hebrew Bold, sans-serif',
+                                  lineHeight: '1.5'
+                                }}
+                              >
+                                {judgment.title || judgment.case_info || judgment.case_title || judgment.case_number || 'Untitled Judgment'}
+                              </h3>
+                              {index === 0 && judgments.length > 0 && !loading && (
+                                <span className="inline-flex items-center px-2.5 py-1 bg-green-100 text-green-700 rounded-md text-xs font-semibold">
+                                  Latest
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
 
-                        <div className="flex-shrink-0 flex flex-col gap-3 w-full lg:w-48">
-                          <motion.button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              viewJudgment(judgment);
-                            }}
-                            whileHover={{ scale: 1.05, y: -2 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="w-full px-4 sm:px-6 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
-                            style={{ fontFamily: 'Roboto, sans-serif' }}
-                          >
-                            <span className="flex items-center justify-center gap-2">
-                              View Details
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                              </svg>
-                            </span>
-                          </motion.button>
+                        {/* Simple Card Body */}
+                        <div className="px-5 sm:px-6 py-4 sm:py-5">
+                          <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
+                            {/* Left side - Details */}
+                            <div className="flex-1">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                {(judgment.court_name || judgment.court) && (
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs text-gray-500 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>Court</p>
+                                      <p className="text-sm font-medium text-gray-900 truncate" style={{ fontFamily: 'Roboto, sans-serif' }}>{judgment.court_name || judgment.court}</p>
+                                    </div>
+                                  </div>
+                                )}
+                                
+                                {judgment.decision_date && (
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#CF9B63' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs text-gray-500 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>Decision Date</p>
+                                      <p className="text-sm font-medium text-gray-900" style={{ fontFamily: 'Roboto, sans-serif' }}>{judgment.decision_date}</p>
+                                    </div>
+                                  </div>
+                                )}
+                                
+                                {judgment.cnr && (
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                                    </svg>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs text-gray-500 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>CNR</p>
+                                      <p className="text-sm font-medium text-gray-900 font-mono truncate" style={{ fontFamily: 'Roboto Mono, monospace' }}>{judgment.cnr}</p>
+                                    </div>
+                                  </div>
+                                )}
+                                
+                                {judgment.judge && (
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#CF9B63' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs text-gray-500 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>Judge</p>
+                                      <p className="text-sm font-medium text-gray-900 line-clamp-1" style={{ fontFamily: 'Roboto, sans-serif' }}>{judgment.judge}</p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {judgment.petitioner && (
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs text-gray-500 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>Petitioner</p>
+                                      <p className="text-sm font-medium text-gray-900 line-clamp-1" style={{ fontFamily: 'Roboto, sans-serif' }}>{judgment.petitioner}</p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {judgment.respondent && (
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#CF9B63' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs text-gray-500 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>Respondent</p>
+                                      <p className="text-sm font-medium text-gray-900 line-clamp-1" style={{ fontFamily: 'Roboto, sans-serif' }}>{judgment.respondent}</p>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Right side - Button */}
+                            <div className="flex-shrink-0 flex items-center lg:items-start lg:pt-0">
+                              <motion.button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  viewJudgment(judgment);
+                                }}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap"
+                                style={{ 
+                                  backgroundColor: '#1E65AD',
+                                  color: '#FFFFFF',
+                                  fontFamily: 'Roboto, sans-serif'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#155a9a';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#1E65AD';
+                                }}
+                              >
+                                <span>View Details</span>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                              </motion.button>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
                     </motion.div>
                   ))}
                 </AnimatePresence>
                 
-                {/* Enhanced Infinite Scroll Loader */}
-                <div ref={loadingRef}>
-                  <EnhancedInfiniteScrollLoader 
-                    isLoading={isLoadingMore} 
-                    hasMore={hasMore} 
-                    error={scrollError} 
-                    onRetry={retry}
-                    retryCount={retryCount}
-                    isFetching={isFetching}
-                  />
+                  {/* Enhanced Infinite Scroll Loader */}
+                  {hasMore && (
+                    <div 
+                      ref={loadingRef}
+                      className="py-4"
+                      style={{ minHeight: '100px' }}
+                    >
+                      <EnhancedInfiniteScrollLoader 
+                        isLoading={isLoadingMore} 
+                        hasMore={hasMore} 
+                        error={scrollError} 
+                        onRetry={retry}
+                        retryCount={retryCount}
+                        isFetching={isFetching}
+                      />
+                    </div>
+                  )}
+                  </motion.div>
                 </div>
-              </div>
-            )}
+              )}
+            </AnimatePresence>
           </motion.div>
 
         </div>

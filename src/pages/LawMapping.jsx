@@ -860,9 +860,37 @@ export default function LawMapping() {
                 )}
               </motion.div>
             ) : (
-              <div className="space-y-2 sm:space-y-3 md:space-y-4">
-                <AnimatePresence mode="popLayout">
-                  {mappings.map((mapping, index) => {
+              <div 
+                key="mappings-list-container"
+                className="relative"
+                data-mappings-scroll-container="true"
+                style={{ 
+                  maxHeight: '70vh',
+                  overflowY: 'auto',
+                  overflowX: 'hidden',
+                  paddingRight: '8px'
+                }}
+              >
+                <style>{`
+                  /* Custom scrollbar styling for mappings list */
+                  [data-mappings-scroll-container]::-webkit-scrollbar {
+                    width: 8px;
+                  }
+                  [data-mappings-scroll-container]::-webkit-scrollbar-track {
+                    background: #f1f1f1;
+                    border-radius: 10px;
+                  }
+                  [data-mappings-scroll-container]::-webkit-scrollbar-thumb {
+                    background: #1E65AD;
+                    border-radius: 10px;
+                  }
+                  [data-mappings-scroll-container]::-webkit-scrollbar-thumb:hover {
+                    background: #CF9B63;
+                  }
+                `}</style>
+                <div className="space-y-2 sm:space-y-3 md:space-y-4">
+                  <AnimatePresence mode="popLayout">
+                    {mappings.map((mapping, index) => {
                   // Get section numbers based on mapping type
                   const getSourceSection = () => {
                     if (mappingType === 'bns_ipc') {
@@ -1000,19 +1028,22 @@ export default function LawMapping() {
                       </div>
                     </motion.div>
                   );
-                })}
-                </AnimatePresence>
-                
-                {/* Enhanced Infinite Scroll Loader */}
-                <div ref={loadingRef}>
-                  <EnhancedInfiniteScrollLoader 
-                    isLoading={isLoadingMore} 
-                    hasMore={hasMore} 
-                    error={scrollError} 
-                    onRetry={retry}
-                    retryCount={retryCount}
-                    isFetching={isFetching}
-                  />
+                    })}
+                  </AnimatePresence>
+                  
+                  {/* Enhanced Infinite Scroll Loader */}
+                  {hasMore && (
+                    <div ref={loadingRef} className="py-4" style={{ minHeight: '100px' }}>
+                      <EnhancedInfiniteScrollLoader 
+                        isLoading={isLoadingMore} 
+                        hasMore={hasMore} 
+                        error={scrollError} 
+                        onRetry={retry}
+                        retryCount={retryCount}
+                        isFetching={isFetching}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             )}

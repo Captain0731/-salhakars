@@ -1028,136 +1028,230 @@ export default function LawLibrary() {
                 )}
               </motion.div>
             ) : (
-              <div className="space-y-4">
-                <AnimatePresence mode="popLayout">
-                  {acts.map((act, index) => (
+              <div 
+                key="acts-list-container"
+                className="relative"
+                data-acts-scroll-container="true"
+                style={{ 
+                  maxHeight: '70vh',
+                  overflowY: 'auto',
+                  overflowX: 'hidden',
+                  paddingRight: '8px'
+                }}
+              >
+                <style>{`
+                  /* Custom scrollbar styling for acts list */
+                  [data-acts-scroll-container]::-webkit-scrollbar {
+                    width: 8px;
+                  }
+                  [data-acts-scroll-container]::-webkit-scrollbar-track {
+                    background: #f1f1f1;
+                    border-radius: 10px;
+                  }
+                  [data-acts-scroll-container]::-webkit-scrollbar-thumb {
+                    background: #1E65AD;
+                    border-radius: 10px;
+                  }
+                  [data-acts-scroll-container]::-webkit-scrollbar-thumb:hover {
+                    background: #CF9B63;
+                  }
+                `}</style>
+                <div className="space-y-5 sm:space-y-6">
+                  <AnimatePresence mode="wait">
+                    {acts.map((act, index) => (
                     <motion.div
                       key={act.id || act.act_id || `act-${index}`}
-                      initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
                       transition={{ 
-                        duration: 0.4, 
-                        delay: index * 0.05,
+                        duration: 0.3, 
+                        delay: index * 0.03,
                         ease: [0.4, 0, 0.2, 1]
                       }}
-                      whileHover={{ 
-                        y: -4, 
-                        scale: 1.01,
-                        transition: { duration: 0.2 }
-                      }}
-                      whileTap={{ scale: 0.98 }}
                     >
                       <div 
                         onClick={() => viewActDetails(act)}
-                        className="border border-gray-200 rounded-lg p-3 sm:p-4 md:p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-300 bg-white group cursor-pointer"
+                        className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer"
+                        style={{
+                          borderLeft: '4px solid #1E65AD'
+                        }}
                       >
-                      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 sm:gap-4">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start gap-2 sm:gap-3 mb-2 sm:mb-3">
-                            <h3 className="text-base sm:text-lg md:text-xl font-semibold flex-1 group-hover:text-blue-700 transition-colors break-words" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                              {/* Display highlighted title if available */}
-                              {act.highlights && act.highlights.short_title ? (
-                                <span dangerouslySetInnerHTML={{ __html: act.highlights.short_title[0] }} />
-                              ) : (
-                                act.short_title || act.long_title || 'Untitled Act'
-                              )}
-                            </h3>
-                            <div className="flex items-center gap-2 flex-shrink-0">
-                              {act.relevance_score && (
-                                <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium" title={`Relevance Score: ${act.relevance_score.toFixed(2)}`}>
-                                  Score: {act.relevance_score.toFixed(1)}
-                                </span>
-                              )}
-                              {index === 0 && !loading && !searchInfo && (
-                                <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                                  Latest
-                                </span>
-                              )}
+                        {/* Simple Card Header */}
+                        <div className="px-5 sm:px-6 py-4 sm:py-5 border-b border-gray-100">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <h3 
+                                className="text-base sm:text-lg md:text-xl font-bold mb-2 line-clamp-2 group-hover:text-blue-700 transition-colors" 
+                                style={{ 
+                                  color: '#1E65AD', 
+                                  fontFamily: 'Helvetica Hebrew Bold, sans-serif',
+                                  lineHeight: '1.5'
+                                }}
+                              >
+                                {/* Display highlighted title if available */}
+                                {act.highlights && act.highlights.short_title ? (
+                                  <span dangerouslySetInnerHTML={{ __html: act.highlights.short_title[0] }} />
+                                ) : (
+                                  act.short_title || act.long_title || 'Untitled Act'
+                                )}
+                              </h3>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                {index === 0 && !loading && !searchInfo && (
+                                  <span className="inline-flex items-center px-2.5 py-1 bg-green-100 text-green-700 rounded-md text-xs font-semibold">
+                                    Latest
+                                  </span>
+                                )}
+                                {act.relevance_score && (
+                                  <span className="inline-flex items-center px-2.5 py-1 bg-purple-100 text-purple-700 rounded-md text-xs font-semibold" title={`Relevance Score: ${act.relevance_score.toFixed(2)}`}>
+                                    Score: {act.relevance_score.toFixed(1)}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
-                          
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 md:gap-4 text-xs sm:text-sm mb-2 sm:mb-3">
-                            {act.year && (
-                              <div>
-                                <span className="font-medium text-gray-800">Year:</span>
-                                <span className="ml-2" style={{ color: '#8C969F' }}>{act.year}</span>
-                              </div>
-                            )}
-                            {act.ministry && (
-                              <div>
-                                <span className="font-medium text-gray-800">Ministry:</span>
-                                <span className="ml-2 block sm:inline" style={{ color: '#8C969F' }}>{act.ministry}</span>
-                              </div>
-                            )}
-                            {act.department && (
-                              <div>
-                                <span className="font-medium text-gray-800">Department:</span>
-                                <span className="ml-2 block sm:inline" style={{ color: '#8C969F' }}>{act.department}</span>
-                              </div>
-                            )}
-                            {act.act_id && (
-                              <div>
-                                <span className="font-medium text-gray-800">Act ID:</span>
-                                <span className="ml-2" style={{ color: '#8C969F' }}>{act.act_id}</span>
-                              </div>
-                            )}
-                            {act.act_number && (
-                              <div>
-                                <span className="font-medium text-gray-800">Act Number:</span>
-                                <span className="ml-2" style={{ color: '#8C969F' }}>{act.act_number}</span>
-                              </div>
-                            )}
-                            {act.state && (
-                              <div>
-                                <span className="font-medium text-gray-800">State:</span>
-                                <span className="ml-2" style={{ color: '#8C969F' }}>{act.state}</span>
-                              </div>
-                            )}
-                          </div>
-
-                          {act.long_title && act.long_title !== act.short_title && (
-                            <div className="mb-3">
-                              <span className="font-medium text-gray-800 text-sm">Description:</span>
-                              <p className="mt-1 text-sm" style={{ color: '#8C969F' }}>{act.long_title}</p>
-                            </div>
-                          )}
-                          
-                          {/* Display search highlights if available */}
-                          {act.highlights && act.highlights.content && act.highlights.content.length > 0 && (
-                            <div className="mb-3 mt-3 p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded">
-                              <span className="font-medium text-gray-800 text-sm block mb-2">Search Matches:</span>
-                              {act.highlights.content.map((fragment, idx) => (
-                                <p 
-                                  key={idx} 
-                                  className="text-sm mb-2 last:mb-0" 
-                                  style={{ color: '#8C969F' }}
-                                  dangerouslySetInnerHTML={{ __html: fragment }}
-                                />
-                              ))}
-                            </div>
-                          )}
                         </div>
 
-                        <div className="flex-shrink-0 flex flex-col gap-2 w-full sm:w-auto">
-                          <motion.button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              viewActDetails(act);
-                            }}
-                            whileHover={{ scale: 1.05, y: -2 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="px-4 sm:px-6 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium shadow-sm hover:shadow-md text-sm sm:text-base"
-                            style={{ fontFamily: 'Roboto, sans-serif' }}
-                          >
-                            View Details
-                          </motion.button>
+                        {/* Simple Card Body */}
+                        <div className="px-5 sm:px-6 py-4 sm:py-5">
+                          <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
+                            {/* Left side - Details */}
+                            <div className="flex-1">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                {act.year && (
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#CF9B63' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs text-gray-500 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>Year</p>
+                                      <p className="text-sm font-medium text-gray-900" style={{ fontFamily: 'Roboto, sans-serif' }}>{act.year}</p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {act.ministry && (
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs text-gray-500 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>Ministry</p>
+                                      <p className="text-sm font-medium text-gray-900 line-clamp-1" style={{ fontFamily: 'Roboto, sans-serif' }}>{act.ministry}</p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {act.department && (
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs text-gray-500 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>Department</p>
+                                      <p className="text-sm font-medium text-gray-900 line-clamp-1" style={{ fontFamily: 'Roboto, sans-serif' }}>{act.department}</p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {act.act_id && (
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                                    </svg>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs text-gray-500 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>Act ID</p>
+                                      <p className="text-sm font-medium text-gray-900 font-mono truncate" style={{ fontFamily: 'Roboto Mono, monospace' }}>{act.act_id}</p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {act.act_number && (
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#CF9B63' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                                    </svg>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs text-gray-500 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>Act Number</p>
+                                      <p className="text-sm font-medium text-gray-900 truncate" style={{ fontFamily: 'Roboto, sans-serif' }}>{act.act_number}</p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {act.state && (
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#CF9B63' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs text-gray-500 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>State</p>
+                                      <p className="text-sm font-medium text-gray-900 line-clamp-1" style={{ fontFamily: 'Roboto, sans-serif' }}>{act.state}</p>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Long Title / Description */}
+                              {act.long_title && act.long_title !== act.short_title && (
+                                <div className="mt-4 pt-4 border-t border-gray-100">
+                                  <p className="text-xs text-gray-500 mb-1.5" style={{ fontFamily: 'Roboto, sans-serif' }}>Description</p>
+                                  <p className="text-sm text-gray-700 line-clamp-2" style={{ fontFamily: 'Roboto, sans-serif' }}>{act.long_title}</p>
+                                </div>
+                              )}
+
+                              {/* Display search highlights if available */}
+                              {act.highlights && act.highlights.content && act.highlights.content.length > 0 && (
+                                <div className="mt-4 pt-4 border-t border-gray-100">
+                                  <p className="text-xs text-gray-500 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>Search Matches</p>
+                                  <div className="space-y-2">
+                                    {act.highlights.content.map((fragment, idx) => (
+                                      <p 
+                                        key={idx} 
+                                        className="text-sm text-gray-700 line-clamp-2" 
+                                        style={{ fontFamily: 'Roboto, sans-serif' }}
+                                        dangerouslySetInnerHTML={{ __html: fragment }}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Right side - Button */}
+                            <div className="flex-shrink-0 flex items-center lg:items-start lg:pt-0">
+                              <motion.button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  viewActDetails(act);
+                                }}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap"
+                                style={{ 
+                                  backgroundColor: '#1E65AD',
+                                  color: '#FFFFFF',
+                                  fontFamily: 'Roboto, sans-serif'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#155a9a';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#1E65AD';
+                                }}
+                              >
+                                <span>View Details</span>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                              </motion.button>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
                     </motion.div>
                   ))}
-                </AnimatePresence>
+                  </AnimatePresence>
+                </div>
               </div>
             )}
             

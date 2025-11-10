@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
-import { Send, Bot, User, Sparkles, X, RotateCcw } from "lucide-react";
+import { Send, Bot, User, Sparkles, X, RotateCcw, Mic, MicOff, Upload } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import apiService from "../services/api";
 
 export default function LegalChatbot() {
   const navigate = useNavigate();
@@ -10,9 +11,14 @@ export default function LegalChatbot() {
   const [inputMessage, setInputMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isProcessingVoice, setIsProcessingVoice] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const messagesContainerRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const fileInputRef = useRef(null);
 
   const quickQuestions = [
     "What are my rights as a tenant?",
@@ -37,25 +43,35 @@ export default function LegalChatbot() {
     ]);
   }, []);
 
+  const scrollToBottom = useCallback(() => {
+    // Use requestAnimationFrame to ensure DOM is updated
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        // Try scrolling the messages container first
+        if (messagesContainerRef.current) {
+          messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+        }
+        // Also try scrolling to the end ref element
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+        }
+      }, 150);
+    });
+  }, []);
+
   useEffect(() => {
-    // Auto-scroll to bottom when new messages are added
+    // Auto-scroll to bottom when new messages are added or typing state changes
     if (messages.length > 0) {
       scrollToBottom();
     }
-  }, [messages, isTyping]);
+  }, [messages, isTyping, scrollToBottom]);
 
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      if (messagesEndRef.current) {
-        messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 100);
-  };
-
-  const getBotResponse = (userMessage) => {
-    // TODO: Implement real AI chatbot integration
-    return "I'm sorry, but the AI chatbot feature is not yet implemented. Please check back later for this functionality.";
-  };
+  // Additional scroll when typing indicator appears/disappears
+  useEffect(() => {
+    if (isTyping) {
+      scrollToBottom();
+    }
+  }, [isTyping, scrollToBottom]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || loading) return;
@@ -70,22 +86,210 @@ export default function LegalChatbot() {
     setMessages(prev => [...prev, userMessage]);
     const currentInput = inputMessage;
     setInputMessage("");
+    
+    // Scroll to bottom immediately after adding user message
+    setTimeout(() => {
+      scrollToBottom();
+    }, 50);
+    
     setLoading(true);
     setIsTyping(true);
 
-    // Simulate AI processing time
-    setTimeout(() => {
+    try {
+      // Call the LLM Chat API
+      const response = await apiService.llmChat(currentInput);
+      
       const botResponse = {
         id: Date.now() + 1,
-        text: getBotResponse(currentInput),
+        text: response.reply || "I'm sorry, I couldn't process your request. Please try again.",
         sender: "bot",
         timestamp: new Date().toISOString()
       };
 
       setMessages(prev => [...prev, botResponse]);
+      
+      // Scroll to bottom after bot response
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    } catch (error) {
+      console.error('Error getting bot response:', error);
+      const errorResponse = {
+        id: Date.now() + 1,
+        text: "I'm sorry, there was an error processing your message. Please try again.",
+        sender: "bot",
+        timestamp: new Date().toISOString()
+      };
+      setMessages(prev => [...prev, errorResponse]);
+      
+      // Scroll to bottom after error response
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    } finally {
       setLoading(false);
       setIsTyping(false);
-    }, 1500);
+    }
+  };
+
+  // Voice Recording Functions
+  const startRecording = async () => {
+    if (isRecording) {
+      stopRecording();
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm;codecs=opus'
+      });
+      
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+      const streamRef = stream; // Store stream reference
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        await handleVoiceInput(audioBlob);
+        
+        // Stop all tracks
+        streamRef.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      alert('Could not access microphone. Please check your permissions.');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (mediaRecorderRef.current && isRecording) {
+        mediaRecorderRef.current.stop();
+      }
+    };
+  }, [isRecording]);
+
+  const handleVoiceInput = async (audioBlob) => {
+    setIsProcessingVoice(true);
+    setIsTyping(true);
+
+    try {
+      // Create a File object from the blob
+      const audioFile = new File([audioBlob], 'recording.webm', { type: 'audio/webm' });
+      
+      // Call the Speech API
+      const response = await apiService.speechToGemini(audioFile);
+
+      // Add user message with transcription
+      if (response.transcription) {
+        const userMessage = {
+          id: Date.now(),
+          text: response.transcription,
+          sender: "user",
+          timestamp: new Date().toISOString(),
+          isVoice: true
+        };
+        setMessages(prev => [...prev, userMessage]);
+        setTimeout(() => scrollToBottom(), 50);
+      }
+
+      // Add bot response
+      const botResponse = {
+        id: Date.now() + 1,
+        text: response.gemini_reply || "I'm sorry, I couldn't process your voice input. Please try again.",
+        sender: "bot",
+        timestamp: new Date().toISOString()
+      };
+      setMessages(prev => [...prev, botResponse]);
+      setTimeout(() => scrollToBottom(), 100);
+    } catch (error) {
+      console.error('Error processing voice input:', error);
+      const errorResponse = {
+        id: Date.now() + 1,
+        text: "I'm sorry, there was an error processing your voice input. Please try again.",
+        sender: "bot",
+        timestamp: new Date().toISOString()
+      };
+      setMessages(prev => [...prev, errorResponse]);
+    } finally {
+      setIsProcessingVoice(false);
+      setIsTyping(false);
+    }
+  };
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Check if it's an audio file
+    if (!file.type.startsWith('audio/')) {
+      alert('Please upload an audio file.');
+      return;
+    }
+
+    setIsProcessingVoice(true);
+    setIsTyping(true);
+
+    try {
+      const response = await apiService.speechToGemini(file);
+
+      // Add user message with transcription
+      if (response.transcription) {
+        const userMessage = {
+          id: Date.now(),
+          text: response.transcription,
+          sender: "user",
+          timestamp: new Date().toISOString(),
+          isVoice: true
+        };
+        setMessages(prev => [...prev, userMessage]);
+        setTimeout(() => scrollToBottom(), 50);
+      }
+
+      // Add bot response
+      const botResponse = {
+        id: Date.now() + 1,
+        text: response.gemini_reply || "I'm sorry, I couldn't process your audio file. Please try again.",
+        sender: "bot",
+        timestamp: new Date().toISOString()
+      };
+      setMessages(prev => [...prev, botResponse]);
+      setTimeout(() => scrollToBottom(), 100);
+    } catch (error) {
+      console.error('Error processing audio file:', error);
+      const errorResponse = {
+        id: Date.now() + 1,
+        text: "I'm sorry, there was an error processing your audio file. Please try again.",
+        sender: "bot",
+        timestamp: new Date().toISOString()
+      };
+      setMessages(prev => [...prev, errorResponse]);
+    } finally {
+      setIsProcessingVoice(false);
+      setIsTyping(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   const handleQuickQuestion = (question) => {
@@ -239,6 +443,12 @@ export default function LegalChatbot() {
                               ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-tr-sm'
                               : 'bg-white text-gray-800 border border-gray-200 rounded-tl-sm'
                           }`}>
+                            {message.isVoice && (
+                              <div className="flex items-center gap-1 mb-1.5">
+                                <Mic className="w-3 h-3 text-blue-200" />
+                                <span className="text-[10px] text-blue-200 italic">Voice input</span>
+                              </div>
+                            )}
                             <p className="text-xs sm:text-sm md:text-base leading-relaxed break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
                           {message.text}
                         </p>
@@ -280,7 +490,89 @@ export default function LegalChatbot() {
 
                 {/* Input Area */}
                 <div className="p-3 sm:p-4 md:p-6 border-t border-gray-200 bg-white">
+                  {/* Voice Recording Animation Overlay */}
+                  <AnimatePresence>
+                    {isRecording && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="mb-3 sm:mb-4 p-3 sm:p-4 bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-200 rounded-lg sm:rounded-xl flex items-center gap-3 sm:gap-4"
+                      >
+                        <div className="flex-shrink-0">
+                          <div className="relative w-10 h-10 sm:w-12 sm:h-12">
+                            <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
+                            <div className="relative w-10 h-10 sm:w-12 sm:h-12 bg-red-600 rounded-full flex items-center justify-center">
+                              <Mic className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm sm:text-base font-semibold text-red-700 mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                            Recording...
+                          </p>
+                          <div className="flex items-center gap-1">
+                            <div className="flex items-end gap-0.5 sm:gap-1" style={{ height: '20px' }}>
+                              <div className="w-0.5 sm:w-1 bg-red-500 rounded-full animate-voice-bar" style={{ animationDelay: '0s', height: '8px' }}></div>
+                              <div className="w-0.5 sm:w-1 bg-red-500 rounded-full animate-voice-bar" style={{ animationDelay: '0.1s', height: '12px' }}></div>
+                              <div className="w-0.5 sm:w-1 bg-red-500 rounded-full animate-voice-bar" style={{ animationDelay: '0.2s', height: '16px' }}></div>
+                              <div className="w-0.5 sm:w-1 bg-red-500 rounded-full animate-voice-bar" style={{ animationDelay: '0.3s', height: '20px' }}></div>
+                              <div className="w-0.5 sm:w-1 bg-red-500 rounded-full animate-voice-bar" style={{ animationDelay: '0.4s', height: '16px' }}></div>
+                              <div className="w-0.5 sm:w-1 bg-red-500 rounded-full animate-voice-bar" style={{ animationDelay: '0.5s', height: '12px' }}></div>
+                              <div className="w-0.5 sm:w-1 bg-red-500 rounded-full animate-voice-bar" style={{ animationDelay: '0.6s', height: '8px' }}></div>
+                            </div>
+                            <p className="text-xs sm:text-sm text-red-600 ml-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                              Click mic button to stop
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   <div className="flex items-end gap-2 sm:gap-3">
+                    {/* Voice Recording Button */}
+                    <button
+                      onClick={startRecording}
+                      disabled={loading || isProcessingVoice}
+                      className={`px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 flex items-center justify-center flex-shrink-0 ${
+                        isRecording 
+                          ? 'bg-red-600 hover:bg-red-700 text-white animate-pulse' 
+                          : 'bg-gray-100 hover:bg-gray-200 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed'
+                      }`}
+                      style={{ fontFamily: 'Roboto, sans-serif', minWidth: '44px' }}
+                      title={isRecording ? "Click to stop recording" : "Click to start recording"}
+                    >
+                      {isRecording ? (
+                        <MicOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                      ) : (
+                        <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
+                      )}
+                    </button>
+
+                    {/* File Upload Button */}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="audio/*"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                      id="audio-file-input"
+                      disabled={loading || isProcessingVoice}
+                    />
+                    <label
+                      htmlFor="audio-file-input"
+                      className={`px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 flex items-center justify-center flex-shrink-0 cursor-pointer ${
+                        loading || isProcessingVoice
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                          : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                      }`}
+                      style={{ fontFamily: 'Roboto, sans-serif', minWidth: '44px' }}
+                      title="Upload audio file"
+                    >
+                      <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </label>
+
                     <div className="flex-1 relative">
                       <div className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 z-10">
                         <img 
@@ -303,7 +595,7 @@ export default function LegalChatbot() {
                           minHeight: '44px',
                           maxHeight: '120px'
                         }}
-                      disabled={loading}
+                      disabled={loading || isProcessingVoice}
                         onInput={(e) => {
                           e.target.style.height = 'auto';
                           e.target.style.height = e.target.scrollHeight + 'px';
@@ -320,11 +612,11 @@ export default function LegalChatbot() {
                     </div>
                     <button
                       onClick={handleSendMessage}
-                      disabled={loading || !inputMessage.trim()}
+                      disabled={loading || isProcessingVoice || !inputMessage.trim()}
                       className="px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg sm:rounded-xl hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 flex-shrink-0"
                       style={{ fontFamily: 'Roboto, sans-serif', minWidth: '44px' }}
                     >
-                      {loading ? (
+                      {(loading || isProcessingVoice) ? (
                         <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       ) : (
                         <Send className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -332,7 +624,7 @@ export default function LegalChatbot() {
                     </button>
                   </div>
                   <p className="text-[10px] sm:text-xs text-gray-500 mt-1.5 sm:mt-2 text-center" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                    Press Enter to send • Shift+Enter for new line
+                    {isRecording ? "Recording... Click mic button again to stop" : "Press Enter to send • Click mic to record • Upload audio file"}
                   </p>
                 </div>
               </motion.div>
@@ -415,6 +707,22 @@ export default function LegalChatbot() {
         }
         .overflow-y-auto::-webkit-scrollbar-thumb:hover {
           background: #A0AEC0;
+        }
+        
+        /* Voice Recording Animation */
+        @keyframes voice-bar {
+          0%, 100% {
+            transform: scaleY(0.4);
+            opacity: 0.7;
+          }
+          50% {
+            transform: scaleY(1);
+            opacity: 1;
+          }
+        }
+        
+        .animate-voice-bar {
+          animation: voice-bar 1s ease-in-out infinite;
         }
       `}</style>
     </div>

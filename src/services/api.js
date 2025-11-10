@@ -1,5 +1,5 @@
 // API Service for Legal Platform - Complete Integration
-const API_BASE_URL = 'https://operantly-unchattering-ernie.ngrok-free.dev';
+const API_BASE_URL = 'https://unquestioned-gunnar-medially.ngrok-free.dev';
 
 // Fallback URLs in case the primary one fails
 const FALLBACK_URLS = [
@@ -2154,6 +2154,48 @@ class ApiService {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ url: videoUrl })
+    });
+    return await this.handleResponse(response);
+  }
+
+  // LLM Chat - Text-based chat with Gemini
+  async llmChat(message) {
+    const response = await fetch(`${this.baseURL}/llm_chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+        ...this.getAuthHeaders()
+      },
+      body: JSON.stringify({ message })
+    });
+    return await this.handleResponse(response);
+  }
+
+  // Speech to Text and Gemini Response - Voice input
+  async speechToGemini(audioFile) {
+    const formData = new FormData();
+    formData.append('file', audioFile);
+
+    // Get auth token for authorization header
+    const token = localStorage.getItem('access_token') || 
+                  localStorage.getItem('accessToken') || 
+                  localStorage.getItem('token') ||
+                  this.accessToken;
+
+    const headers = {
+      'ngrok-skip-browser-warning': 'true'
+    };
+
+    // Add authorization if token exists
+    if (token && token !== 'null' && token !== 'undefined') {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${this.baseURL}/speech`, {
+      method: 'POST',
+      headers: headers,
+      body: formData
     });
     return await this.handleResponse(response);
   }

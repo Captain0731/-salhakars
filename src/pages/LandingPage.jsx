@@ -7,7 +7,6 @@ import VideoSection from "../components/landing/VideoSection";
 import Testimonials from "../components/landing/Testimonials";
 import BlogSection from "../components/landing/BlogSection";
 import FAQ from "../components/landing/FAQ";
-import Footer from "../components/landing/Footer";
 
 function LandingPage() {
   return (
@@ -24,7 +23,6 @@ function LandingPage() {
         <BlogSection />
       </div>
       <FAQ />
-      <Footer />
     </div>
   );
 }
