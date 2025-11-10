@@ -19,6 +19,7 @@ const useSmoothInfiniteScroll = ({
   throttleDelay = 100
 }) => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState(null);
   const [retryCount, setRetryCount] = useState(0);
   
@@ -50,6 +51,7 @@ const useSmoothInfiniteScroll = ({
 
     try {
       isFetchingRef.current = true;
+      setIsFetching(true);
       setIsLoadingMore(true);
       setError(null);
       lastFetchTimeRef.current = Date.now();
@@ -61,6 +63,7 @@ const useSmoothInfiniteScroll = ({
       setRetryCount(prev => prev + 1);
     } finally {
       isFetchingRef.current = false;
+      setIsFetching(false);
       setIsLoadingMore(false);
     }
   }, [fetchMore, hasMore, isLoading, isLoadingMore, throttleDelay]);
@@ -124,7 +127,7 @@ const useSmoothInfiniteScroll = ({
     error,
     retry,
     retryCount,
-    isFetching: isFetchingRef.current
+    isFetching
   };
 };
 

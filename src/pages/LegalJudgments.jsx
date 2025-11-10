@@ -114,6 +114,8 @@ export default function LegalJudgments() {
   const fetchJudgmentsRef = useRef(null);
   const isInitialMountRef = useRef(true);
   const isFetchingRef = useRef(false);
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
+  const scrollTimeoutRef = useRef(null);
 
   // Filter states - will change based on court type
   const [filters, setFilters] = useState({
@@ -499,6 +501,20 @@ export default function LegalJudgments() {
     const judgmentId = judgment.id || judgment.cnr;
     const url = judgmentId ? `/judgment/${judgmentId}` : '/judgment';
     navigate(url, { state: { judgment } });
+  };
+
+  // Scroll to top button - always visible
+  useEffect(() => {
+    // Always show the button
+    setShowScrollToTop(true);
+  }, []);
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
 
   // Cleanup effect
@@ -1146,6 +1162,41 @@ export default function LegalJudgments() {
 
         </div>
       </div>
+
+      {/* Scroll to Top Button */}
+      <AnimatePresence>
+        {showScrollToTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.5, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.5, y: 20 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            onClick={scrollToTop}
+            className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 sm:p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+            style={{ 
+              fontFamily: 'Roboto, sans-serif',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+            }}
+            whileHover={{ scale: 1.1, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            aria-label="Scroll to top"
+          >
+            <svg 
+              className="w-5 h-5 sm:w-6 sm:h-6 transform group-hover:-translate-y-1 transition-transform duration-300" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M5 10l7-7m0 0l7 7m-7-7v18" 
+              />
+            </svg>
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

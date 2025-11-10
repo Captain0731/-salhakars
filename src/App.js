@@ -55,7 +55,9 @@ function AppLayout() {
     '/view-docx',
     '/react-pdf-viewer',
     '/act-details',
-    '/mapping-details'
+    '/mapping-details',
+    '/law-library',
+    '/law-mapping'
   ];
   
   const shouldShowChatbot = !hideChatbotPaths.some(path => location.pathname.startsWith(path));

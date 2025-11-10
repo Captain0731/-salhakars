@@ -308,8 +308,8 @@ function PricingPage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="pt-14 sm:pt-16 md:pt-20 lg:pt-28 pb-6 sm:pb-8 md:pb-12 lg:pb-16 bg-white relative z-20 border-2 border-gray-200 shadow-lg p-4 sm:p-6 md:p-10 lg:p-14 mx-2 sm:mx-4">
-        <div className="max-w-4xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 text-center pt-4 sm:pt-6 md:pt-7">
+      <section className="pt-14 sm:pt-16 md:pt-20 lg:pt-28 pb-6 sm:pb-8 md:pb-12 lg:pb-16 bg-white relative z-20 w-full border-2 border-gray-200 shadow-lg">
+        <div className="w-full mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 text-center pt-4 sm:pt-6 md:pt-7">
           <h1
             className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 leading-tight"
             style={{
@@ -439,7 +439,7 @@ function PricingPage() {
             >
               Monthly
             </span>
-            <label className="relative inline-block cursor-pointer">
+            <label className="relative inline-block cursor-pointer group">
               <input
                 type="checkbox"
                 className="sr-only"
@@ -447,31 +447,49 @@ function PricingPage() {
                 onChange={(e) => setBillingCycle(e.target.checked ? "yearly" : "monthly") }
               />
               <div
-                className="relative overflow-hidden"
+                className="relative overflow-hidden transition-all duration-300 ease-in-out"
                 style={{
-                  width: "50px",
-                  height: "26px",
-                  backgroundColor: billingCycle === "yearly" ? "#1E65AD" : "#d3d3d3",
-                  borderRadius: "20px",
-                  border: "3px solid transparent",
-                  transition: "0.3s",
-                  boxShadow: "0 0 10px 0 rgba(0, 0, 0, 0.25) inset",
+                  width: "56px",
+                  height: "32px",
+                  backgroundColor: billingCycle === "yearly" ? "#1E65AD" : "#E5E7EB",
+                  borderRadius: "16px",
+                  boxShadow: billingCycle === "yearly" 
+                    ? "inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(30, 101, 173, 0.2)"
+                    : "inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)",
                   cursor: "pointer"
                 }}
               >
+                {/* Inner shadow effect for depth */}
                 <div
-                  className="absolute top-0 left-0 rounded-full transition-transform duration-300"
+                  className="absolute inset-0 rounded-full pointer-events-none"
                   style={{
-                    backgroundColor: "#fff",
-                    transform: billingCycle === "yearly" ? "translateX(24px)" : "translateX(0px)",
-                    borderRadius: "20px",
-                    boxShadow: "0 0 10px 3px rgba(0, 0, 0, 0.25)",
-                    width: "20px",
-                    height: "20px",
-                    top: "3px",
-                    left: "3px"
+                    background: billingCycle === "yearly"
+                      ? "linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1))"
+                      : "linear-gradient(to bottom, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.05))",
                   }}
                 />
+                {/* Toggle knob */}
+                <div
+                  className="absolute rounded-full transition-all duration-300 ease-in-out flex items-center justify-center"
+                  style={{
+                    backgroundColor: "#FFFFFF",
+                    transform: billingCycle === "yearly" ? "translateX(24px)" : "translateX(2px)",
+                    borderRadius: "50%",
+                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1)",
+                    width: "28px",
+                    height: "28px",
+                    top: "2px",
+                    left: "2px"
+                  }}
+                >
+                  {/* Subtle inner highlight on knob */}
+                  <div
+                    className="absolute inset-0 rounded-full pointer-events-none"
+                    style={{
+                      background: "radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), transparent 60%)",
+                    }}
+                  />
+                </div>
               </div>
             </label>
             <span
@@ -518,6 +536,24 @@ function PricingPage() {
                     Most Popular
                   </div>
                 )}
+
+                {/* Not Required Autopay Sticker for Free Plan */}
+                {(() => {
+                  const isFree = !plan.price || plan.price === "₹/mo" || plan.price === "₹0/mo" || plan.title.toLowerCase().includes("free");
+                  return isFree && (
+                    <div
+                      className="absolute -top-3 sm:-top-4 md:-top-5 left-2 sm:left-8 md:left-10 lg:left-1 bg-[#1E65AD] text-white px-3 sm:px-4 md:px-5 lg:px-6 py-1.5 sm:py-2 md:py-2.5 lg:py-3 rounded-full text-xs sm:text-sm md:text-base font-bold shadow-lg z-10 transform -rotate-5 hover:rotate-0 hover:scale-105 transition-all duration-300"
+                      style={{ 
+                        fontFamily: "'Roboto', sans-serif",
+                        fontWeight: 700,
+                        boxShadow: '0 4px 12px rgba(30, 101, 173, 0.4)',
+                        letterSpacing: '0.02em'
+                      }}
+                    >
+                      <span className="whitespace-nowrap">No Autopay Required</span>
+                    </div>
+                  );
+                })()}
 
                 <div className="mb-4 sm:mb-6 md:mb-8 text-center" style={{ marginTop: plan.popular ? "0.5rem sm:1rem" : "0" }}>
                   <h3

@@ -8,7 +8,7 @@ const About = () => {
       <Navbar />
       <div className="py-2 sm:py-3 md:py-5">
          {/* Hero Section */}
-        <section className="pt-14 sm:pt-16 md:pt-20 lg:pt-28 pb-8 sm:pb-12 md:pb-16 lg:pb-20 relative z-20 overflow-hidden border-2 border-gray-200 rounded-xl sm:rounded-2xl shadow-lg mx-2 sm:mx-4"
+        <section className="pt-14 sm:pt-16 md:pt-20 lg:pt-28 pb-6 sm:pb-8 md:pb-12 lg:pb-16 bg-white relative z-20 w-full border-2 border-gray-200 shadow-lg overflow-hidden"
           style={{
             background: 'linear-gradient(135deg, #F9FAFC 0%, #FFFFFF 100%)'
           }}
@@ -21,7 +21,7 @@ const About = () => {
               style={{ backgroundColor: '#CF9B63', filter: 'blur(100px)' }}
             ></div>
           </div>
-          <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 text-center pt-4 sm:pt-6 md:pt-7 relative z-10">
+          <div className="w-full mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 text-center pt-4 sm:pt-6 md:pt-7 relative z-10">
             <h1
               className="text-xl sm:text-2xl md:text-3xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 leading-tight"
             style={{
