@@ -163,6 +163,11 @@ export default function LegalJudgments() {
     setJudgments([]);
     setNextCursor(null);
     setHasMore(true);
+    setError(null);
+    // Reset fetching state when court type changes
+    isFetchingRef.current = false;
+    setLoading(false);
+    setIsSearching(false);
   }, [courtType]);
 
   // Store filters in ref to always get latest values
@@ -467,12 +472,19 @@ export default function LegalJudgments() {
       isInitialMountRef.current = false;
       return () => clearTimeout(timer);
     } else {
-      // On court type change, fetch immediately but check if not already fetching
-      if (!isFetchingRef.current) {
-        fetchJudgments(false);
-      }
+      // On court type change, reset fetching state and fetch immediately
+      isFetchingRef.current = false;
+      setLoading(true);
+      setError(null);
+      // Use setTimeout to ensure state updates are processed
+      const timer = setTimeout(() => {
+        if (fetchJudgmentsRef.current) {
+          fetchJudgmentsRef.current(false);
+        }
+      }, 50);
+      return () => clearTimeout(timer);
     }
-  }, [courtType, fetchJudgments]);
+  }, [courtType]);
 
   // Enhanced infinite scroll logic
   const loadMoreData = useCallback(async () => {
