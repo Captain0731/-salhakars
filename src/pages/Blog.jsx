@@ -97,7 +97,7 @@ const Blog = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="pt-14 sm:pt-16 md:pt-20 lg:pt-24 xl:pt-32 pb-8 sm:pb-12 md:pb-16 lg:pb-20 relative z-20 overflow-hidden"
+      <section className="pt-14 sm:pt-16 md:pt-20 lg:pt-24 xl:pt-32 pb-8 sm:pb-12 md:pb-16 lg:pb-20 relative z-20 overflow-hidden border-2 border-gray-200 shadow-lg"
         style={{
           background: 'linear-gradient(135deg, #F9FAFC 0%, #FFFFFF 100%)'
         }}
@@ -141,7 +141,7 @@ const Blog = () => {
       </section>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 pb-8 sm:pb-12 md:pb-16 lg:pb-20">
+      <div className="max-w-7xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 pb-8 sm:pb-12 md:pb-16 lg:pb-20 pt-10">
         {/* Search and Filter Section */}
         <div className="mb-6 sm:mb-8 md:mb-10 lg:mb-12">
           <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-5 lg:p-6 shadow-lg mx-2 sm:mx-0"

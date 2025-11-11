@@ -2158,24 +2158,34 @@ class ApiService {
     return await this.handleResponse(response);
   }
 
-  // LLM Chat - Text-based chat with Gemini
-  async llmChat(message) {
-    const response = await fetch(`${this.baseURL}/llm_chat`, {
+  // AI Assistant - Text-based chat with automatic tool usage
+  async llmChat(message, useTools = null, limit = 10) {
+    const response = await fetch(`${this.baseURL}/ai_assistant`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'ngrok-skip-browser-warning': 'true',
         ...this.getAuthHeaders()
       },
-      body: JSON.stringify({ message })
+      body: JSON.stringify({ 
+        message,
+        ...(useTools !== null && { use_tools: useTools }),
+        limit
+      })
     });
     return await this.handleResponse(response);
   }
 
-  // Speech to Text and Gemini Response - Voice input
-  async speechToGemini(audioFile) {
+  // Speech to Text and AI Assistant Response - Voice input
+  async speechToGemini(audioFile, useTools = null, limit = 10) {
     const formData = new FormData();
-    formData.append('file', audioFile);
+    formData.append('audio_file', audioFile);
+    
+    // Add optional parameters
+    if (useTools !== null) {
+      formData.append('use_tools', useTools);
+    }
+    formData.append('limit', limit.toString());
 
     // Get auth token for authorization header
     const token = localStorage.getItem('access_token') || 

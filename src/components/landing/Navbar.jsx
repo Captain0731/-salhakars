@@ -68,7 +68,7 @@ const navItems = [
       },
       { 
         label: "Support", 
-        path: "/legal-chatbot"
+        path: "/support"
       },
       { 
         label: "Referral Program", 

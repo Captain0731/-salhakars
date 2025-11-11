@@ -4,9 +4,12 @@ import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import Navbar from "../components/landing/Navbar";
 import BookmarkButton from "../components/BookmarkButton";
+import SummaryPopup from "../components/SummaryPopup";
 import apiService from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import { FileText, StickyNote, Share2, Download } from "lucide-react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 export default function ViewPDF() {
   const navigate = useNavigate();
@@ -54,6 +57,9 @@ export default function ViewPDF() {
   const [loadingNotes, setLoadingNotes] = useState(false);
   const [savingNote, setSavingNote] = useState(false);
   const [showDownloadDropdown, setShowDownloadDropdown] = useState(false);
+  
+  // Summary popup state
+  const [summaryPopupOpen, setSummaryPopupOpen] = useState(false);
 
   // Get current language from cookie (Google Translate)
   const getCurrentLanguage = () => {
@@ -71,6 +77,72 @@ export default function ViewPDF() {
       }
     }
     return 'en';
+  };
+
+  // Get language name from code
+  const getLanguageName = (langCode) => {
+    const languageMap = {
+      'en': 'English',
+      'hi': 'Hindi',
+      'gu': 'Gujarati',
+      'ta': 'Tamil',
+      'te': 'Telugu',
+      'kn': 'Kannada',
+      'ml': 'Malayalam',
+      'bn': 'Bengali',
+      'mr': 'Marathi',
+      'pa': 'Punjabi',
+      'ur': 'Urdu',
+      'or': 'Odia',
+      'as': 'Assamese'
+    };
+    return languageMap[langCode] || 'English';
+  };
+
+  // Translate text using Google Translate API
+  const translateText = async (text, targetLang) => {
+    if (!text || !text.trim() || targetLang === 'en') {
+      return text;
+    }
+
+    try {
+      // Split long text into chunks for translation
+      const maxChunkLength = 5000;
+      const chunks = [];
+      for (let i = 0; i < text.length; i += maxChunkLength) {
+        chunks.push(text.substring(i, i + maxChunkLength));
+      }
+
+      const translatedChunks = await Promise.all(
+        chunks.map(async (chunk, index) => {
+          try {
+            const response = await fetch(
+              `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(chunk)}`,
+              {
+                method: 'GET',
+                signal: AbortSignal.timeout(30000)
+              }
+            );
+
+            if (response.ok) {
+              const data = await response.json();
+              if (data && data[0]) {
+                return data[0].map((seg) => seg[0]).join(" ");
+              }
+            }
+            return chunk;
+          } catch (chunkError) {
+            console.warn(`Translation chunk ${index + 1} failed:`, chunkError);
+            return chunk; // Return original chunk on error
+          }
+        })
+      );
+
+      return translatedChunks.join(" ");
+    } catch (error) {
+      console.error("Translation error:", error);
+      return text; // Fallback to original text
+    }
   };
 
   // Check if translation is active and set default view
@@ -505,44 +577,221 @@ export default function ViewPDF() {
                                 </button>
                                 <button
                                   onClick={async () => {
-                                    if (markdownContent) {
-                                      // Convert markdown to PDF or download as text
-                                      // For now, we'll download as a text file with markdown content
-                                      const blob = new Blob([markdownContent], { type: 'text/plain' });
-                                      const url = URL.createObjectURL(blob);
-                                      const link = document.createElement('a');
-                                      link.href = url;
-                                      link.download = `${judgmentInfo?.title || 'judgment'}_translated.txt`;
-                                      document.body.appendChild(link);
-                                      link.click();
-                                      document.body.removeChild(link);
-                                      URL.revokeObjectURL(url);
-                                    } else {
-                                      // Try to fetch markdown if not loaded
-                                      try {
+                                    try {
+                                      // Get current selected language
+                                      const currentLang = getCurrentLanguage();
+                                      const langName = getLanguageName(currentLang);
+                                      
+                                      let contentToDownload = markdownContent;
+                                      
+                                      // If markdown content is not loaded, fetch it
+                                      if (!contentToDownload) {
                                         const judgmentId = judgmentInfo?.id || judgmentInfo?.cnr;
                                         if (judgmentId) {
-                                          const markdown = await apiService.getJudgementByIdMarkdown(judgmentId);
-                                          if (markdown) {
-                                            const blob = new Blob([markdown], { type: 'text/plain' });
-                                            const url = URL.createObjectURL(blob);
-                                            const link = document.createElement('a');
-                                            link.href = url;
-                                            link.download = `${judgmentInfo?.title || 'judgment'}_translated.txt`;
-                                            document.body.appendChild(link);
-                                            link.click();
-                                            document.body.removeChild(link);
-                                            URL.revokeObjectURL(url);
+                                          contentToDownload = await apiService.getJudgementByIdMarkdown(judgmentId);
                                           } else {
                                             alert('Translated PDF not available');
+                                          setShowDownloadDropdown(false);
+                                          return;
                                           }
-                                        } else {
+                                      }
+
+                                      if (!contentToDownload || contentToDownload.trim() === '') {
                                           alert('Translated PDF not available');
+                                        setShowDownloadDropdown(false);
+                                        return;
+                                      }
+
+                                      // Show loading message if translating
+                                      if (currentLang !== 'en') {
+                                        const loadingMsg = document.createElement('div');
+                                        loadingMsg.id = 'pdf-translation-loading';
+                                        loadingMsg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#1E65AD;color:white;padding:20px 30px;border-radius:8px;z-index:10000;font-family:Roboto,sans-serif;box-shadow:0 4px 6px rgba(0,0,0,0.3);';
+                                        loadingMsg.textContent = `Translating to ${langName}... Please wait.`;
+                                        document.body.appendChild(loadingMsg);
+                                      }
+
+                                      // Translate content if language is not English
+                                      let finalContent = contentToDownload;
+                                      if (currentLang !== 'en') {
+                                        // Clean markdown first before translating
+                                        const cleanMarkdown = contentToDownload
+                                          .replace(/#{1,6}\s+/g, '') // Remove markdown headers
+                                          .replace(/\*\*\*(.*?)\*\*\*/g, '$1') // Remove bold italic
+                                          .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold
+                                          .replace(/\*(.*?)\*/g, '$1') // Remove italic
+                                          .replace(/`(.*?)`/g, '$1') // Remove code
+                                          .replace(/```[\s\S]*?```/g, '') // Remove code blocks
+                                          .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') // Remove links
+                                          .trim();
+                                        
+                                        finalContent = await translateText(cleanMarkdown, currentLang);
+                                        
+                                        // Remove loading message
+                                        const loadingMsg = document.getElementById('pdf-translation-loading');
+                                        if (loadingMsg) {
+                                          document.body.removeChild(loadingMsg);
                                         }
+                                      } else {
+                                        // Remove loading message if it exists
+                                        const loadingMsg = document.getElementById('pdf-translation-loading');
+                                        if (loadingMsg) {
+                                          document.body.removeChild(loadingMsg);
+                                        }
+                                      }
+
+                                      // Create a temporary HTML element to render the text with proper Unicode support
+                                      const tempDiv = document.createElement('div');
+                                      tempDiv.style.position = 'absolute';
+                                      tempDiv.style.left = '-9999px';
+                                      tempDiv.style.width = '210mm'; // A4 width
+                                      tempDiv.style.padding = '20mm';
+                                      tempDiv.style.fontSize = '12pt';
+                                      tempDiv.style.lineHeight = '1.6';
+                                      tempDiv.style.fontFamily = currentLang === 'en' 
+                                        ? 'Arial, sans-serif' 
+                                        : 'Noto Sans Devanagari, Noto Sans Gujarati, Arial Unicode MS, sans-serif';
+                                      tempDiv.style.color = '#1a1a1a';
+                                      tempDiv.style.backgroundColor = '#ffffff';
+                                      tempDiv.style.whiteSpace = 'pre-wrap';
+                                      tempDiv.style.wordWrap = 'break-word';
+                                      
+                                      // Set text content (preserve line breaks and Unicode characters)
+                                      tempDiv.textContent = finalContent;
+                                      
+                                      document.body.appendChild(tempDiv);
+
+                                      // Wait a moment for fonts to load
+                                      await new Promise(resolve => setTimeout(resolve, 100));
+
+                                      // Use html2canvas to capture the HTML as image (handles Unicode properly)
+                                      const canvas = await html2canvas(tempDiv, {
+                                        scale: 2,
+                                        useCORS: true,
+                                        logging: false,
+                                        backgroundColor: '#ffffff',
+                                        width: tempDiv.offsetWidth,
+                                        height: tempDiv.scrollHeight,
+                                        windowWidth: tempDiv.scrollWidth,
+                                        windowHeight: tempDiv.scrollHeight
+                                      });
+
+                                      // Remove temporary element
+                                      document.body.removeChild(tempDiv);
+
+                                      // Create PDF and add the canvas image with proper page breaks
+                                      const pdf = new jsPDF('p', 'mm', 'a4');
+                                      const pageWidth = pdf.internal.pageSize.getWidth();
+                                      const pageHeight = pdf.internal.pageSize.getHeight();
+                                      const margin = 20; // mm
+                                      const imgWidth = pageWidth;
+                                      const imgHeight = (canvas.height * pageWidth) / canvas.width;
+                                      
+                                      // Get judgment link
+                                      const judgmentId = judgmentInfo?.id || judgmentInfo?.cnr || urlId;
+                                      const judgmentLink = judgmentId 
+                                        ? `${window.location.origin}/judgment/${judgmentId}`
+                                        : window.location.origin;
+                                      
+                                      // Function to add footer to a page
+                                      const addFooter = (pdfInstance, pageNum, link) => {
+                                        // Add footer line
+                                        pdfInstance.setDrawColor(200, 200, 200);
+                                        pdfInstance.setLineWidth(0.5);
+                                        pdfInstance.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
+                                        
+                                        pdfInstance.setTextColor(100, 100, 100);
+                                        pdfInstance.setFontSize(8);
+                                        pdfInstance.setFont('helvetica', 'normal');
+                                        
+                                        // Footer text: salhakar.com (centered)
+                                        const footerText = 'salhakar.com';
+                                        const footerTextWidth = pdfInstance.getTextWidth(footerText);
+                                        const footerX = (pageWidth - footerTextWidth) / 2;
+                                        const footerY = pageHeight - 12;
+                                        pdfInstance.text(footerText, footerX, footerY);
+                                        
+                                        // Page number (center)
+                                        pdfInstance.setFontSize(7);
+                                        pdfInstance.setTextColor(150, 150, 150);
+                                        const pageText = `Page ${pageNum}`;
+                                        const pageTextWidth = pdfInstance.getTextWidth(pageText);
+                                        const pageX = (pageWidth - pageTextWidth) / 2;
+                                        pdfInstance.text(pageText, pageX, footerY - 4);
+                                        
+                                        // Add judgment link (as clickable text on the right)
+                                        if (link) {
+                                          try {
+                                            // Show the actual link URL
+                                            const linkText = link.length > 40 ? link.substring(0, 40) + '...' : link;
+                                            const linkTextWidth = pdfInstance.getTextWidth(linkText);
+                                            const linkX = pageWidth - margin - linkTextWidth;
+                                            const linkY = pageHeight - 12;
+                                            
+                                            // Add text first
+                                            pdfInstance.setTextColor(26, 101, 173); // #1E65AD
+                                            pdfInstance.setFontSize(7);
+                                            pdfInstance.text(linkText, linkX, linkY);
+                                            
+                                            // Add clickable link annotation covering the text area
+                                            pdfInstance.link(linkX, linkY - 3, linkTextWidth, 4, { url: link });
+                                            
+                                            pdfInstance.setFontSize(8); // Reset font size
+                                            pdfInstance.setTextColor(100, 100, 100); // Reset color
+                                          } catch (error) {
+                                            console.warn('Could not add judgment link:', error);
+                                            // Fallback: just show the link text
+                                            const linkText = link.length > 40 ? link.substring(0, 40) + '...' : link;
+                                            const linkTextWidth = pdfInstance.getTextWidth(linkText);
+                                            const linkX = pageWidth - margin - linkTextWidth;
+                                            const linkY = pageHeight - 12;
+                                            pdfInstance.setTextColor(26, 101, 173);
+                                            pdfInstance.setFontSize(7);
+                                            pdfInstance.text(linkText, linkX, linkY);
+                                            pdfInstance.setFontSize(8);
+                                            pdfInstance.setTextColor(100, 100, 100);
+                                          }
+                                        }
+                                      };
+                                      
+                                      let heightLeft = imgHeight;
+                                      let position = 0;
+                                      let pageNum = 1;
+
+                                      // Add first page
+                                      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+                                      heightLeft -= pageHeight;
+                                      pageNum++;
+
+                                      // Add additional pages if needed
+                                      while (heightLeft >= 0) {
+                                        position = heightLeft - imgHeight;
+                                        pdf.addPage();
+                                        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+                                        heightLeft -= pageHeight;
+                                        pageNum++;
+                                      }
+
+                                      // Add footer only on the last page
+                                      const lastPageNum = pdf.internal.getNumberOfPages();
+                                      pdf.setPage(lastPageNum);
+                                      addFooter(pdf, lastPageNum, judgmentLink);
+
+                                      // Download PDF with language name in filename
+                                      const baseFileName = (judgmentInfo?.title || 'judgment').replace(/[^a-z0-9]/gi, '_');
+                                      const fileName = currentLang !== 'en' 
+                                        ? `${baseFileName}_${langName}.pdf`
+                                        : `${baseFileName}_translated.pdf`;
+                                      pdf.save(fileName);
+                                      
                                       } catch (error) {
                                         console.error('Error downloading translated PDF:', error);
-                                        alert('Failed to download translated PDF');
+                                      // Remove loading message if it exists
+                                      const loadingMsg = document.getElementById('pdf-translation-loading');
+                                      if (loadingMsg) {
+                                        document.body.removeChild(loadingMsg);
                                       }
+                                      alert('Failed to download translated PDF. Please try again.');
                                     }
                                     setShowDownloadDropdown(false);
                                   }}
@@ -550,7 +799,15 @@ export default function ViewPDF() {
                                   style={{ fontFamily: 'Roboto, sans-serif', color: '#1a1a1a' }}
                                 >
                                   <FileText className="h-4 w-4" style={{ color: '#CF9B63' }} />
-                                  <span>Translated PDF</span>
+                                  <span>
+                                    {(() => {
+                                      const currentLang = getCurrentLanguage();
+                                      const langName = getLanguageName(currentLang);
+                                      return currentLang !== 'en' 
+                                        ? `Download PDF (${langName})`
+                                        : 'Translated PDF';
+                                    })()}
+                                  </span>
                                 </button>
                               </div>
                             </>
@@ -985,9 +1242,8 @@ export default function ViewPDF() {
                           navigate('/pricing');
                           return;
                         }
-                        // Navigate to summary or show summary modal
-                        console.log('Summary clicked for:', judgmentInfo?.id || judgmentInfo?.title);
-                        // You can implement summary functionality here
+                        // Open summary popup
+                        setSummaryPopupOpen(true);
                       }}
                       title="View Summary"
                     >
@@ -1356,9 +1612,40 @@ export default function ViewPDF() {
                         height: '100%',
                         display: 'flex',
                         flexDirection: 'column',
-                        overflow: 'hidden'
+                        overflow: 'hidden',
+                        position: 'relative'
                       }}
                     >
+                      {/* Watermark - Logo */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          zIndex: 0,
+                          opacity: 0.15,
+                          pointerEvents: 'none',
+                          width: '300px',
+                          height: '300px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <img 
+                          src="/logo4.png" 
+                          alt="Watermark"
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'contain'
+                          }}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      </div>
                       <style>
                         {`
                           .markdown-scroll-container::-webkit-scrollbar {
@@ -1437,7 +1724,9 @@ export default function ViewPDF() {
                           scrollbarWidth: 'thin',
                           scrollbarColor: '#CF9B63 #f4f4f4',
                           height: '100%',
-                          overflowY: 'scroll'
+                          overflowY: 'scroll',
+                          position: 'relative',
+                          zIndex: 1
                         }}
                       >
                         {loadingMarkdown ? (
@@ -1671,14 +1960,46 @@ export default function ViewPDF() {
                             </ReactMarkdown>
                             
                             {/* Footer - Appears at bottom of markdown content */}
-                            <div className="mt-12 pt-8 border-t-2 border-gray-300 text-center" style={{ 
+                            <div className="mt-12 pt-8 border-t border-gray-300" style={{ 
                               fontFamily: 'Roboto, sans-serif',
                               color: '#666',
-                              fontSize: '14px',
+                              fontSize: '12px',
                               paddingBottom: '20px',
-                              marginTop: '48px'
+                              marginTop: '48px',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              flexWrap: 'wrap',
+                              gap: '12px'
                             }}>
-                              <p style={{ fontWeight: '500' }}>salhakar - /judgment/{urlId || judgmentInfo?.id || judgmentInfo?.cnr || ''}</p>
+                              {/* Left: salhakar.com */}
+                              <div style={{ color: '#666', fontWeight: '500' }}>
+                                salhakar.com
+                              </div>
+                              
+                              {/* Center: Page number (not applicable for markdown, but keeping for consistency) */}
+                              <div style={{ color: '#999', fontSize: '11px' }}>
+                                {/* Markdown view doesn't have page numbers */}
+                              </div>
+                              
+                              {/* Right: Judgment link */}
+                              <div>
+                                <a 
+                                  href={`${window.location.origin}/judgment/${urlId || judgmentInfo?.id || judgmentInfo?.cnr || ''}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  style={{ 
+                                    color: '#1E65AD',
+                                    textDecoration: 'none',
+                                    fontSize: '11px',
+                                    wordBreak: 'break-all'
+                                  }}
+                                  onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
+                                  onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
+                                >
+                                  {`${window.location.origin}/judgment/${urlId || judgmentInfo?.id || judgmentInfo?.cnr || ''}`}
+                                </a>
+                              </div>
                             </div>
                           </div>
                         ) : (
@@ -2217,6 +2538,16 @@ export default function ViewPDF() {
           </div>
         </>
       )}
+
+      {/* Summary Popup */}
+      <SummaryPopup
+        isOpen={summaryPopupOpen}
+        onClose={() => {
+          setSummaryPopupOpen(false);
+        }}
+        item={judgmentInfo}
+        itemType="judgment"
+      />
 
     </div>
   );

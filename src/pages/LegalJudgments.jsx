@@ -3,10 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
-import useSmoothInfiniteScroll from "../hooks/useSmoothInfiniteScroll";
 import { 
   EnhancedJudgmentSkeleton, 
-  EnhancedInfiniteScrollLoader, 
   SkeletonGrid,
   SmoothTransitionWrapper 
 } from "../components/EnhancedLoadingComponents";
@@ -116,8 +114,6 @@ export default function LegalJudgments() {
   const isFetchingRef = useRef(false);
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const scrollTimeoutRef = useRef(null);
-  const scrollContainerRef = useRef(null);
-  const [scrollContainer, setScrollContainer] = useState(null);
 
   // Filter states - will change based on court type
   const [filters, setFilters] = useState({
@@ -131,7 +127,7 @@ export default function LegalJudgments() {
     decisionDateFrom: ''
   });
 
-  const pageSize = 10;
+  const pageSize = 10; // Increased to show more judgments per load
 
   // Get filter fields based on court type
   const getFilterFields = () => {
@@ -180,20 +176,19 @@ export default function LegalJudgments() {
   const fetchJudgments = useCallback(async (isLoadMore = false, customFilters = null) => {
     if (!isMountedRef.current) return;
     
-    // Prevent duplicate simultaneous requests
+    // Prevent duplicate simultaneous requests for initial load only
     if (isFetchingRef.current && !isLoadMore) {
-      console.log('Already fetching, skipping duplicate request');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Already fetching, skipping duplicate request');
+      }
       return;
     }
     
     try {
-      if (!isLoadMore) {
-        isFetchingRef.current = true;
-      }
-      
       if (isLoadMore) {
         setIsSearching(true);
       } else {
+        isFetchingRef.current = true;
         setLoading(true);
         setError(null);
       }
@@ -327,8 +322,10 @@ export default function LegalJudgments() {
       }
       
       // Update cursor and hasMore based on API response
-      setNextCursor(data.next_cursor || null);
-      setHasMore(paginationInfo.has_more || false);
+      const newCursor = data.next_cursor || null;
+      setNextCursor(newCursor);
+      nextCursorRef.current = newCursor;
+      setHasMore(paginationInfo.has_more !== false);
       
       if (!isLoadMore) {
         setTotalCount(judgmentsArray.length + (paginationInfo.has_more ? 1 : 0));
@@ -465,8 +462,8 @@ export default function LegalJudgments() {
     if (isInitialMountRef.current) {
       // On initial mount, fetch after a short delay to ensure everything is set up
       const timer = setTimeout(() => {
-        if (!isFetchingRef.current) {
-          fetchJudgments(false);
+        if (!isFetchingRef.current && fetchJudgmentsRef.current) {
+          fetchJudgmentsRef.current(false);
         }
       }, 100);
       isInitialMountRef.current = false;
@@ -486,31 +483,50 @@ export default function LegalJudgments() {
     }
   }, [courtType]);
 
-  // Enhanced infinite scroll logic
-  const loadMoreData = useCallback(async () => {
-    if (!hasMore || loading || isSearching || !isMountedRef.current) return;
-    if (fetchJudgmentsRef.current) {
-      await fetchJudgmentsRef.current(true);
-    }
-  }, [hasMore, loading, isSearching]);
+  // Custom infinite scroll using window scroll events
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const loadingRef = useRef(null);
+  const infiniteScrollTimeoutRef = useRef(null);
 
-  const { 
-    loadingRef, 
-    isLoadingMore, 
-    error: scrollError, 
-    retry, 
-    retryCount,
-    isFetching 
-  } = useSmoothInfiniteScroll({
-    fetchMore: loadMoreData,
-    hasMore,
-    isLoading: loading || isSearching,
-    threshold: 0.01,
-    rootMargin: '200px',
-    preloadThreshold: 0.1,
-    throttleDelay: 100,
-    scrollContainer: scrollContainer
-  });
+  const loadMoreData = useCallback(() => {
+    if (fetchJudgmentsRef.current && hasMore && !loading && !isSearching && !isLoadingMore) {
+      setIsLoadingMore(true);
+      fetchJudgmentsRef.current(true).finally(() => {
+        setIsLoadingMore(false);
+      });
+    }
+  }, [hasMore, loading, isSearching, isLoadingMore]);
+
+  // Window scroll event handler for infinite scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (infiniteScrollTimeoutRef.current) {
+        clearTimeout(infiniteScrollTimeoutRef.current);
+      }
+
+      infiniteScrollTimeoutRef.current = setTimeout(() => {
+        if (!hasMore || loading || isSearching || isLoadingMore) return;
+
+        // Calculate if user is near bottom (within 500px)
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+
+        // Check if user is within 500px of bottom
+        if (scrollTop + windowHeight >= documentHeight - 500) {
+          loadMoreData();
+        }
+      }, 200); // Throttle scroll events
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (infiniteScrollTimeoutRef.current) {
+        clearTimeout(infiniteScrollTimeoutRef.current);
+      }
+    };
+  }, [hasMore, loading, isSearching, isLoadingMore, loadMoreData]);
 
   const viewJudgment = (judgment) => {
     const judgmentId = judgment.id || judgment.cnr;
@@ -1067,37 +1083,7 @@ export default function LegalJudgments() {
                 <div 
                   key="judgments-list-container"
                   className="relative"
-                  style={{ 
-                    maxHeight: '70vh',
-                    overflowY: 'auto',
-                    overflowX: 'hidden',
-                    paddingRight: '8px'
-                  }}
-                  ref={(el) => {
-                    scrollContainerRef.current = el;
-                    if (el) {
-                      setScrollContainer(el);
-                      el.setAttribute('data-scroll-container', 'true');
-                    }
-                  }}
                 >
-                  <style>{`
-                    /* Custom scrollbar styling */
-                    [data-scroll-container]::-webkit-scrollbar {
-                      width: 8px;
-                    }
-                    [data-scroll-container]::-webkit-scrollbar-track {
-                      background: #f1f1f1;
-                      border-radius: 10px;
-                    }
-                    [data-scroll-container]::-webkit-scrollbar-thumb {
-                      background: #1E65AD;
-                      border-radius: 10px;
-                    }
-                    [data-scroll-container]::-webkit-scrollbar-thumb:hover {
-                      background: #CF9B63;
-                    }
-                  `}</style>
                   <motion.div 
                     className="space-y-5 sm:space-y-6"
                     initial={{ opacity: 0 }}
@@ -1267,21 +1253,32 @@ export default function LegalJudgments() {
                   ))}
                 </AnimatePresence>
                 
-                  {/* Enhanced Infinite Scroll Loader */}
-                  {hasMore && (
+                  {/* Custom Infinite Scroll Loader */}
+                  {judgments.length > 0 && hasMore && (
                     <div 
-                      ref={loadingRef}
-                      className="py-4"
+                      ref={loadingRef} 
+                      className="mt-8 py-8 flex items-center justify-center"
                       style={{ minHeight: '100px' }}
                     >
-                      <EnhancedInfiniteScrollLoader 
-                        isLoading={isLoadingMore} 
-                        hasMore={hasMore} 
-                        error={scrollError} 
-                        onRetry={retry}
-                        retryCount={retryCount}
-                        isFetching={isFetching}
-                      />
+                      {isLoadingMore ? (
+                        <div className="flex flex-col items-center gap-3">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                          <p className="text-sm text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                            Loading more judgments...
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          Scroll down to load more
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  {judgments.length > 0 && !hasMore && (
+                    <div className="mt-8 py-8 text-center">
+                      <p className="text-sm text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                        No more judgments to load
+                      </p>
                     </div>
                   )}
                   </motion.div>

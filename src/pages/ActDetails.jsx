@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
 import BookmarkButton from "../components/BookmarkButton";
+import SummaryPopup from "../components/SummaryPopup";
 import { FileText, StickyNote, Share2 } from "lucide-react";
 
 export default function ActDetails() {
@@ -25,6 +26,9 @@ export default function ActDetails() {
   const [isResizing, setIsResizing] = useState(false);
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const [isMobile, setIsMobile] = useState(false);
+  
+  // Summary popup state
+  const [summaryPopupOpen, setSummaryPopupOpen] = useState(false);
 
   // Detect mobile view
   useEffect(() => {
@@ -443,7 +447,7 @@ export default function ActDetails() {
                     {/* Summary Button */}
                     <button
                       onClick={() => {
-                        console.log('Summary clicked for act:', act?.id || act?.short_title);
+                        setSummaryPopupOpen(true);
                       }}
                       className="flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium text-xs sm:text-sm shadow-sm hover:shadow-md whitespace-nowrap"
                       style={{ fontFamily: 'Roboto, sans-serif' }}
@@ -934,6 +938,16 @@ export default function ActDetails() {
           </div>
         </>
       )}
+
+      {/* Summary Popup */}
+      <SummaryPopup
+        isOpen={summaryPopupOpen}
+        onClose={() => {
+          setSummaryPopupOpen(false);
+        }}
+        item={act}
+        itemType="act"
+      />
 
     </div>
   );

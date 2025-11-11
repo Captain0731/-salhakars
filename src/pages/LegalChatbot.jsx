@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import { Send, Bot, User, Sparkles, X, RotateCcw, Mic, MicOff, Upload } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
 import apiService from "../services/api";
 
 export default function LegalChatbot() {
@@ -96,14 +97,17 @@ export default function LegalChatbot() {
     setIsTyping(true);
 
     try {
-      // Call the LLM Chat API
+      // Call the AI Assistant API
       const response = await apiService.llmChat(currentInput);
       
       const botResponse = {
         id: Date.now() + 1,
         text: response.reply || "I'm sorry, I couldn't process your request. Please try again.",
         sender: "bot",
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        usedTools: response.used_tools || false,
+        toolUsed: response.tool_used || null,
+        searchInfo: response.search_info || null
       };
 
       setMessages(prev => [...prev, botResponse]);
@@ -198,25 +202,28 @@ export default function LegalChatbot() {
       // Call the Speech API
       const response = await apiService.speechToGemini(audioFile);
 
-      // Add user message with transcription
-      if (response.transcription) {
-        const userMessage = {
-          id: Date.now(),
-          text: response.transcription,
-          sender: "user",
-          timestamp: new Date().toISOString(),
-          isVoice: true
-        };
-        setMessages(prev => [...prev, userMessage]);
-        setTimeout(() => scrollToBottom(), 50);
-      }
+      // Note: The new API doesn't return transcription separately
+      // The transcription is handled internally and only the AI reply is returned
+      // We'll show a placeholder message for voice input
+      const userMessage = {
+        id: Date.now(),
+        text: "[Voice message]",
+        sender: "user",
+        timestamp: new Date().toISOString(),
+        isVoice: true
+      };
+      setMessages(prev => [...prev, userMessage]);
+      setTimeout(() => scrollToBottom(), 50);
 
       // Add bot response
       const botResponse = {
         id: Date.now() + 1,
-        text: response.gemini_reply || "I'm sorry, I couldn't process your voice input. Please try again.",
+        text: response.reply || "I'm sorry, I couldn't process your voice input. Please try again.",
         sender: "bot",
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        usedTools: response.used_tools || false,
+        toolUsed: response.tool_used || null,
+        searchInfo: response.search_info || null
       };
       setMessages(prev => [...prev, botResponse]);
       setTimeout(() => scrollToBottom(), 100);
@@ -251,25 +258,28 @@ export default function LegalChatbot() {
     try {
       const response = await apiService.speechToGemini(file);
 
-      // Add user message with transcription
-      if (response.transcription) {
-        const userMessage = {
-          id: Date.now(),
-          text: response.transcription,
-          sender: "user",
-          timestamp: new Date().toISOString(),
-          isVoice: true
-        };
-        setMessages(prev => [...prev, userMessage]);
-        setTimeout(() => scrollToBottom(), 50);
-      }
+      // Note: The new API doesn't return transcription separately
+      // The transcription is handled internally and only the AI reply is returned
+      // We'll show a placeholder message for uploaded audio
+      const userMessage = {
+        id: Date.now(),
+        text: "[Audio file uploaded]",
+        sender: "user",
+        timestamp: new Date().toISOString(),
+        isVoice: true
+      };
+      setMessages(prev => [...prev, userMessage]);
+      setTimeout(() => scrollToBottom(), 50);
 
       // Add bot response
       const botResponse = {
         id: Date.now() + 1,
-        text: response.gemini_reply || "I'm sorry, I couldn't process your audio file. Please try again.",
+        text: response.reply || "I'm sorry, I couldn't process your audio file. Please try again.",
         sender: "bot",
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        usedTools: response.used_tools || false,
+        toolUsed: response.tool_used || null,
+        searchInfo: response.search_info || null
       };
       setMessages(prev => [...prev, botResponse]);
       setTimeout(() => scrollToBottom(), 100);
@@ -449,9 +459,81 @@ export default function LegalChatbot() {
                                 <span className="text-[10px] text-blue-200 italic">Voice input</span>
                               </div>
                             )}
-                            <p className="text-xs sm:text-sm md:text-base leading-relaxed break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                          {message.text}
-                        </p>
+                            {message.sender === 'bot' ? (
+                              <div 
+                                className="text-xs sm:text-sm md:text-base leading-relaxed break-words chatbot-markdown" 
+                                style={{ fontFamily: 'Roboto, sans-serif' }}
+                              >
+                                <ReactMarkdown
+                                  components={{
+                                    p: ({ children }) => <p style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }}>{children}</p>,
+                                    h1: ({ children }) => <h1 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '0.5rem', marginTop: '0.75rem' }}>{children}</h1>,
+                                    h2: ({ children }) => <h2 style={{ fontSize: '1.125rem', fontWeight: 'bold', marginBottom: '0.5rem', marginTop: '0.75rem' }}>{children}</h2>,
+                                    h3: ({ children }) => <h3 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '0.5rem', marginTop: '0.75rem' }}>{children}</h3>,
+                                    ul: ({ children }) => <ul style={{ marginLeft: '1rem', marginBottom: '0.5rem', marginTop: '0.5rem', listStyleType: 'disc' }}>{children}</ul>,
+                                    ol: ({ children }) => <ol style={{ marginLeft: '1rem', marginBottom: '0.5rem', marginTop: '0.5rem', listStyleType: 'decimal' }}>{children}</ol>,
+                                    li: ({ children }) => <li style={{ marginBottom: '0.25rem' }}>{children}</li>,
+                                    code: ({ children, className }) => {
+                                      const isInline = !className;
+                                      return isInline ? (
+                                        <code style={{ 
+                                          backgroundColor: 'rgba(0, 0, 0, 0.1)', 
+                                          padding: '0.125rem 0.25rem', 
+                                          borderRadius: '0.25rem',
+                                          fontSize: '0.875em',
+                                          fontFamily: 'monospace'
+                                        }}>{children}</code>
+                                      ) : (
+                                        <code style={{ 
+                                          display: 'block',
+                                          backgroundColor: 'rgba(0, 0, 0, 0.05)', 
+                                          padding: '0.5rem', 
+                                          borderRadius: '0.25rem',
+                                          fontSize: '0.875em',
+                                          fontFamily: 'monospace',
+                                          overflowX: 'auto',
+                                          marginTop: '0.5rem',
+                                          marginBottom: '0.5rem'
+                                        }}>{children}</code>
+                                      );
+                                    },
+                                    blockquote: ({ children }) => (
+                                      <blockquote style={{ 
+                                        borderLeft: '3px solid #1E65AD', 
+                                        paddingLeft: '0.75rem', 
+                                        marginLeft: '0',
+                                        marginTop: '0.5rem',
+                                        marginBottom: '0.5rem',
+                                        fontStyle: 'italic',
+                                        color: '#4a5568'
+                                      }}>{children}</blockquote>
+                                    ),
+                                    a: ({ href, children }) => (
+                                      <a 
+                                        href={href} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        style={{ 
+                                          color: '#1E65AD', 
+                                          textDecoration: 'underline',
+                                          wordBreak: 'break-all'
+                                        }}
+                                      >
+                                        {children}
+                                      </a>
+                                    ),
+                                    strong: ({ children }) => <strong style={{ fontWeight: 'bold' }}>{children}</strong>,
+                                    em: ({ children }) => <em style={{ fontStyle: 'italic' }}>{children}</em>,
+                                  }}
+                                >
+                                  {message.text}
+                                </ReactMarkdown>
+                              </div>
+                            ) : (
+                              <p className="text-xs sm:text-sm md:text-base leading-relaxed break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                                {message.text}
+                              </p>
+                            )}
                             <p className={`text-[10px] sm:text-xs mt-1.5 sm:mt-2 ${
                           message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
                             }`} style={{ fontFamily: 'Roboto, sans-serif' }}>

@@ -7,6 +7,7 @@ import VideoSection from "../components/landing/VideoSection";
 import Testimonials from "../components/landing/Testimonials";
 import BlogSection from "../components/landing/BlogSection";
 import FAQ from "../components/landing/FAQ";
+import FreeTrialPopup from "../components/landing/FreeTrialPopup";
 
 function LandingPage() {
   return (
@@ -23,6 +24,7 @@ function LandingPage() {
         <BlogSection />
       </div>
       <FAQ />
+      <FreeTrialPopup />
     </div>
   );
 }

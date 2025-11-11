@@ -39,10 +39,12 @@ import NotesPage from "./pages/NotesPage";
 import LanguageSelectorDemo from "./pages/LanguageSelectorDemo";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import Support from "./pages/Support";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import Chatbot from "./components/Chatbot";
 import Footer from "./components/landing/Footer";
+import CookieConsentPopup from "./components/CookieConsentPopup";
 
 function AppLayout() {
   const location = useLocation();
@@ -66,7 +68,10 @@ function AppLayout() {
     '/login',
     '/signup',
     '/dashboard',
-    '/profile'
+    '/profile',
+    '/judgment-access',
+    '/law-library',
+    '/law-mapping'
   ];
   
   const shouldShowChatbot = !hideChatbotPaths.some(path => location.pathname.startsWith(path));
@@ -79,6 +84,8 @@ function AppLayout() {
     <div style={{ minHeight: "100vh", overflowY: "auto" }}>
       {/* Google Translate Component - Global mount point */}
       <GoogleTranslate />
+      {/* Cookie Consent Popup - Shows on first visit */}
+      <CookieConsentPopup />
       {/* Chatbot Icon - Fixed position on all pages except specified ones */}
       {shouldShowChatbot && <Chatbot />}
       <Routes>
@@ -91,6 +98,7 @@ function AppLayout() {
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:id" element={<BlogPost />} />
+        <Route path="/support" element={<Support />} />
         <Route path="/our-team" element={<OurTeam />} />
         <Route path="/language-demo" element={<LanguageSelectorDemo />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />

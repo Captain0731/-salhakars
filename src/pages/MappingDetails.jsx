@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
 import BookmarkButton from "../components/BookmarkButton";
+import SummaryPopup from "../components/SummaryPopup";
 import { FileText, StickyNote, Share2, X } from "lucide-react";
 
 export default function MappingDetails() {
@@ -27,6 +28,9 @@ export default function MappingDetails() {
   const [isMobile, setIsMobile] = useState(false);
   const [saveButtonText, setSaveButtonText] = useState('Save Notes');
   const [saveButtonColor, setSaveButtonColor] = useState('');
+  
+  // Summary popup state
+  const [summaryPopupOpen, setSummaryPopupOpen] = useState(false);
 
   // Detect mobile view
   useEffect(() => {
@@ -336,7 +340,7 @@ export default function MappingDetails() {
                     {/* Summary Button */}
                     <button
                       onClick={() => {
-                        console.log('Summary clicked for mapping:', mapping?.id || mapping?.subject);
+                        setSummaryPopupOpen(true);
                       }}
                       className="flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium text-xs sm:text-sm shadow-sm hover:shadow-md whitespace-nowrap"
                       style={{ fontFamily: 'Roboto, sans-serif' }}
@@ -1158,6 +1162,16 @@ export default function MappingDetails() {
           </div>
         </>
       )}
+
+      {/* Summary Popup */}
+      <SummaryPopup
+        isOpen={summaryPopupOpen}
+        onClose={() => {
+          setSummaryPopupOpen(false);
+        }}
+        item={mapping}
+        itemType="mapping"
+      />
 
     </div>
   );

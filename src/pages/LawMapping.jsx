@@ -863,31 +863,7 @@ export default function LawMapping() {
               <div 
                 key="mappings-list-container"
                 className="relative"
-                data-mappings-scroll-container="true"
-                style={{ 
-                  maxHeight: '70vh',
-                  overflowY: 'auto',
-                  overflowX: 'hidden',
-                  paddingRight: '8px'
-                }}
               >
-                <style>{`
-                  /* Custom scrollbar styling for mappings list */
-                  [data-mappings-scroll-container]::-webkit-scrollbar {
-                    width: 8px;
-                  }
-                  [data-mappings-scroll-container]::-webkit-scrollbar-track {
-                    background: #f1f1f1;
-                    border-radius: 10px;
-                  }
-                  [data-mappings-scroll-container]::-webkit-scrollbar-thumb {
-                    background: #1E65AD;
-                    border-radius: 10px;
-                  }
-                  [data-mappings-scroll-container]::-webkit-scrollbar-thumb:hover {
-                    background: #CF9B63;
-                  }
-                `}</style>
                 <div className="space-y-2 sm:space-y-3 md:space-y-4">
                   <AnimatePresence mode="popLayout">
                     {mappings.map((mapping, index) => {
@@ -1007,7 +983,8 @@ export default function LawMapping() {
                             )}
                           </div>
                           
-                          <div className="flex-shrink-0 flex flex-col gap-2 sm:gap-3 w-full sm:w-auto lg:w-48">
+                          <div className="flex-shrink-0 flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto lg:w-auto">
+                            {/* View Details Button */}
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();

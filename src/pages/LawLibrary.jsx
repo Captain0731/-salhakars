@@ -1005,31 +1005,7 @@ export default function LawLibrary() {
               <div 
                 key="acts-list-container"
                 className="relative"
-                data-acts-scroll-container="true"
-                style={{ 
-                  maxHeight: '70vh',
-                  overflowY: 'auto',
-                  overflowX: 'hidden',
-                  paddingRight: '8px'
-                }}
               >
-                <style>{`
-                  /* Custom scrollbar styling for acts list */
-                  [data-acts-scroll-container]::-webkit-scrollbar {
-                    width: 8px;
-                  }
-                  [data-acts-scroll-container]::-webkit-scrollbar-track {
-                    background: #f1f1f1;
-                    border-radius: 10px;
-                  }
-                  [data-acts-scroll-container]::-webkit-scrollbar-thumb {
-                    background: #1E65AD;
-                    border-radius: 10px;
-                  }
-                  [data-acts-scroll-container]::-webkit-scrollbar-thumb:hover {
-                    background: #CF9B63;
-                  }
-                `}</style>
                 <div className="space-y-5 sm:space-y-6">
                   <AnimatePresence mode="wait">
                     {acts.map((act, index) => (

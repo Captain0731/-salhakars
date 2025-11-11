@@ -33,6 +33,11 @@ export const useInfiniteScroll = ({
   }, [fetchMore, hasMore, isLoading, isLoadingMore]);
 
   useEffect(() => {
+    // Disconnect previous observer
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         const target = entries[0];
@@ -48,6 +53,7 @@ export const useInfiniteScroll = ({
 
     observerRef.current = observer;
 
+    // Observe the loading element when it's available
     if (loadingRef.current) {
       observer.observe(loadingRef.current);
     }
@@ -58,6 +64,13 @@ export const useInfiniteScroll = ({
       }
     };
   }, [loadMore, hasMore, isLoadingMore, isLoading, threshold, rootMargin]);
+
+  // Re-observe when loadingRef element becomes available
+  useEffect(() => {
+    if (loadingRef.current && observerRef.current) {
+      observerRef.current.observe(loadingRef.current);
+    }
+  });
 
   return {
     loadingRef,
