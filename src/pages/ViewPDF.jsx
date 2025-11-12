@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import ReactDOM from "react-dom/client";
 import Navbar from "../components/landing/Navbar";
 import BookmarkButton from "../components/BookmarkButton";
 import SummaryPopup from "../components/SummaryPopup";
@@ -611,21 +612,13 @@ export default function ViewPDF() {
                                         document.body.appendChild(loadingMsg);
                                       }
 
-                                      // Translate content if language is not English
-                                      let finalContent = contentToDownload;
+                                      // Translate markdown content if language is not English
+                                      // Keep markdown formatting intact during translation
+                                      let finalMarkdownContent = contentToDownload;
                                       if (currentLang !== 'en') {
-                                        // Clean markdown first before translating
-                                        const cleanMarkdown = contentToDownload
-                                          .replace(/#{1,6}\s+/g, '') // Remove markdown headers
-                                          .replace(/\*\*\*(.*?)\*\*\*/g, '$1') // Remove bold italic
-                                          .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold
-                                          .replace(/\*(.*?)\*/g, '$1') // Remove italic
-                                          .replace(/`(.*?)`/g, '$1') // Remove code
-                                          .replace(/```[\s\S]*?```/g, '') // Remove code blocks
-                                          .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') // Remove links
-                                          .trim();
-                                        
-                                        finalContent = await translateText(cleanMarkdown, currentLang);
+                                        // Translate the markdown content while preserving markdown syntax
+                                        // The translation API should handle markdown appropriately
+                                        finalMarkdownContent = await translateText(contentToDownload, currentLang);
                                         
                                         // Remove loading message
                                         const loadingMsg = document.getElementById('pdf-translation-loading');
@@ -640,50 +633,560 @@ export default function ViewPDF() {
                                         }
                                       }
 
-                                      // Create a temporary HTML element to render the text with proper Unicode support
+                                      // Create a temporary container div to render markdown
+                                      // A4 width in pixels: 210mm = 794px at 96 DPI, with 20mm margins = 755px content width
+                                      const a4WidthPx = 794; // 210mm in pixels
+                                      const marginPx = 76; // 20mm in pixels
+                                      const contentWidthPx = a4WidthPx - (marginPx * 2);
+                                      
                                       const tempDiv = document.createElement('div');
                                       tempDiv.style.position = 'absolute';
                                       tempDiv.style.left = '-9999px';
-                                      tempDiv.style.width = '210mm'; // A4 width
-                                      tempDiv.style.padding = '20mm';
-                                      tempDiv.style.fontSize = '12pt';
-                                      tempDiv.style.lineHeight = '1.6';
+                                      tempDiv.style.top = '0';
+                                      tempDiv.style.width = `${a4WidthPx}px`;
+                                      tempDiv.style.minHeight = '100px'; // Ensure minimum height
+                                      tempDiv.style.padding = `${marginPx}px`;
+                                      tempDiv.style.backgroundColor = '#ffffff';
                                       tempDiv.style.fontFamily = currentLang === 'en' 
-                                        ? 'Arial, sans-serif' 
+                                        ? 'Roboto, Arial, sans-serif' 
                                         : 'Noto Sans Devanagari, Noto Sans Gujarati, Arial Unicode MS, sans-serif';
                                       tempDiv.style.color = '#1a1a1a';
-                                      tempDiv.style.backgroundColor = '#ffffff';
-                                      tempDiv.style.whiteSpace = 'pre-wrap';
-                                      tempDiv.style.wordWrap = 'break-word';
+                                      tempDiv.style.lineHeight = '2.2'; // Increased line height for better spacing
+                                      tempDiv.style.fontSize = '15px';
+                                      tempDiv.style.letterSpacing = '0.01em';
+                                      tempDiv.style.boxSizing = 'border-box';
+                                      tempDiv.style.visibility = 'visible';
+                                      tempDiv.style.display = 'block';
                                       
-                                      // Set text content (preserve line breaks and Unicode characters)
-                                      tempDiv.textContent = finalContent;
+                                      // Create inner div for markdown content with proper styling
+                                      const markdownContainer = document.createElement('div');
+                                      markdownContainer.className = 'markdown-content';
+                                      markdownContainer.style.fontFamily = 'Roboto, sans-serif';
+                                      markdownContainer.style.lineHeight = '2.2'; // Increased for better spacing
+                                      markdownContainer.style.color = '#1a1a1a';
+                                      markdownContainer.style.fontSize = '15px';
+                                      markdownContainer.style.width = `${contentWidthPx}px`;
+                                      markdownContainer.style.maxWidth = '100%';
+                                      markdownContainer.style.padding = '10px 0'; // Add vertical padding for break points
+                                      markdownContainer.style.letterSpacing = '0.01em';
+                                      markdownContainer.style.minHeight = '50px';
+                                      // Prevent page breaks and ensure proper spacing
+                                      markdownContainer.style.pageBreakInside = 'auto';
+                                      markdownContainer.style.orphans = '4'; // Increased to prevent single lines
+                                      markdownContainer.style.widows = '4'; // Increased to prevent single lines
                                       
+                                      tempDiv.appendChild(markdownContainer);
                                       document.body.appendChild(tempDiv);
+                                      
+                                      // Force layout calculation
+                                      void tempDiv.offsetHeight;
 
-                                      // Wait a moment for fonts to load
-                                      await new Promise(resolve => setTimeout(resolve, 100));
+                                      // Render ReactMarkdown into the container
+                                      let root = null;
+                                      try {
+                                        root = ReactDOM.createRoot(markdownContainer);
+                                        root.render(
+                                          React.createElement(ReactMarkdown, {
+                                            components: {
+                                              h1: ({node, children, ...props}) => React.createElement('h1', {
+                                                style: {
+                                                  fontSize: '1rem',
+                                                  fontWeight: '800',
+                                                  marginTop: '3rem', // Increased top margin
+                                                  marginBottom: '2rem', // Increased bottom margin for break points
+                                                  paddingTop: '1rem', // Add padding for break zones
+                                                  paddingBottom: '1rem',
+                                                  color: '#1E65AD',
+                                                  lineHeight: '1.4',
+                                                  borderBottom: '3px solid #E3F2FD',
+                                                  textAlign: 'center',
+                                                  pageBreakAfter: 'avoid',
+                                                  pageBreakInside: 'avoid',
+                                                  breakAfter: 'avoid',
+                                                  breakInside: 'avoid'
+                                                },
+                                                ...props
+                                              }, children),
+                                              h2: ({node, children, ...props}) => React.createElement('h2', {
+                                                style: {
+                                                  fontSize: '1rem',
+                                                  fontWeight: '700',
+                                                  marginTop: '2.5rem', // Increased
+                                                  marginBottom: '1.75rem', // Increased for break points
+                                                  color: '#1E65AD',
+                                                  lineHeight: '1.4',
+                                                  paddingLeft: '0.5rem',
+                                                  paddingTop: '0.75rem', // Increased
+                                                  paddingBottom: '0.75rem', // Increased
+                                                  textAlign: 'center',
+                                                  pageBreakAfter: 'avoid',
+                                                  pageBreakInside: 'avoid',
+                                                  breakAfter: 'avoid',
+                                                  breakInside: 'avoid'
+                                                },
+                                                ...props
+                                              }, children),
+                                              h3: ({node, children, ...props}) => React.createElement('h3', {
+                                                style: {
+                                                  fontSize: '2rem',
+                                                  fontWeight: '600',
+                                                  marginTop: '2.25rem', // Increased
+                                                  marginBottom: '1.5rem', // Increased
+                                                  paddingTop: '0.75rem', // Added
+                                                  paddingBottom: '0.75rem', // Added
+                                                  color: '#1E65AD',
+                                                  lineHeight: '1.4',
+                                                  textAlign: 'center',
+                                                  letterSpacing: '0',
+                                                  pageBreakAfter: 'avoid',
+                                                  pageBreakInside: 'avoid',
+                                                  breakAfter: 'avoid',
+                                                  breakInside: 'avoid'
+                                                },
+                                                ...props
+                                              }, children),
+                                              h4: ({node, children, ...props}) => React.createElement('h4', {
+                                                style: {
+                                                  fontSize: '1.75rem',
+                                                  fontWeight: '600',
+                                                  marginTop: '2rem', // Increased
+                                                  marginBottom: '1.25rem', // Increased
+                                                  paddingTop: '0.5rem', // Added
+                                                  paddingBottom: '0.5rem', // Added
+                                                  color: '#1E65AD',
+                                                  textAlign: 'center',
+                                                  lineHeight: '1.5',
+                                                  pageBreakAfter: 'avoid',
+                                                  pageBreakInside: 'avoid',
+                                                  breakAfter: 'avoid',
+                                                  breakInside: 'avoid'
+                                                },
+                                                ...props
+                                              }, children),
+                                              h5: ({node, children, ...props}) => React.createElement('h5', {
+                                                style: {
+                                                  fontSize: '1.5rem',
+                                                  fontWeight: '600',
+                                                  marginTop: '1.75rem', // Increased
+                                                  marginBottom: '1rem', // Increased
+                                                  paddingTop: '0.5rem', // Added
+                                                  paddingBottom: '0.5rem', // Added
+                                                  color: '#1E65AD',
+                                                  textAlign: 'center',
+                                                  lineHeight: '1.5',
+                                                  pageBreakAfter: 'avoid',
+                                                  pageBreakInside: 'avoid',
+                                                  breakAfter: 'avoid',
+                                                  breakInside: 'avoid'
+                                                },
+                                                ...props
+                                              }, children),
+                                              h6: ({node, children, ...props}) => React.createElement('h6', {
+                                                style: {
+                                                  fontSize: '1.25rem',
+                                                  fontWeight: '600',
+                                                  marginTop: '1.5rem', // Increased
+                                                  marginBottom: '0.875rem', // Increased
+                                                  paddingTop: '0.5rem', // Added
+                                                  paddingBottom: '0.5rem', // Added
+                                                  textAlign: 'center',
+                                                  color: '#1E65AD',
+                                                  lineHeight: '1.5',
+                                                  pageBreakAfter: 'avoid',
+                                                  pageBreakInside: 'avoid',
+                                                  breakAfter: 'avoid',
+                                                  breakInside: 'avoid'
+                                                },
+                                                ...props
+                                              }, children),
+                                              p: ({node, ...props}) => React.createElement('p', {
+                                                style: {
+                                                  marginBottom: '2rem', // Increased from 1.5rem for better break points
+                                                  marginTop: '0',
+                                                  lineHeight: '2.2', // Increased line height
+                                                  fontSize: '15px',
+                                                  color: '#2c3e50',
+                                                  padding: '0.75rem 0', // Increased padding for break zones
+                                                  maxWidth: '100%',
+                                                  pageBreakInside: 'avoid',
+                                                  breakInside: 'avoid',
+                                                  orphans: '4', // Increased to prevent single lines
+                                                  widows: '4' // Increased to prevent single lines
+                                                },
+                                                ...props
+                                              }),
+                                              ul: ({node, ...props}) => React.createElement('ul', {
+                                                style: {
+                                                  marginBottom: '2rem', // Increased
+                                                  marginTop: '0.5rem', // Added top margin
+                                                  paddingLeft: '2.5rem',
+                                                  paddingTop: '0.5rem', // Added padding
+                                                  paddingBottom: '0.5rem', // Added padding
+                                                  listStyleType: 'disc',
+                                                  textAlign: 'left',
+                                                  lineHeight: '2.1', // Increased
+                                                  pageBreakInside: 'avoid',
+                                                  breakInside: 'avoid'
+                                                },
+                                                ...props
+                                              }),
+                                              ol: ({node, ...props}) => React.createElement('ol', {
+                                                style: {
+                                                  marginBottom: '2rem', // Increased
+                                                  marginTop: '0.5rem', // Added top margin
+                                                  paddingLeft: '2.5rem',
+                                                  paddingTop: '0.5rem', // Added padding
+                                                  paddingBottom: '0.5rem', // Added padding
+                                                  listStyleType: 'decimal',
+                                                  textAlign: 'left',
+                                                  lineHeight: '2.1', // Increased
+                                                  pageBreakInside: 'avoid',
+                                                  breakInside: 'avoid'
+                                                },
+                                                ...props
+                                              }),
+                                              li: ({node, ...props}) => React.createElement('li', {
+                                                style: {
+                                                  marginBottom: '1rem', // Increased from 0.75rem
+                                                  marginTop: '0.25rem', // Added top margin
+                                                  lineHeight: '2.1', // Increased
+                                                  color: '#2c3e50',
+                                                  textAlign: 'left',
+                                                  fontSize: '18px',
+                                                  paddingLeft: '0.5rem',
+                                                  paddingTop: '0.25rem', // Added padding
+                                                  paddingBottom: '0.25rem', // Added padding
+                                                  pageBreakInside: 'avoid',
+                                                  breakInside: 'avoid'
+                                                },
+                                                ...props
+                                              }),
+                                              strong: ({node, ...props}) => React.createElement('strong', {
+                                                style: {
+                                                  fontWeight: '700',
+                                                  color: '#1E65AD',
+                                                  letterSpacing: '0.01em'
+                                                },
+                                                ...props
+                                              }),
+                                              em: ({node, ...props}) => React.createElement('em', {
+                                                style: {
+                                                  fontStyle: 'italic',
+                                                  color: '#2c3e50',
+                                                  fontWeight: '500'
+                                                },
+                                                ...props
+                                              }),
+                                              code: ({node, ...props}) => React.createElement('code', {
+                                                style: {
+                                                  backgroundColor: '#f1f3f5',
+                                                  padding: '0.3rem 0.6rem',
+                                                  borderRadius: '0.375rem',
+                                                  fontFamily: '"Fira Code", "Courier New", monospace',
+                                                  fontSize: '0.9em',
+                                                  color: '#d63384',
+                                                  border: '1px solid #dee2e6',
+                                                  fontWeight: '500',
+                                                  letterSpacing: '0'
+                                                },
+                                                ...props
+                                              }),
+                                              pre: ({node, ...props}) => React.createElement('pre', {
+                                                style: {
+                                                  backgroundColor: '#f8f9fa',
+                                                  padding: '1.5rem', // Increased
+                                                  borderRadius: '0.625rem',
+                                                  overflowX: 'auto',
+                                                  marginTop: '0.5rem', // Added top margin
+                                                  marginBottom: '2rem', // Increased
+                                                  border: '1px solid #e9ecef',
+                                                  fontSize: '0.9em',
+                                                  lineHeight: '1.9', // Increased
+                                                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                                                  pageBreakInside: 'avoid',
+                                                  breakInside: 'avoid'
+                                                },
+                                                ...props
+                                              }),
+                                              blockquote: ({node, ...props}) => React.createElement('blockquote', {
+                                                style: {
+                                                  borderLeft: '5px solid #1E65AD',
+                                                  paddingLeft: '1.5rem',
+                                                  marginLeft: '0',
+                                                  marginTop: '0.5rem', // Added top margin
+                                                  marginBottom: '2rem', // Increased
+                                                  fontStyle: 'italic',
+                                                  color: '#495057',
+                                                  backgroundColor: '#f8f9fa',
+                                                  padding: '1.5rem 1.5rem 1.5rem 1.75rem', // Increased padding
+                                                  borderRadius: '0.5rem',
+                                                  borderTop: '1px solid #e9ecef',
+                                                  borderRight: '1px solid #e9ecef',
+                                                  borderBottom: '1px solid #e9ecef',
+                                                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                                                  pageBreakInside: 'avoid',
+                                                  breakInside: 'avoid'
+                                                },
+                                                ...props
+                                              }),
+                                              hr: ({node, ...props}) => React.createElement('hr', {
+                                                style: {
+                                                  border: 'none',
+                                                  borderTop: '2px solid #E3F2FD',
+                                                  margin: '3rem 0', // Increased margins for better break points
+                                                  padding: '1rem 0', // Added padding
+                                                  borderRadius: '1px',
+                                                  height: '2px',
+                                                  background: 'linear-gradient(90deg, transparent, #E3F2FD, transparent)'
+                                                },
+                                                ...props
+                                              }),
+                                              a: ({node, children, ...props}) => React.createElement('a', {
+                                                style: {
+                                                  color: '#1E65AD',
+                                                  textDecoration: 'underline',
+                                                  textDecorationColor: '#CF9B63',
+                                                  textUnderlineOffset: '3px',
+                                                  fontWeight: '500',
+                                                  transition: 'color 0.2s ease'
+                                                },
+                                                ...props
+                                              }, children || props.href || ''),
+                                              table: ({node, ...props}) => React.createElement('table', {
+                                                style: {
+                                                  width: '100%',
+                                                  borderCollapse: 'collapse',
+                                                  marginBottom: '1.5rem',
+                                                  fontSize: '16px',
+                                                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                                                  borderRadius: '0.5rem',
+                                                  overflow: 'hidden',
+                                                  pageBreakInside: 'avoid',
+                                                  breakInside: 'avoid'
+                                                },
+                                                ...props
+                                              }),
+                                              th: ({node, ...props}) => React.createElement('th', {
+                                                style: {
+                                                  backgroundColor: '#1E65AD',
+                                                  color: '#ffffff',
+                                                  padding: '1rem',
+                                                  textAlign: 'left',
+                                                  fontWeight: '600',
+                                                  border: '1px solid #1a5a9a',
+                                                  fontSize: '0.95em',
+                                                  letterSpacing: '0.02em'
+                                                },
+                                                ...props
+                                              }),
+                                              td: ({node, ...props}) => React.createElement('td', {
+                                                style: {
+                                                  padding: '0.875rem 1rem',
+                                                  border: '1px solid #e9ecef',
+                                                  backgroundColor: '#ffffff',
+                                                  fontSize: '0.95em'
+                                                },
+                                                ...props
+                                              }),
+                                              img: ({node, ...props}) => React.createElement('img', {
+                                                alt: props.alt || 'Markdown content image',
+                                                style: {
+                                                  maxWidth: '100%',
+                                                  height: 'auto',
+                                                  borderRadius: '0.625rem',
+                                                  margin: '2rem 0',
+                                                  boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                                                  display: 'block',
+                                                  marginLeft: 'auto',
+                                                  marginRight: 'auto'
+                                                },
+                                                ...props
+                                              })
+                                            }
+                                          }, finalMarkdownContent)
+                                        );
 
-                                      // Use html2canvas to capture the HTML as image (handles Unicode properly)
-                                      const canvas = await html2canvas(tempDiv, {
-                                        scale: 2,
-                                        useCORS: true,
-                                        logging: false,
-                                        backgroundColor: '#ffffff',
-                                        width: tempDiv.offsetWidth,
-                                        height: tempDiv.scrollHeight,
-                                        windowWidth: tempDiv.scrollWidth,
-                                        windowHeight: tempDiv.scrollHeight
+                                        // Wait for React to render and fonts to load
+                                        await new Promise(resolve => setTimeout(resolve, 800));
+                                        
+                                        // Force a reflow to ensure dimensions are calculated
+                                        void markdownContainer.offsetHeight;
+                                      } catch (renderError) {
+                                        console.error('Error rendering markdown:', renderError);
+                                        // Fallback: render as plain text with basic formatting
+                                        markdownContainer.innerHTML = finalMarkdownContent
+                                          .replace(/\n/g, '<br>')
+                                          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                          .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                                          .replace(/#{1,6}\s+(.*?)$/gm, (match, text) => {
+                                            const level = match.match(/^#+/)[0].length;
+                                            return `<h${level}>${text}</h${level}>`;
+                                          });
+                                        await new Promise(resolve => setTimeout(resolve, 300));
+                                        // Force a reflow
+                                        void markdownContainer.offsetHeight;
+                                      }
+
+                                      // Use html2canvas to capture the rendered markdown as image
+                                      if (!tempDiv || !tempDiv.parentNode) {
+                                        throw new Error('Temporary container was removed before rendering');
+                                      }
+                                      
+                                      // Ensure the container has content
+                                      const hasContent = markdownContainer.children.length > 0 || 
+                                                        markdownContainer.innerHTML.trim().length > 0 ||
+                                                        markdownContainer.textContent.trim().length > 0;
+                                      if (!hasContent) {
+                                        throw new Error('Markdown content was not rendered');
+                                      }
+                                      
+                                      // Verify dimensions before capturing
+                                      const containerWidth = tempDiv.offsetWidth || tempDiv.scrollWidth || a4WidthPx;
+                                      const containerHeight = tempDiv.offsetHeight || tempDiv.scrollHeight || 100;
+                                      
+                                      if (containerWidth === 0 || containerHeight === 0) {
+                                        console.error('Container dimensions:', {
+                                          offsetWidth: tempDiv.offsetWidth,
+                                          offsetHeight: tempDiv.offsetHeight,
+                                          scrollWidth: tempDiv.scrollWidth,
+                                          scrollHeight: tempDiv.scrollHeight,
+                                          clientWidth: tempDiv.clientWidth,
+                                          clientHeight: tempDiv.clientHeight
+                                        });
+                                        throw new Error(`Container has invalid dimensions: ${containerWidth}x${containerHeight}`);
+                                      }
+                                      
+                                      // Temporarily make element visible for html2canvas (it works better this way)
+                                      const originalLeft = tempDiv.style.left;
+                                      const originalTop = tempDiv.style.top;
+                                      const originalZIndex = tempDiv.style.zIndex;
+                                      tempDiv.style.left = '0';
+                                      tempDiv.style.top = '0';
+                                      tempDiv.style.zIndex = '-9999';
+                                      
+                                      // Wait a bit more to ensure everything is ready
+                                      await new Promise(resolve => setTimeout(resolve, 300));
+                                      
+                                      // Force another layout calculation
+                                      void tempDiv.offsetHeight;
+                                      
+                                      // Re-check dimensions after making visible
+                                      const finalWidth = tempDiv.offsetWidth || tempDiv.scrollWidth || containerWidth;
+                                      const finalHeight = tempDiv.offsetHeight || tempDiv.scrollHeight || containerHeight;
+                                      
+                                      if (finalWidth === 0 || finalHeight === 0) {
+                                        // Restore original position
+                                        tempDiv.style.left = originalLeft;
+                                        tempDiv.style.top = originalTop;
+                                        tempDiv.style.zIndex = originalZIndex;
+                                        throw new Error(`Container still has invalid dimensions after making visible: ${finalWidth}x${finalHeight}`);
+                                      }
+                                      
+                                      // Replace gradients with solid colors to avoid createPattern issues
+                                      const originalHrStyles = [];
+                                      const hrElements = tempDiv.querySelectorAll('hr');
+                                      hrElements.forEach((hr, index) => {
+                                        originalHrStyles[index] = hr.style.background;
+                                        hr.style.background = '#E3F2FD';
+                                        hr.style.borderTop = '2px solid #E3F2FD';
                                       });
+                                      
+                                      let canvas;
+                                      try {
+                                        canvas = await html2canvas(tempDiv, {
+                                          scale: 2,
+                                          useCORS: true,
+                                          logging: false,
+                                          backgroundColor: '#ffffff',
+                                          allowTaint: true,
+                                          removeContainer: false,
+                                          imageTimeout: 15000,
+                                          ignoreElements: (element) => {
+                                            // Ignore elements that might cause issues
+                                            return element.style && element.style.display === 'none';
+                                          },
+                                          onclone: (clonedDoc) => {
+                                            // Ensure fonts are loaded in the cloned document
+                                            const clonedDiv = clonedDoc.querySelector('.markdown-content');
+                                            if (clonedDiv) {
+                                              clonedDiv.style.fontFamily = currentLang === 'en' 
+                                                ? 'Roboto, Arial, sans-serif' 
+                                                : 'Noto Sans Devanagari, Noto Sans Gujarati, Arial Unicode MS, sans-serif';
+                                            }
+                                            // Ensure cloned element has proper dimensions and visibility
+                                            const clonedTempDiv = clonedDoc.body.querySelector('[style*="z-index: -9999"]') || 
+                                                                  clonedDoc.body.lastElementChild;
+                                            if (clonedTempDiv) {
+                                              clonedTempDiv.style.width = `${finalWidth}px`;
+                                              clonedTempDiv.style.height = 'auto';
+                                              clonedTempDiv.style.minHeight = `${Math.max(finalHeight, 100)}px`;
+                                              clonedTempDiv.style.position = 'absolute';
+                                              clonedTempDiv.style.left = '0';
+                                              clonedTempDiv.style.top = '0';
+                                              clonedTempDiv.style.visibility = 'visible';
+                                              clonedTempDiv.style.display = 'block';
+                                              clonedTempDiv.style.boxSizing = 'border-box';
+                                            }
+                                            // Replace gradients in cloned document too
+                                            const clonedHrs = clonedDoc.querySelectorAll('hr');
+                                            clonedHrs.forEach(hr => {
+                                              hr.style.background = '#E3F2FD';
+                                              hr.style.borderTop = '2px solid #E3F2FD';
+                                            });
+                                          }
+                                        });
+                                      } catch (canvasError) {
+                                        // Restore original styles before throwing
+                                        hrElements.forEach((hr, index) => {
+                                          if (originalHrStyles[index]) {
+                                            hr.style.background = originalHrStyles[index];
+                                          }
+                                        });
+                                        // Restore original position
+                                        tempDiv.style.left = originalLeft;
+                                        tempDiv.style.top = originalTop;
+                                        tempDiv.style.zIndex = originalZIndex;
+                                        throw canvasError;
+                                      } finally {
+                                        // Restore original hr styles
+                                        hrElements.forEach((hr, index) => {
+                                          if (originalHrStyles[index]) {
+                                            hr.style.background = originalHrStyles[index];
+                                          }
+                                        });
+                                        // Restore original position
+                                        tempDiv.style.left = originalLeft;
+                                        tempDiv.style.top = originalTop;
+                                        tempDiv.style.zIndex = originalZIndex;
+                                      }
+                                      
+                                      if (!canvas) {
+                                        throw new Error('html2canvas returned null');
+                                      }
+                                      
+                                      if (canvas.width === 0 || canvas.height === 0) {
+                                        throw new Error(`Canvas has invalid dimensions: ${canvas.width}x${canvas.height}. Container was: ${finalWidth}x${finalHeight}`);
+                                      }
 
-                                      // Remove temporary element
-                                      document.body.removeChild(tempDiv);
+                                      // Clean up: unmount React root and remove temporary element
+                                      try {
+                                        if (root) {
+                                          root.unmount();
+                                        }
+                                      } catch (unmountError) {
+                                        console.warn('Error unmounting React root:', unmountError);
+                                      }
+                                      if (tempDiv && tempDiv.parentNode) {
+                                        document.body.removeChild(tempDiv);
+                                      }
 
                                       // Create PDF and add the canvas image with proper page breaks
                                       const pdf = new jsPDF('p', 'mm', 'a4');
                                       const pageWidth = pdf.internal.pageSize.getWidth();
                                       const pageHeight = pdf.internal.pageSize.getHeight();
                                       const margin = 20; // mm
+                                      const footerHeight = 25; // Space reserved for footer
+                                      const contentHeight = pageHeight - footerHeight; // Available content height per page
                                       const imgWidth = pageWidth;
                                       const imgHeight = (canvas.height * pageWidth) / canvas.width;
                                       
@@ -754,28 +1257,55 @@ export default function ViewPDF() {
                                         }
                                       };
                                       
-                                      let heightLeft = imgHeight;
-                                      let position = 0;
+                                      // Improved page splitting with better spacing
+                                      let sourceY = 0; // Position in the source image
                                       let pageNum = 1;
+                                      const minContentHeight = 30; // Minimum content height before starting new page (mm)
 
-                                      // Add first page
-                                      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
-                                      heightLeft -= pageHeight;
-                                      pageNum++;
-
-                                      // Add additional pages if needed
-                                      while (heightLeft >= 0) {
-                                        position = heightLeft - imgHeight;
-                                        pdf.addPage();
-                                        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
-                                        heightLeft -= pageHeight;
+                                      while (sourceY < imgHeight) {
+                                        if (pageNum > 1) {
+                                          pdf.addPage();
+                                        }
+                                        
+                                        // Calculate how much content fits on this page
+                                        const remainingOnPage = contentHeight;
+                                        const remainingInImage = imgHeight - sourceY;
+                                        const contentToShow = Math.min(remainingOnPage, remainingInImage);
+                                        
+                                        // Calculate source position (in pixels)
+                                        const sourceYpx = (sourceY / imgHeight) * canvas.height;
+                                        const sourceHeightPx = (contentToShow / imgHeight) * canvas.height;
+                                        
+                                        // Create a temporary canvas for this page
+                                        const pageCanvas = document.createElement('canvas');
+                                        pageCanvas.width = canvas.width;
+                                        pageCanvas.height = sourceHeightPx;
+                                        const pageCtx = pageCanvas.getContext('2d');
+                                        
+                                        // Draw the portion of the image for this page
+                                        pageCtx.drawImage(
+                                          canvas,
+                                          0, sourceYpx, canvas.width, sourceHeightPx, // Source
+                                          0, 0, canvas.width, sourceHeightPx // Destination
+                                        );
+                                        
+                                        // Add to PDF
+                                        const pageImgHeight = (pageCanvas.height * pageWidth) / pageCanvas.width;
+                                        pdf.addImage(
+                                          pageCanvas.toDataURL('image/png'),
+                                          'PNG',
+                                          0,
+                                          0,
+                                          imgWidth,
+                                          pageImgHeight
+                                        );
+                                        
+                                        // Add footer to this page
+                                        addFooter(pdf, pageNum, judgmentLink);
+                                        
+                                        sourceY += contentToShow;
                                         pageNum++;
                                       }
-
-                                      // Add footer only on the last page
-                                      const lastPageNum = pdf.internal.getNumberOfPages();
-                                      pdf.setPage(lastPageNum);
-                                      addFooter(pdf, lastPageNum, judgmentLink);
 
                                       // Download PDF with language name in filename
                                       const baseFileName = (judgmentInfo?.title || 'judgment').replace(/[^a-z0-9]/gi, '_');
@@ -786,13 +1316,32 @@ export default function ViewPDF() {
                                       
                                       } catch (error) {
                                         console.error('Error downloading translated PDF:', error);
-                                      // Remove loading message if it exists
-                                      const loadingMsg = document.getElementById('pdf-translation-loading');
-                                      if (loadingMsg) {
-                                        document.body.removeChild(loadingMsg);
+                                        console.error('Error details:', {
+                                          message: error.message,
+                                          stack: error.stack,
+                                          name: error.name
+                                        });
+                                        
+                                        // Clean up any temporary elements
+                                        try {
+                                          const tempDivs = document.querySelectorAll('[style*="left: -9999px"]');
+                                          tempDivs.forEach(div => {
+                                            if (div.parentNode) {
+                                              div.parentNode.removeChild(div);
+                                            }
+                                          });
+                                        } catch (cleanupError) {
+                                          console.warn('Error during cleanup:', cleanupError);
+                                        }
+                                        
+                                        // Remove loading message if it exists
+                                        const loadingMsg = document.getElementById('pdf-translation-loading');
+                                        if (loadingMsg && loadingMsg.parentNode) {
+                                          document.body.removeChild(loadingMsg);
+                                        }
+                                        
+                                        alert(`Failed to download translated PDF: ${error.message || 'Unknown error'}. Please try again.`);
                                       }
-                                      alert('Failed to download translated PDF. Please try again.');
-                                    }
                                     setShowDownloadDropdown(false);
                                   }}
                                   className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm border-t border-gray-200"
