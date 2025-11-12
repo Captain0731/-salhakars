@@ -241,11 +241,13 @@ export default function LegalJudgments() {
           }
         } else {
           // High Court: Both cursor_decision_date and cursor_id needed
-          if (currentNextCursor.decision_date) {
+          // Only add cursor if both are present to avoid 400 errors
+          if (currentNextCursor.decision_date && currentNextCursor.id) {
             params.cursor_decision_date = currentNextCursor.decision_date;
-          }
-          if (currentNextCursor.id) {
             params.cursor_id = currentNextCursor.id;
+          } else {
+            // If cursor is incomplete, don't use it (will fetch from beginning)
+            console.warn('Incomplete cursor data, fetching from beginning');
           }
         }
       }
@@ -343,6 +345,8 @@ export default function LegalJudgments() {
         errorMessage = "Authentication required. Please log in to access judgments.";
       } else if (error.message.includes('403') || error.message.includes('Forbidden')) {
         errorMessage = "Access denied. Please check your permissions.";
+      } else if (error.message.includes('400') || error.message.includes('Bad Request')) {
+        errorMessage = error.message || "Invalid request parameters. Please check your filters and try again.";
       } else if (error.message.includes('500') || error.message.includes('Internal Server')) {
         errorMessage = "Server error. Please try again later.";
       } else if (error.message.includes('Network') || error.message.includes('fetch') || error.message.includes('Failed to fetch')) {

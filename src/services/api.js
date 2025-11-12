@@ -1,5 +1,5 @@
 // API Service for Legal Platform - Complete Integration
-const API_BASE_URL = 'https://unquestioned-gunnar-medially.ngrok-free.dev';
+const API_BASE_URL = 'https://operantly-unchattering-ernie.ngrok-free.dev';
 
 // Fallback URLs in case the primary one fails
 const FALLBACK_URLS = [
@@ -402,38 +402,40 @@ class ApiService {
   async getJudgements(params = {}) {
     console.log('🌐 getJudgements called with params:', params);
     
+    // Build URL outside try block so it's accessible in catch block
+    const queryParams = new URLSearchParams();
+    
+    // Add pagination parameters
+    if (params.limit) queryParams.append('limit', params.limit);
+    if (params.offset) queryParams.append('offset', params.offset);
+    
+    // Add cursor-based pagination parameters for High Court
+    if (params.cursor_decision_date) queryParams.append('cursor_decision_date', params.cursor_decision_date);
+    if (params.cursor_id) queryParams.append('cursor_id', params.cursor_id);
+    
+    // Add search and filter parameters
+    if (params.search) queryParams.append('search', params.search);
+    if (params.title) queryParams.append('title', params.title);
+    if (params.cnr) queryParams.append('cnr', params.cnr);
+    // Support both highCourt (for backward compatibility) and court_name (preferred)
+    if (params.court_name) {
+      queryParams.append('court_name', params.court_name);
+    } else if (params.highCourt) {
+      queryParams.append('court_name', params.highCourt);
+    }
+    if (params.judge) queryParams.append('judge', params.judge);
+    if (params.decisionDateFrom || params.decision_date_from) {
+      // Keep date in YYYY-MM-DD format as per API documentation
+      const dateValue = params.decisionDateFrom || params.decision_date_from;
+      queryParams.append('decision_date_from', dateValue);
+    }
+    
+    // Note: Using /api/judgements endpoint for High Court judgments as per API documentation
+    const url = `${this.baseURL}/api/judgements?${queryParams.toString()}`;
+    console.log('🌐 API URL:', url);
+    
     try {
       console.log('🌐 Making real API call for judgments');
-      const queryParams = new URLSearchParams();
-      
-      // Add pagination parameters
-      if (params.limit) queryParams.append('limit', params.limit);
-      if (params.offset) queryParams.append('offset', params.offset);
-      
-      // Add cursor-based pagination parameters for High Court
-      if (params.cursor_decision_date) queryParams.append('cursor_decision_date', params.cursor_decision_date);
-      if (params.cursor_id) queryParams.append('cursor_id', params.cursor_id);
-      
-      // Add search and filter parameters
-      if (params.search) queryParams.append('search', params.search);
-      if (params.title) queryParams.append('title', params.title);
-      if (params.cnr) queryParams.append('cnr', params.cnr);
-      // Support both highCourt (for backward compatibility) and court_name (preferred)
-      if (params.court_name) {
-        queryParams.append('court_name', params.court_name);
-      } else if (params.highCourt) {
-        queryParams.append('court_name', params.highCourt);
-      }
-      if (params.judge) queryParams.append('judge', params.judge);
-      if (params.decisionDateFrom || params.decision_date_from) {
-        // Keep date in YYYY-MM-DD format as per API documentation
-        const dateValue = params.decisionDateFrom || params.decision_date_from;
-        queryParams.append('decision_date_from', dateValue);
-      }
-      
-      // Note: Using /api/judgements endpoint for High Court judgments as per API documentation
-      const url = `${this.baseURL}/api/judgements?${queryParams.toString()}`;
-      console.log('🌐 API URL:', url);
       
       // Check authentication token
       const token = localStorage.getItem('access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
@@ -452,15 +454,45 @@ class ApiService {
       
       const response = await fetch(url, {
         method: 'GET',
-        headers: headers
+        headers: headers,
+        mode: 'cors', // Explicitly set CORS mode
+        credentials: 'omit' // Don't send credentials for public endpoints
       });
       
       console.log('🌐 Response status:', response.status);
       console.log('🌐 Response headers:', Object.fromEntries(response.headers.entries()));
       
+      // Check if response is HTML (ngrok warning page) instead of JSON
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('text/html')) {
+        const htmlText = await response.text();
+        console.error('🌐 Received HTML instead of JSON (likely ngrok warning):', htmlText.substring(0, 200));
+        throw new Error('API returned HTML page instead of JSON. This might be an ngrok warning page. Please check the API URL and ngrok-skip-browser-warning header.');
+      }
+      
       if (!response.ok) {
         const errorText = await response.text();
         console.error('🌐 API Error Response:', errorText);
+        console.error('🌐 Request URL:', url);
+        console.error('🌐 Request params:', params);
+        
+        // Provide specific error message for 400 Bad Request
+        if (response.status === 400) {
+          let errorMessage = 'Bad Request (400): Invalid parameters sent to API.';
+          try {
+            const errorJson = JSON.parse(errorText);
+            if (errorJson.detail) {
+              errorMessage = `Bad Request: ${typeof errorJson.detail === 'string' ? errorJson.detail : JSON.stringify(errorJson.detail)}`;
+            } else if (errorJson.message) {
+              errorMessage = `Bad Request: ${errorJson.message}`;
+            }
+          } catch (e) {
+            // If not JSON, use the text as is
+            errorMessage = `Bad Request: ${errorText.substring(0, 200)}`;
+          }
+          throw new Error(errorMessage);
+        }
+        
         throw new Error(`API request failed: ${response.status} ${response.statusText} - ${errorText}`);
       }
       
@@ -483,8 +515,20 @@ class ApiService {
       console.error('🌐 Error details:', {
         message: error.message,
         stack: error.stack,
-        name: error.name
+        name: error.name,
+        url: url
       });
+      
+      // Provide more specific error messages
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        // Network/CORS error
+        console.error('🌐 Network/CORS Error detected. Possible causes:');
+        console.error('  1. CORS not enabled on API server');
+        console.error('  2. ngrok blocking the request');
+        console.error('  3. Network connectivity issue');
+        console.error('  4. API URL incorrect:', url);
+        throw new Error(`Network error: Unable to connect to API. Please check: 1) API URL is correct, 2) CORS is enabled, 3) ngrok-skip-browser-warning header is set. URL: ${url}`);
+      }
       
       // Throw error instead of returning mock data
       throw error;
@@ -650,32 +694,34 @@ class ApiService {
   async getSupremeCourtJudgements(params = {}) {
     console.log('🌐 getSupremeCourtJudgements called with params:', params);
     
+    // Build URL outside try block so it's accessible in catch block
+    const queryParams = new URLSearchParams();
+    
+    // Add pagination parameters
+    if (params.limit) queryParams.append('limit', params.limit);
+    if (params.offset) queryParams.append('offset', params.offset);
+    
+    // Add cursor-based pagination for Supreme Court
+    if (params.cursor_id) queryParams.append('cursor_id', params.cursor_id);
+    
+    // Add search and filter parameters
+    if (params.search) queryParams.append('search', params.search);
+    if (params.title) queryParams.append('title', params.title);
+    if (params.cnr) queryParams.append('cnr', params.cnr);
+    if (params.judge) queryParams.append('judge', params.judge);
+    if (params.petitioner) queryParams.append('petitioner', params.petitioner);
+    if (params.respondent) queryParams.append('respondent', params.respondent);
+    if (params.decisionDateFrom || params.decision_date_from) {
+      // Keep date in YYYY-MM-DD format as per API documentation
+      const dateValue = params.decisionDateFrom || params.decision_date_from;
+      queryParams.append('decision_date_from', dateValue);
+    }
+    
+    const url = `${this.baseURL}/api/supreme-court-judgements?${queryParams.toString()}`;
+    console.log('🌐 Supreme Court API URL:', url);
+    
     try {
       console.log('🌐 Making real API call for Supreme Court judgments');
-      const queryParams = new URLSearchParams();
-      
-      // Add pagination parameters
-      if (params.limit) queryParams.append('limit', params.limit);
-      if (params.offset) queryParams.append('offset', params.offset);
-      
-      // Add cursor-based pagination for Supreme Court
-      if (params.cursor_id) queryParams.append('cursor_id', params.cursor_id);
-      
-      // Add search and filter parameters
-      if (params.search) queryParams.append('search', params.search);
-      if (params.title) queryParams.append('title', params.title);
-      if (params.cnr) queryParams.append('cnr', params.cnr);
-      if (params.judge) queryParams.append('judge', params.judge);
-      if (params.petitioner) queryParams.append('petitioner', params.petitioner);
-      if (params.respondent) queryParams.append('respondent', params.respondent);
-      if (params.decisionDateFrom || params.decision_date_from) {
-        // Keep date in YYYY-MM-DD format as per API documentation
-        const dateValue = params.decisionDateFrom || params.decision_date_from;
-        queryParams.append('decision_date_from', dateValue);
-      }
-      
-      const url = `${this.baseURL}/api/supreme-court-judgements?${queryParams.toString()}`;
-      console.log('🌐 Supreme Court API URL:', url);
       
       // Check authentication token
       const token = localStorage.getItem('access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
@@ -694,15 +740,45 @@ class ApiService {
       
       const response = await fetch(url, {
         method: 'GET',
-        headers: headers
+        headers: headers,
+        mode: 'cors', // Explicitly set CORS mode
+        credentials: 'omit' // Don't send credentials for public endpoints
       });
       
       console.log('🌐 Response status:', response.status);
       console.log('🌐 Response headers:', Object.fromEntries(response.headers.entries()));
       
+      // Check if response is HTML (ngrok warning page) instead of JSON
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('text/html')) {
+        const htmlText = await response.text();
+        console.error('🌐 Received HTML instead of JSON (likely ngrok warning):', htmlText.substring(0, 200));
+        throw new Error('API returned HTML page instead of JSON. This might be an ngrok warning page. Please check the API URL and ngrok-skip-browser-warning header.');
+      }
+      
       if (!response.ok) {
         const errorText = await response.text();
         console.error('🌐 Supreme Court API Error Response:', errorText);
+        console.error('🌐 Request URL:', url);
+        console.error('🌐 Request params:', params);
+        
+        // Provide specific error message for 400 Bad Request
+        if (response.status === 400) {
+          let errorMessage = 'Bad Request (400): Invalid parameters sent to API.';
+          try {
+            const errorJson = JSON.parse(errorText);
+            if (errorJson.detail) {
+              errorMessage = `Bad Request: ${typeof errorJson.detail === 'string' ? errorJson.detail : JSON.stringify(errorJson.detail)}`;
+            } else if (errorJson.message) {
+              errorMessage = `Bad Request: ${errorJson.message}`;
+            }
+          } catch (e) {
+            // If not JSON, use the text as is
+            errorMessage = `Bad Request: ${errorText.substring(0, 200)}`;
+          }
+          throw new Error(errorMessage);
+        }
+        
         throw new Error(`Supreme Court API request failed: ${response.status} ${response.statusText} - ${errorText}`);
       }
       
@@ -725,8 +801,20 @@ class ApiService {
       console.error('🌐 Error details:', {
         message: error.message,
         stack: error.stack,
-        name: error.name
+        name: error.name,
+        url: url
       });
+      
+      // Provide more specific error messages
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        // Network/CORS error
+        console.error('🌐 Network/CORS Error detected. Possible causes:');
+        console.error('  1. CORS not enabled on API server');
+        console.error('  2. ngrok blocking the request');
+        console.error('  3. Network connectivity issue');
+        console.error('  4. API URL incorrect:', url);
+        throw new Error(`Network error: Unable to connect to API. Please check: 1) API URL is correct, 2) CORS is enabled, 3) ngrok-skip-browser-warning header is set. URL: ${url}`);
+      }
       
       // Throw error instead of returning mock data
       throw error;
